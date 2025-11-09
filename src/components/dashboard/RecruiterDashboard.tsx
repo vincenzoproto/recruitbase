@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, LogOut, Gift, UserCheck } from "lucide-react";
+import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
@@ -15,12 +15,13 @@ import TRSDashboardCard from "../trm/TRSDashboardCard";
 import KanbanBoard from "../trm/KanbanBoard";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
-import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
 import { LiveMetrics } from "@/components/premium/LiveMetrics";
 import { hapticFeedback } from "@/lib/haptics";
+import { KPIWidget } from "./KPIWidget";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -33,6 +34,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [showCreateJob, setShowCreateJob] = useState(false);
   const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Pipeline, 2: Offerte, 3: Insights
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [kpiData, setKpiData] = useState({
+    avgTRS: 0,
+    activeCandidates: 0,
+    followUpsSent: 0,
+  });
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
@@ -43,12 +49,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   useEffect(() => {
     loadJobOffers();
+    loadKPIData();
   }, []);
 
   useEffect(() => {
     // Mostra l'onboarding solo dopo che il profilo è caricato e solo se non è stato completato
     if (profile?.id && profile?.role === "recruiter") {
-      const onboardingCompleted = localStorage.getItem("onboarding-completed");
+      const onboardingCompleted = localStorage.getItem("rb_onboarding_completed");
       if (!onboardingCompleted) {
         // Ritarda di 500ms per permettere il caricamento completo della dashboard
         setTimeout(() => {
@@ -57,6 +64,38 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       }
     }
   }, [profile]);
+
+  const loadKPIData = async () => {
+    try {
+      // Carica TRS medio
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("talent_relationship_score")
+        .eq("role", "candidate")
+        .not("talent_relationship_score", "is", null);
+
+      const avgTRS = profiles && profiles.length > 0
+        ? Math.round(profiles.reduce((acc, p) => acc + (p.talent_relationship_score || 0), 0) / profiles.length)
+        : 0;
+
+      // Carica candidati attivi
+      const { count: activeCandidates } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "candidate");
+
+      // Simula follow-up inviati (in futuro sostituire con dati reali)
+      const followUpsSent = Math.floor(Math.random() * 50) + 20;
+
+      setKpiData({
+        avgTRS,
+        activeCandidates: activeCandidates || 0,
+        followUpsSent,
+      });
+    } catch (error) {
+      console.error("Error loading KPI data:", error);
+    }
+  };
 
 
   const loadJobOffers = async () => {
@@ -83,7 +122,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem("onboarding-completed", "true");
+    localStorage.setItem("rb_onboarding_completed", "true");
     setShowOnboarding(false);
   };
 
@@ -113,7 +152,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
+      <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />

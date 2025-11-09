@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Briefcase, Users, Target, Zap, Activity, MessageCircle, TrendingUp, ArrowRight } from "lucide-react";
+import { Briefcase, Users, Target, Zap, Activity, ArrowRight } from "lucide-react";
+import { TRSInfoPopup } from "@/components/premium/TRSInfoPopup";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useTranslation, Language } from "@/lib/i18n";
 
 const Index = () => {
   const navigate = useNavigate();
   const [showTRSDialog, setShowTRSDialog] = useState(false);
+  const [language, setLanguage] = useState<Language>("it");
+  const { t } = useTranslation(language);
 
   useEffect(() => {
     let mounted = true;
@@ -36,9 +40,12 @@ const Index = () => {
             <Briefcase className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
           </div>
-          <Button onClick={() => navigate("/auth")} variant="outline">
-            Accedi / Registrati
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSelector currentLang={language} onLanguageChange={setLanguage} />
+            <Button onClick={() => navigate("/auth")} variant="outline">
+              {language === "it" ? "Accedi / Registrati" : "Sign In / Sign Up"}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -58,14 +65,14 @@ const Index = () => {
             {/* Main Headline */}
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight">
               Recruit Base TRM
-              <br />
-              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                Misura la qualità delle relazioni di talento.
-              </span>
             </h1>
             
             {/* Subheadline */}
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-primary font-semibold">
+              {t("hero.title")}
+            </p>
+            
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Algoritmo proprietario <span className="font-semibold text-foreground">Talent Relationship Score™</span> per costruire 
               <span className="font-semibold text-foreground"> relazioni durature</span> con i migliori candidati.
             </p>
@@ -77,15 +84,16 @@ const Index = () => {
                 className="w-full h-12 font-bold"
                 onClick={() => navigate("/auth")}
               >
-                Inizia Gratis
+                {language === "it" ? "Inizia Gratis" : "Start Free"}
               </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="w-full h-12"
+                className="w-full h-12 gap-2"
                 onClick={() => setShowTRSDialog(true)}
               >
-                Scopri come funziona
+                {t("hero.cta")}
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
 
@@ -196,102 +204,16 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t bg-card">
-        <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 Recruit Base. Tutti i diritti riservati.</p>
-          <p className="mt-2 text-xs italic">Talent Relationship Score™ – Proprietary Algorithm</p>
+        <div className="container mx-auto px-4 py-8 text-center space-y-2">
+          <p className="text-sm text-muted-foreground">© 2025 Recruit Base. {language === "it" ? "Tutti i diritti riservati" : "All rights reserved"}.</p>
+          <p className="text-xs text-muted-foreground/60 italic font-light">
+            {t("footer")}
+          </p>
         </div>
       </footer>
 
-      {/* TRS Explanation Dialog */}
-      <Dialog open={showTRSDialog} onOpenChange={setShowTRSDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl md:text-3xl font-bold text-center mb-4">
-              Come funziona il Talent Relationship Score™
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-8 py-6">
-            {/* Feature 1 */}
-            <div className="flex gap-6 items-start animate-fade-in">
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/10 flex items-center justify-center">
-                  <MessageCircle className="h-8 w-8 text-blue-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold mb-2">1️⃣ Interazione Reale</h4>
-                <p className="text-muted-foreground leading-relaxed">
-                  Analizza la qualità dei tuoi messaggi e risposte. L'algoritmo valuta empatia, 
-                  frequenza di contatto e la profondità delle conversazioni per determinare la 
-                  forza della relazione.
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="flex gap-6 items-start animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/10 flex items-center justify-center">
-                  <Activity className="h-8 w-8 text-green-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold mb-2">2️⃣ Engagement Continuo</h4>
-                <p className="text-muted-foreground leading-relaxed">
-                  Misura la costanza e la profondità dei contatti nel tempo. Il TRS™ tiene traccia 
-                  di ogni interazione e nota le attività regolari che dimostrano un genuino interesse reciproco.
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="flex gap-6 items-start animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/10 flex items-center justify-center">
-                  <TrendingUp className="h-8 w-8 text-purple-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold mb-2">3️⃣ Predizione Relazionale</h4>
-                <p className="text-muted-foreground leading-relaxed">
-                  Ti segnala i talenti più pronti a collaborare. Il sistema proprietario predice quali 
-                  candidati hanno maggiore probabilità di rispondere positivamente e di essere interessati 
-                  a nuove opportunità.
-                </p>
-              </div>
-            </div>
-
-            {/* Proprietary Badge */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border border-primary/20">
-              <p className="text-center font-semibold text-foreground mb-2">
-                🔒 Talent Relationship Score™ – Proprietary Metric
-              </p>
-              <p className="text-center text-sm text-muted-foreground italic">
-                Algoritmo esclusivo di Recruit Base
-              </p>
-            </div>
-
-            {/* CTA */}
-            <div className="text-center pt-4 space-y-4">
-              <p className="text-lg font-semibold text-foreground">
-                Scopri il potere del tuo network di talenti.
-              </p>
-              <Button 
-                size="lg" 
-                className="h-12 px-8 font-bold"
-                onClick={() => {
-                  setShowTRSDialog(false);
-                  navigate("/auth");
-                }}
-              >
-                Accedi a Recruit Base TRM
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* TRS Info Popup */}
+      <TRSInfoPopup open={showTRSDialog} onOpenChange={setShowTRSDialog} />
     </div>
   );
 };

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthCache } from "@/hooks/useAuthCache";
 import { toast } from "sonner";
-import SplashScreen from "@/components/SplashScreen";
+import { SplashScreen } from "@/components/splash/SplashScreen";
 import RoleSetup from "@/components/dashboard/RoleSetup";
-import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Lazy load dashboard components
@@ -213,18 +213,18 @@ const Dashboard = () => {
     <>
       {showSplash && (
         <SplashScreen 
-          userName={profile.full_name} 
           onComplete={() => setShowSplash(false)} 
         />
       )}
       
       {!showSplash && (
         <>
-          <OnboardingDialog
+          <OnboardingFlow
             open={showOnboarding}
-            userId={profile.id}
-            initialRole={profile.role}
-            onComplete={handleOnboardingComplete}
+            onComplete={() => {
+              setShowOnboarding(false);
+              localStorage.setItem("rb_onboarding_completed", "true");
+            }}
           />
           
           <ErrorBoundary 

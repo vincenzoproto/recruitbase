@@ -200,10 +200,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-accent via-background to-accent/50 p-4">
-      <Card className="w-full max-w-md shadow-xl animate-scale-in border-border/50">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-accent via-background to-accent/50 p-4">
+      {/* Background Blur Effect */}
+      <div className="absolute inset-0 backdrop-blur-[2px] bg-background/30" />
+      
+      <Card className="w-full max-w-md shadow-2xl animate-scale-in border-border/50 backdrop-blur-sm bg-card/95 relative z-10">
         <CardHeader className="text-center space-y-3 pb-6">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2 shadow-lg">
             <Briefcase className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -251,6 +254,33 @@ const Auth = () => {
                 >
                   {loading ? "Accesso..." : "Accedi"}
                 </Button>
+
+                {canUseBiometric && (
+                  <div className="space-y-3 pt-4 border-t">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-11 gap-2"
+                      onClick={async () => {
+                        try {
+                          const success = await biometricAuth.authenticate();
+                          if (success) {
+                            toast.success("Accesso biometrico effettuato!");
+                            navigate("/dashboard");
+                          }
+                        } catch (error) {
+                          toast.error("Errore accesso biometrico");
+                        }
+                      }}
+                    >
+                      <Fingerprint className="h-5 w-5" />
+                      Accedi con impronta digitale
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      🔒 Login sicuro – dati criptati e protetti
+                    </p>
+                  </div>
+                )}
               </form>
             </TabsContent>
 
