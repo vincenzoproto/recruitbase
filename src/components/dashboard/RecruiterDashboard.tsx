@@ -13,7 +13,6 @@ import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
 import KanbanBoard from "../trm/KanbanBoard";
-import { SmartNotifications } from "@/components/mobile/SmartNotifications";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
@@ -118,7 +117,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />
-          <SmartNotifications userId={profile.id} />
           <RBCopilot />
         </>
       )}
