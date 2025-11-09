@@ -26,6 +26,7 @@ import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { DashboardViewSelector } from "@/components/mobile/DashboardViewSelector";
 import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
+import { useSwipe } from "@/hooks/use-swipe";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { ReferralLeaderboard } from "@/components/mobile/ReferralLeaderboard";
@@ -245,6 +246,31 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setShowOnboarding(false);
   };
 
+  // Tab navigation order for swipe gestures
+  const tabOrder = ["pipeline", "offers", "candidates", "favorites", "analytics", "matches"];
+  
+  const handleSwipeLeft = () => {
+    if (!isMobile) return;
+    const currentIndex = tabOrder.indexOf(activeTab);
+    if (currentIndex < tabOrder.length - 1) {
+      setActiveTab(tabOrder[currentIndex + 1]);
+    }
+  };
+
+  const handleSwipeRight = () => {
+    if (!isMobile) return;
+    const currentIndex = tabOrder.indexOf(activeTab);
+    if (currentIndex > 0) {
+      setActiveTab(tabOrder[currentIndex - 1]);
+    }
+  };
+
+  const swipeHandlers = useSwipe({
+    onSwipedLeft: handleSwipeLeft,
+    onSwipedRight: handleSwipeRight,
+    minSwipeDistance: 50
+  });
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
@@ -340,6 +366,31 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
+          {isMobile && (
+            <div className="mb-4 overflow-x-auto -mx-4 px-4 scrollbar-hide">
+              <TabsList className="inline-flex min-w-max h-auto p-1 gap-1">
+                <TabsTrigger value="pipeline" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Pipeline
+                </TabsTrigger>
+                <TabsTrigger value="offers" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Offerte
+                </TabsTrigger>
+                <TabsTrigger value="candidates" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Candidati
+                </TabsTrigger>
+                <TabsTrigger value="favorites" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Preferiti
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Analytics
+                </TabsTrigger>
+                <TabsTrigger value="matches" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                  Match AI
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          )}
+
           {!isMobile && (
             <div className="overflow-x-auto -mx-4 px-4">
               <TabsList className="grid w-full min-w-max grid-cols-6 h-auto">
@@ -365,24 +416,28 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          <TabsContent value="pipeline">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Pipeline Kanban
-                </CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Trascina i candidati per aggiornare lo stato
-                </p>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                <KanbanBoard />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <div 
+            {...(isMobile ? swipeHandlers : {})}
+            className="min-h-[60vh] touch-pan-y"
+          >
+            <TabsContent value="pipeline" className="animate-fade-in">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                    <Briefcase className="h-5 w-5" />
+                    Pipeline Kanban
+                  </CardTitle>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {isMobile ? "Swipe per cambiare sezione" : "Trascina i candidati per aggiornare lo stato"}
+                  </p>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  <KanbanBoard />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="offers">
+          <TabsContent value="offers" className="animate-fade-in">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Le Tue Offerte</h2>
@@ -404,7 +459,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           </TabsContent>
 
-          <TabsContent value="candidates">
+          <TabsContent value="candidates" className="animate-fade-in">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -448,7 +503,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="favorites">
+          <TabsContent value="favorites" className="animate-fade-in">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -481,7 +536,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             <AnalyticsChart data={analyticsData} userRole="recruiter" />
           </TabsContent>
 
-          <TabsContent value="matches">
+          <TabsContent value="matches" className="animate-fade-in">
             <Card>
               <CardHeader>
                 <CardTitle>Match AI Intelligenti</CardTitle>
@@ -494,6 +549,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               </CardContent>
             </Card>
           </TabsContent>
+          </div>
         </Tabs>
 
         {profile.referral_code && (

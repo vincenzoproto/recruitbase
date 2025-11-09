@@ -4,6 +4,16 @@
 
 /* Recruit Base Design System - Apple Premium Edition */
 
+/* Custom scrollbar hide for mobile tabs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @layer base {
   :root {
     /* Apple Premium Palette */
