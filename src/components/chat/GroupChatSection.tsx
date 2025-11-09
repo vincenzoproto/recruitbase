@@ -29,6 +29,7 @@ export const GroupChatSection = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [groupMessages, setGroupMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [memberFilter, setMemberFilter] = useState("");
 
   useEffect(() => {
     loadGroups();
@@ -203,24 +204,35 @@ export const GroupChatSection = () => {
               </div>
               <div className="space-y-2">
                 <Label>Membri</Label>
+                <Input
+                  placeholder="Cerca membri..."
+                  value={memberFilter}
+                  onChange={(e) => setMemberFilter(e.target.value)}
+                  className="mb-2"
+                />
                 <ScrollArea className="h-48 border rounded-md p-4">
-                  {users.map(user => (
-                    <div key={user.id} className="flex items-center space-x-2 mb-2">
-                      <Checkbox
-                        checked={selectedUsers.includes(user.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedUsers([...selectedUsers, user.id]);
-                          } else {
-                            setSelectedUsers(selectedUsers.filter(id => id !== user.id));
-                          }
-                        }}
-                      />
-                      <label className="text-sm cursor-pointer">
-                        {user.full_name} <Badge variant="outline">{user.role}</Badge>
-                      </label>
-                    </div>
-                  ))}
+                  {users
+                    .filter(user => 
+                      user.full_name.toLowerCase().includes(memberFilter.toLowerCase()) ||
+                      user.role.toLowerCase().includes(memberFilter.toLowerCase())
+                    )
+                    .map(user => (
+                      <div key={user.id} className="flex items-center space-x-2 mb-2">
+                        <Checkbox
+                          checked={selectedUsers.includes(user.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedUsers([...selectedUsers, user.id]);
+                            } else {
+                              setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                            }
+                          }}
+                        />
+                        <label className="text-sm cursor-pointer">
+                          {user.full_name} <Badge variant="outline">{user.role}</Badge>
+                        </label>
+                      </div>
+                    ))}
                 </ScrollArea>
               </div>
               <Button onClick={createGroup} className="w-full">

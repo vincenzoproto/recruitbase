@@ -399,6 +399,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         <div 
           {...(isMobile ? swipeHandlers : {})}
           className="min-h-[60vh] touch-pan-y mb-6"
+          style={{ touchAction: 'pan-y' }}
         >
           {/* Vista 0: Home */}
           {(!isMobile || currentView === 0) && (

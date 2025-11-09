@@ -210,15 +210,16 @@ export const ChatDialog = ({
 
     const fileName = `${currentUserId}/${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage
-      .from('cvs')
+      .from('chat-media')
       .upload(fileName, file);
 
     if (uploadError) {
       toast.error("Errore caricamento immagine");
+      console.error(uploadError);
       return;
     }
 
-    const { data } = supabase.storage.from('cvs').getPublicUrl(fileName);
+    const { data } = supabase.storage.from('chat-media').getPublicUrl(fileName);
     await sendMessage('image', 'Immagine', data.publicUrl);
   };
 
@@ -234,15 +235,16 @@ export const ChatDialog = ({
         const fileName = `${currentUserId}/${Date.now()}.webm`;
         
         const { error: uploadError } = await supabase.storage
-          .from('cvs')
+          .from('chat-media')
           .upload(fileName, blob);
 
         if (uploadError) {
           toast.error("Errore caricamento audio");
+          console.error(uploadError);
           return;
         }
 
-        const { data } = supabase.storage.from('cvs').getPublicUrl(fileName);
+        const { data } = supabase.storage.from('chat-media').getPublicUrl(fileName);
         await sendMessage('audio', 'Messaggio vocale', data.publicUrl);
         stream.getTracks().forEach(track => track.stop());
       };

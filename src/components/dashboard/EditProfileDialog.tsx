@@ -46,16 +46,16 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
+      const fileName = `${profile.id}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError, data } = await supabase.storage
-        .from('cvs')
+        .from('avatars')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('cvs')
+        .from('avatars')
         .getPublicUrl(fileName);
 
       setAvatarUrl(publicUrl);

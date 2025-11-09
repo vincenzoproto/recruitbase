@@ -263,7 +263,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
           </Card>
         )}
 
-        <div {...(isMobile ? swipeHandlers : {})} className="min-h-[60vh] touch-pan-y">
+        <div {...(isMobile ? swipeHandlers : {})} className="min-h-[60vh] touch-pan-y" style={{ touchAction: 'pan-y' }}>
           {/* Vista 0: Home */}
           {(!isMobile || currentView === 0) && (
             <div className="space-y-6 animate-fade-in">

@@ -8,6 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditJobDialog from "./EditJobDialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -38,6 +44,7 @@ const experienceLevelLabels: Record<string, string> = {
 const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUpdate }: JobOfferCardProps) => {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("it-IT", {
@@ -82,7 +89,11 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50">
+    <>
+    <Card 
+      className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50 cursor-pointer"
+      onClick={() => setDetailsOpen(true)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
@@ -135,20 +146,20 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
           )}
 
           {isRecruiter && (
-            <div className="flex gap-2 pt-2">
-              <Button onClick={() => setEditOpen(true)} size="sm" variant="outline" className="flex-1">
+            <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+              <Button onClick={(e) => { e.stopPropagation(); setEditOpen(true); }} size="sm" variant="outline" className="flex-1">
                 <Edit className="h-4 w-4 mr-1" />
                 Modifica
               </Button>
               <Button
-                onClick={toggleActive}
+                onClick={(e) => { e.stopPropagation(); toggleActive(); }}
                 size="sm"
                 variant={job.is_active ? "secondary" : "default"}
               >
                 <Power className="h-4 w-4 mr-1" />
                 {job.is_active ? 'Disattiva' : 'Attiva'}
               </Button>
-              <Button onClick={() => setDeleteOpen(true)} size="sm" variant="destructive">
+              <Button onClick={(e) => { e.stopPropagation(); setDeleteOpen(true); }} size="sm" variant="destructive">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -178,6 +189,45 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
         </AlertDialogContent>
       </AlertDialog>
     </Card>
+
+    {/* Dialog dettaglio offerta */}
+    <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl">{job.title}</DialogTitle>
+          <CardDescription className="flex items-center gap-2 text-base">
+            <MapPin className="h-4 w-4" />
+            {job.city} · {experienceLevelLabels[job.experience_level] || job.experience_level}
+          </CardDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold mb-2">Settore</h3>
+            <Badge variant="secondary">{job.sector}</Badge>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Descrizione</h3>
+            <p className="text-muted-foreground whitespace-pre-wrap">{job.description}</p>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Pubblicata il {formatDate(job.created_at)}
+          </div>
+          {isCandidate && onApply && (
+            <Button onClick={() => { onApply(); setDetailsOpen(false); }} disabled={hasApplied} size="lg" className="w-full">
+              {hasApplied ? (
+                <>
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  Candidato
+                </>
+              ) : (
+                "Candidati Ora"
+              )}
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 
