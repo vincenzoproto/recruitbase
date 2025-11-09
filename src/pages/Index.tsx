@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Briefcase, Users, Target, Zap } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Briefcase, Users, Target, Zap, Activity, MessageCircle, TrendingUp, ArrowRight } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showTRSDialog, setShowTRSDialog] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -17,70 +19,118 @@ const Index = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent to-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6">
+      <header className="container mx-auto px-4 py-6 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Briefcase className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
           </div>
-          <Button onClick={() => navigate("/auth")}>Accedi / Registrati</Button>
+          <Button onClick={() => navigate("/auth")} variant="outline">
+            Accedi / Registrati
+          </Button>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <div className="max-w-4xl mx-auto space-y-8 animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-sm font-semibold text-primary">✨ Nuovo</span>
-            <span className="text-sm text-muted-foreground">30 giorni di prova gratuita Premium</span>
-          </div>
-          
-          <h2 className="text-5xl md:text-7xl font-bold text-foreground leading-tight">
-            Trova il talento perfetto.<br />
-            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              In pochi click.
-            </span>
-          </h2>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            La piattaforma professionale che connette recruiter e candidati.<br />
-            <span className="font-semibold text-foreground">Veloce. Intuitiva. Efficace.</span>
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button 
-              size="lg" 
-              className="h-14 px-10 text-lg font-bold transition-all hover:scale-105 shadow-lg hover:shadow-2xl"
-              onClick={() => navigate("/auth")}
-            >
-              🎉 Prova Gratis 30 Giorni
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="h-14 px-8 text-lg font-semibold transition-all hover:scale-105 hover:bg-accent"
-              onClick={() => {
-                document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              Scopri Come Funziona
-            </Button>
-          </div>
+      {/* TRS Hero Section */}
+      <section className="relative overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        
+        <div className="container mx-auto px-4 py-24 md:py-32 relative">
+          <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <Activity className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Algoritmo Proprietario</span>
+            </div>
+            
+            {/* Main Headline */}
+            <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight tracking-tight">
+              Recruit Base TRM
+              <br />
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                L'unico sistema che misura
+              </span>
+              <br />
+              <span className="text-4xl md:text-6xl">
+                la qualità delle relazioni di talento.
+              </span>
+            </h1>
+            
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Il nostro algoritmo proprietario <span className="font-semibold text-foreground">Talent Relationship Score™</span> analizza 
+              empatia, frequenza di contatto e engagement reale per aiutarti a costruire 
+              <span className="font-semibold text-foreground"> relazioni durature</span> con i migliori candidati.
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+              <Button 
+                size="lg" 
+                className="h-14 px-10 text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105 animate-pulse"
+                onClick={() => setShowTRSDialog(true)}
+              >
+                Scopri come funziona
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="h-14 px-10 text-lg font-semibold transition-all hover:scale-105"
+                onClick={() => navigate("/auth")}
+              >
+                Inizia Gratis
+              </Button>
+            </div>
 
-          <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span>Nessuna carta richiesta</span>
+            {/* Trust Indicators */}
+            <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span>30 giorni gratis</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span>Algoritmo esclusivo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span>Nessuna carta richiesta</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span>Setup in 2 minuti</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span>Cancella quando vuoi</span>
+
+            {/* Visual Element */}
+            <div className="pt-12">
+              <div className="relative max-w-4xl mx-auto">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-3xl rounded-full" />
+                <Card className="relative border-primary/20 bg-card/50 backdrop-blur">
+                  <CardContent className="p-8">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 text-left">
+                        <p className="text-sm text-muted-foreground mb-2">Esempio di TRS</p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-4xl font-bold text-foreground font-mono">87</span>
+                          <span className="text-lg font-semibold text-primary">TRS™</span>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="relative w-full bg-muted rounded-full h-4 overflow-hidden">
+                          <div 
+                            className="bg-gradient-to-r from-green-500 to-green-400 h-full rounded-full transition-all duration-1000 ease-out animate-pulse"
+                            style={{ width: '87%' }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2 text-center">
+                          Relazione forte e attiva
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
@@ -141,12 +191,20 @@ const Index = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">
-        <Card className="border-none shadow-xl bg-primary text-primary-foreground">
-          <CardContent className="py-12 text-center space-y-4">
-            <h3 className="text-3xl font-bold">Pronto a iniziare?</h3>
-            <p className="text-lg opacity-90">Unisciti a Recruit Base e trova il tuo prossimo successo</p>
-            <Button size="lg" variant="secondary" onClick={() => navigate("/auth")}>
-              Registrati Gratis
+        <Card className="border-none shadow-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground">
+          <CardContent className="py-12 text-center space-y-6">
+            <h3 className="text-3xl md:text-4xl font-bold">Pronto a rivoluzionare il recruiting?</h3>
+            <p className="text-lg opacity-90 max-w-2xl mx-auto">
+              Unisciti a Recruit Base TRM e scopri il potere del tuo network di talenti
+            </p>
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="h-14 px-10 text-lg font-bold"
+              onClick={() => navigate("/auth")}
+            >
+              Accedi a Recruit Base TRM
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </CardContent>
         </Card>
@@ -156,8 +214,100 @@ const Index = () => {
       <footer className="border-t bg-card">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
           <p>© 2025 Recruit Base. Tutti i diritti riservati.</p>
+          <p className="mt-2 text-xs italic">Talent Relationship Score™ – Proprietary Algorithm</p>
         </div>
       </footer>
+
+      {/* TRS Explanation Dialog */}
+      <Dialog open={showTRSDialog} onOpenChange={setShowTRSDialog}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl md:text-3xl font-bold text-center mb-4">
+              Come funziona il Talent Relationship Score™
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-8 py-6">
+            {/* Feature 1 */}
+            <div className="flex gap-6 items-start animate-fade-in">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/10 flex items-center justify-center">
+                  <MessageCircle className="h-8 w-8 text-blue-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold mb-2">1️⃣ Interazione Reale</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Analizza la qualità dei tuoi messaggi e risposte. L'algoritmo valuta empatia, 
+                  frequenza di contatto e la profondità delle conversazioni per determinare la 
+                  forza della relazione.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="flex gap-6 items-start animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/10 flex items-center justify-center">
+                  <Activity className="h-8 w-8 text-green-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold mb-2">2️⃣ Engagement Continuo</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Misura la costanza e la profondità dei contatti nel tempo. Il TRS™ tiene traccia 
+                  di ogni interazione e nota le attività regolari che dimostrano un genuino interesse reciproco.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex gap-6 items-start animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/10 flex items-center justify-center">
+                  <TrendingUp className="h-8 w-8 text-purple-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold mb-2">3️⃣ Predizione Relazionale</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Ti segnala i talenti più pronti a collaborare. Il sistema proprietario predice quali 
+                  candidati hanno maggiore probabilità di rispondere positivamente e di essere interessati 
+                  a nuove opportunità.
+                </p>
+              </div>
+            </div>
+
+            {/* Proprietary Badge */}
+            <div className="mt-8 p-6 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border border-primary/20">
+              <p className="text-center font-semibold text-foreground mb-2">
+                🔒 Talent Relationship Score™ – Proprietary Metric
+              </p>
+              <p className="text-center text-sm text-muted-foreground italic">
+                Algoritmo esclusivo brevettabile di Recruit Base
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center pt-4 space-y-4">
+              <p className="text-lg font-semibold text-foreground">
+                Scopri il potere del tuo network di talenti.
+              </p>
+              <Button 
+                size="lg" 
+                className="h-12 px-8 font-bold"
+                onClick={() => {
+                  setShowTRSDialog(false);
+                  navigate("/auth");
+                }}
+              >
+                Accedi a Recruit Base TRM
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
