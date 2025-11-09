@@ -29,11 +29,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   }, []);
 
   const loadJobOffers = async () => {
+    // Carica solo i campi essenziali per performance
     const { data, error } = await supabase
       .from("job_offers")
-      .select("*")
+      .select("id, title, city, sector, experience_level, is_active, created_at")
       .eq("recruiter_id", profile.id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(20); // Limita inizialmente a 20 offerte
 
     if (error) {
       toast.error("Errore nel caricamento delle offerte");
@@ -43,10 +45,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   };
 
   const loadCandidates = async () => {
+    // Carica solo campi essenziali per lista candidati
     const { data, error } = await supabase
       .from("profiles")
-      .select("*")
-      .eq("role", "candidate");
+      .select("id, full_name, city, job_title, skills, linkedin_url")
+      .eq("role", "candidate")
+      .limit(50); // Limita a 50 candidati iniziali
 
     if (error) {
       toast.error("Errore nel caricamento dei candidati");

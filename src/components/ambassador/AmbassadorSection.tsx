@@ -22,27 +22,31 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
   const inviteLink = `${window.location.origin}/invite/${referralCode}`;
 
   useEffect(() => {
-    loadAmbassadorData();
+    // Carica in background per non bloccare il rendering
+    const timer = setTimeout(() => {
+      loadAmbassadorData();
+    }, 500);
+    return () => clearTimeout(timer);
   }, [userId]);
 
   const loadAmbassadorData = async () => {
     try {
-      // Load referrals
+      // Carica referrals solo se necessario (limita a 10 più recenti)
       const { data: referralData, error: refError } = await supabase
         .from("ambassador_referrals")
-        .select("*, referred_user:profiles!ambassador_referrals_referred_user_id_fkey(full_name)")
+        .select("id, status, signup_date, referred_user:profiles!ambassador_referrals_referred_user_id_fkey(full_name)")
         .eq("ambassador_id", userId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(10);
 
       if (refError) throw refError;
       setReferrals(referralData || []);
 
-      // Load earnings
+      // Carica earnings (solo campi essenziali)
       const { data: earningsData, error: earnError } = await supabase
         .from("ambassador_earnings")
-        .select("*")
-        .eq("ambassador_id", userId)
-        .order("created_at", { ascending: false });
+        .select("amount, status")
+        .eq("ambassador_id", userId);
 
       if (earnError) throw earnError;
       setEarnings(earningsData || []);

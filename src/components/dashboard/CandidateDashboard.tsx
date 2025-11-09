@@ -26,11 +26,13 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   }, []);
 
   const loadJobOffers = async () => {
+    // Carica solo campi essenziali per performance
     const { data, error } = await supabase
       .from("job_offers")
-      .select("*")
+      .select("id, title, city, sector, experience_level, description, created_at")
       .eq("is_active", true)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(30); // Limita a 30 offerte iniziali
 
     if (error) {
       toast.error("Errore nel caricamento delle offerte");
