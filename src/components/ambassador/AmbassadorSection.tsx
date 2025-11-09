@@ -19,7 +19,7 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
   const [pendingEarnings, setPendingEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const inviteLink = `${window.location.origin}/invite/${referralCode}`;
+  const inviteLink = `${window.location.origin}/invite?ref=${referralCode}`;
 
   useEffect(() => {
     // Carica in background per non bloccare il rendering

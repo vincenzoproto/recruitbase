@@ -34,8 +34,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   useEffect(() => {
     loadJobOffers();
     loadFavorites();
-    loadStats();
   }, []);
+
+  useEffect(() => {
+    if (jobOffers.length > 0 || candidates.length > 0) {
+      loadStats();
+    }
+  }, [jobOffers.length, candidates.length]);
 
   const loadStats = async () => {
     try {
