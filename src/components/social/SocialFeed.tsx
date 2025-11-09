@@ -98,7 +98,7 @@ export const SocialFeed = () => {
       ) : (
         <div className="space-y-4">
           {filteredPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onDelete={loadPosts} />
           ))}
         </div>
       )}
