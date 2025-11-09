@@ -5,6 +5,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MeetingSchedulerProps {
   candidateId: string;
@@ -16,10 +23,12 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const timeSlots = [
-    "09:00", "10:00", "11:00", "12:00",
-    "14:00", "15:00", "16:00", "17:00"
-  ];
+  // Generate all time slots from 09:00 to 18:00 with 30-minute intervals
+  const timeSlots = Array.from({ length: 19 }, (_, i) => {
+    const hour = Math.floor(i / 2) + 9;
+    const minutes = i % 2 === 0 ? "00" : "30";
+    return `${hour.toString().padStart(2, '0')}:${minutes}`;
+  });
 
   const handleSchedule = async () => {
     if (!date || !selectedTime) {
@@ -78,18 +87,18 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
 
             <div>
               <p className="text-sm font-medium mb-2">Seleziona l'orario</p>
-              <div className="grid grid-cols-4 gap-2">
-                {timeSlots.map((time) => (
-                  <Button
-                    key={time}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedTime(time)}
-                  >
-                    {time}
-                  </Button>
-                ))}
-              </div>
+              <Select value={selectedTime} onValueChange={setSelectedTime}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Scegli un orario" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button onClick={handleSchedule} className="w-full">

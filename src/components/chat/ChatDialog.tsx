@@ -31,6 +31,8 @@ interface ChatDialogProps {
   otherUserId: string;
   otherUserName: string;
   triggerButton?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const ChatDialog = ({
@@ -38,15 +40,21 @@ export const ChatDialog = ({
   otherUserId,
   otherUserName,
   triggerButton,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: ChatDialogProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Use controlled open if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
   const emojis = ["😊", "😂", "❤️", "👍", "🎉", "🔥", "💯", "✨", "👏", "💪", "🙏", "😍"];
 
@@ -92,12 +100,13 @@ export const ChatDialog = ({
               );
             }
 
-            // Create in-app notification
+            // Create in-app notification with sender ID in link
             await supabase.from('notifications').insert({
               user_id: currentUserId,
               type: 'message',
               title: `Nuovo messaggio da ${otherUserName}`,
               message: message.content,
+              link: otherUserId,
               read: false,
             });
           }
@@ -271,14 +280,11 @@ export const ChatDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {triggerButton || (
-          <Button variant="outline" size="sm">
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Chat
-          </Button>
-        )}
-      </DialogTrigger>
+      {triggerButton && (
+        <DialogTrigger asChild>
+          {triggerButton}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[500px] h-[600px] flex flex-col p-0">
         <DialogHeader className="p-4 border-b">
           <div className="flex items-center justify-between">

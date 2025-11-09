@@ -24,9 +24,10 @@ interface Notification {
 interface NotificationBellProps {
   userId: string;
   onMeetingNotificationClick?: () => void;
+  onMessageNotificationClick?: (senderId: string) => void;
 }
 
-export const NotificationBell = ({ userId, onMeetingNotificationClick }: NotificationBellProps) => {
+export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessageNotificationClick }: NotificationBellProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -159,6 +160,9 @@ export const NotificationBell = ({ userId, onMeetingNotificationClick }: Notific
                     markAsRead(notification.id);
                     if (notification.type === 'meeting' && onMeetingNotificationClick) {
                       onMeetingNotificationClick();
+                    }
+                    if (notification.type === 'message' && onMessageNotificationClick && notification.link) {
+                      onMessageNotificationClick(notification.link);
                     }
                     setOpen(false);
                   }}

@@ -18,6 +18,7 @@ import { CVUploader } from "@/components/candidate/CVUploader";
 import RecruiterCard from "./RecruiterCard";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
+import { ChatDialog } from "@/components/chat/ChatDialog";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -33,6 +34,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Offerte, 2: Recruiter, 3: Profilo
   const [recruiters, setRecruiters] = useState<any[]>([]);
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
+  const [chatUserId, setChatUserId] = useState<string | null>(null);
+  const [chatUserName, setChatUserName] = useState<string>("");
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
   const views = [
@@ -126,6 +129,19 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
     }
   };
 
+  const handleOpenChat = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+    
+    if (data) {
+      setChatUserId(userId);
+      setChatUserName(data.full_name);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/auth");
@@ -171,6 +187,16 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
         onOpenChange={setMeetingDialogOpen}
       />
       
+      {chatUserId && (
+        <ChatDialog
+          currentUserId={profile.id}
+          otherUserId={chatUserId}
+          otherUserName={chatUserName}
+          open={!!chatUserId}
+          onOpenChange={(open) => !open && setChatUserId(null)}
+        />
+      )}
+      
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -181,6 +207,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             <NotificationBell 
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+              onMessageNotificationClick={handleOpenChat}
             />
             <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />

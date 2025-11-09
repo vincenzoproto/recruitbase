@@ -25,6 +25,7 @@ import CandidateCard from "./CandidateCard";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
+import { ChatDialog } from "@/components/chat/ChatDialog";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -45,6 +46,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     followUpsSent: 0,
   });
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
+  const [chatUserId, setChatUserId] = useState<string | null>(null);
+  const [chatUserName, setChatUserName] = useState<string>("");
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
   const views = [
@@ -174,6 +177,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     }
   };
 
+  const handleOpenChat = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+    
+    if (data) {
+      setChatUserId(userId);
+      setChatUserName(data.full_name);
+    }
+  };
+
 
   const loadJobOffers = async () => {
     const { data, error } = await supabase
@@ -236,6 +252,16 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         onOpenChange={setMeetingDialogOpen}
       />
       
+      {chatUserId && (
+        <ChatDialog
+          currentUserId={profile.id}
+          otherUserId={chatUserId}
+          otherUserName={chatUserName}
+          open={!!chatUserId}
+          onOpenChange={(open) => !open && setChatUserId(null)}
+        />
+      )}
+      
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />
@@ -258,6 +284,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             <NotificationBell 
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+              onMessageNotificationClick={handleOpenChat}
             />
             <Button
               variant="outline"
