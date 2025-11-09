@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,8 +15,8 @@ import Admin from "./pages/Admin";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -34,8 +34,8 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
