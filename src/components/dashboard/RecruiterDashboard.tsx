@@ -512,6 +512,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                     job={offer}
                     onUpdate={loadJobOffers}
                     isRecruiter={true}
+                    onOpenChat={handleOpenChat}
+                    onOpenCandidateDetail={handleOpenCandidateDetail}
                   />
                 ))}
                 {jobOffers.length === 0 && (

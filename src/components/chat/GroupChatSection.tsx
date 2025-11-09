@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Users, Plus, MessageCircle } from "lucide-react";
+import { Users, Plus, MessageCircle, Image, Mic, Send, Paperclip } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export const GroupChatSection = () => {
@@ -30,6 +30,10 @@ export const GroupChatSection = () => {
   const [groupMessages, setGroupMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [memberFilter, setMemberFilter] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadGroups();
@@ -138,8 +142,10 @@ export const GroupChatSection = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedGroup) return;
+  const sendMessage = async (messageType = 'text', content?: string, mediaUrl?: string) => {
+    const messageContent = content || newMessage.trim();
+    if (!messageContent && !mediaUrl) return;
+    if (!selectedGroup) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -150,16 +156,95 @@ export const GroupChatSection = () => {
         .insert({
           group_id: selectedGroup.id,
           sender_id: user.id,
-          content: newMessage,
-          message_type: 'text'
+          content: messageContent,
+          message_type: messageType,
+          media_url: mediaUrl,
         });
 
       if (error) throw error;
 
       setNewMessage("");
+      scrollToBottom();
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error("Errore nell'invio del messaggio");
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/') && !file.type.startsWith('application/')) {
+      toast.error("Formato non supportato");
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const fileName = `${user.id}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('chat-media')
+      .upload(fileName, file);
+
+    if (uploadError) {
+      toast.error("Errore caricamento file");
+      return;
+    }
+
+    const { data } = supabase.storage.from('chat-media').getPublicUrl(fileName);
+    const msgType = file.type.startsWith('image/') ? 'image' : 'file';
+    await sendMessage(msgType, file.name, data.publicUrl);
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const fileName = `${user.id}/${Date.now()}.webm`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('chat-media')
+          .upload(fileName, blob);
+
+        if (uploadError) {
+          toast.error("Errore caricamento audio");
+          return;
+        }
+
+        const { data } = supabase.storage.from('chat-media').getPublicUrl(fileName);
+        await sendMessage('audio', 'Messaggio vocale', data.publicUrl);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      toast.info("Registrazione in corso...");
+    } catch (error) {
+      toast.error("Errore accesso microfono");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setMediaRecorder(null);
+      setIsRecording(false);
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -289,18 +374,69 @@ export const GroupChatSection = () => {
                           {new Date(msg.created_at).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="text-sm bg-muted p-2 rounded-lg">{msg.content}</p>
+                      <div className="text-sm bg-muted p-2 rounded-lg">
+                        {msg.message_type === 'image' && msg.media_url && (
+                          <img src={msg.media_url} alt="Immagine" className="max-w-full rounded mb-2" />
+                        )}
+                        {msg.message_type === 'audio' && msg.media_url && (
+                          <audio controls src={msg.media_url} className="max-w-full" />
+                        )}
+                        {msg.message_type === 'file' && msg.media_url && (
+                          <a href={msg.media_url} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                            📎 {msg.content}
+                          </a>
+                        )}
+                        {msg.message_type === 'text' && <p>{msg.content}</p>}
+                      </div>
                     </div>
                   ))}
+                  <div ref={scrollRef} />
                 </ScrollArea>
-                <div className="flex gap-2">
-                  <Input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Scrivi un messaggio..."
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                <div className="space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
                   />
-                  <Button onClick={sendMessage}>Invia</Button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Image className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={isRecording ? stopRecording : startRecording}
+                      className={isRecording ? "text-red-500" : ""}
+                    >
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Scrivi un messaggio..."
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      className="flex-1"
+                    />
+                    <Button onClick={() => sendMessage()}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </>

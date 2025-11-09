@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2, Edit, Trash2, Power } from "lucide-react";
+import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2, Edit, Trash2, Power, Users } from "lucide-react";
 import { CVCopilot } from "@/components/candidate/CVCopilot";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditJobDialog from "./EditJobDialog";
+import { JobApplicationsDialog } from "./JobApplicationsDialog";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,8 @@ interface JobOfferCardProps {
   hasApplied?: boolean;
   isCandidate?: boolean;
   isRecruiter?: boolean;
+  onOpenChat?: (userId: string, userName: string) => void;
+  onOpenCandidateDetail?: (candidateId: string) => void;
 }
 
 const experienceLevelLabels: Record<string, string> = {
@@ -41,10 +44,30 @@ const experienceLevelLabels: Record<string, string> = {
   lead: "Lead/Manager",
 };
 
-const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUpdate }: JobOfferCardProps) => {
+const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUpdate, onOpenChat, onOpenCandidateDetail }: JobOfferCardProps) => {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [applicationsOpen, setApplicationsOpen] = useState(false);
+  const [applicationsCount, setApplicationsCount] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isRecruiter) {
+      loadApplicationsCount();
+    }
+  }, [isRecruiter]);
+
+  const loadApplicationsCount = async () => {
+    try {
+      const { count } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('job_offer_id', job.id);
+      setApplicationsCount(count || 0);
+    } catch (error) {
+      console.error('Error loading applications count:', error);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("it-IT", {
@@ -146,22 +169,33 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
           )}
 
           {isRecruiter && (
-            <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-              <Button onClick={(e) => { e.stopPropagation(); setEditOpen(true); }} size="sm" variant="outline" className="flex-1">
-                <Edit className="h-4 w-4 mr-1" />
-                Modifica
-              </Button>
+            <div className="space-y-2 pt-2">
               <Button
-                onClick={(e) => { e.stopPropagation(); toggleActive(); }}
+                onClick={() => setApplicationsOpen(true)}
                 size="sm"
-                variant={job.is_active ? "secondary" : "default"}
+                variant="default"
+                className="w-full"
               >
-                <Power className="h-4 w-4 mr-1" />
-                {job.is_active ? 'Disattiva' : 'Attiva'}
+                <Users className="h-4 w-4 mr-2" />
+                Vedi Candidature ({applicationsCount})
               </Button>
-              <Button onClick={(e) => { e.stopPropagation(); setDeleteOpen(true); }} size="sm" variant="destructive">
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setEditOpen(true)} size="sm" variant="outline" className="flex-1">
+                  <Edit className="h-4 w-4 mr-1" />
+                  Modifica
+                </Button>
+                <Button
+                  onClick={toggleActive}
+                  size="sm"
+                  variant={job.is_active ? "secondary" : "default"}
+                >
+                  <Power className="h-4 w-4 mr-1" />
+                  {job.is_active ? 'Disattiva' : 'Attiva'}
+                </Button>
+                <Button onClick={() => setDeleteOpen(true)} size="sm" variant="destructive">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -188,6 +222,17 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {onOpenChat && onOpenCandidateDetail && isRecruiter && (
+        <JobApplicationsDialog
+          open={applicationsOpen}
+          onOpenChange={setApplicationsOpen}
+          jobOfferId={job.id}
+          jobTitle={job.title}
+          onOpenChat={onOpenChat}
+          onOpenCandidateDetail={onOpenCandidateDetail}
+        />
+      )}
     </Card>
 
     {/* Dialog dettaglio offerta */}
