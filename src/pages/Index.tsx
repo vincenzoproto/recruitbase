@@ -21,7 +21,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6 border-b">
+      <header className="container mx-auto px-4 py-6 border-b relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Briefcase className="h-8 w-8 text-primary" />
@@ -36,9 +36,9 @@ const Index = () => {
       {/* TRS Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
         
-        <div className="container mx-auto px-4 py-24 md:py-32 relative">
+        <div className="container mx-auto px-4 py-24 md:py-32 relative z-10">
           <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
