@@ -16,6 +16,7 @@ const Auth = () => {
   const [checkingSession, setCheckingSession] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"recruiter" | "candidate">("candidate");
 
@@ -61,6 +62,16 @@ const Auth = () => {
     e.preventDefault();
     if (!email || !password || !fullName) {
       toast.error("Compila tutti i campi");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Le password non corrispondono");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("La password deve essere di almeno 6 caratteri");
       return;
     }
 
@@ -262,6 +273,19 @@ const Auth = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="h-11"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password" className="text-sm font-medium">Conferma Password</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     className="h-11"
                     required

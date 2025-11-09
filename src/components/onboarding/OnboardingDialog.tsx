@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, MapPin, Camera, Briefcase, UserCheck } from "lucide-react";
+import { User, MapPin, Camera, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 interface OnboardingDialogProps {
   open: boolean;
@@ -26,6 +27,10 @@ const OnboardingDialog = ({ open, userId, initialRole, onComplete }: OnboardingD
     avatar_url: "",
   });
 
+  const totalSteps = 3;
+  const progress = (step / totalSteps) * 100;
+  const motivationalMessages = ["Iniziamo! ✨", "Ottimo lavoro! 🚀", "Quasi finito! 🎯"];
+
   const handleNext = () => {
     if (step === 1 && !formData.full_name.trim()) {
       toast.error("Inserisci il tuo nome");
@@ -44,7 +49,31 @@ const OnboardingDialog = ({ open, userId, initialRole, onComplete }: OnboardingD
     setStep(step - 1);
   };
 
+  const handleSkip = async () => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: formData.full_name || "Utente",
+        city: formData.city || "Italia",
+        onboarding_completed: true,
+      })
+      .eq("id", userId);
+
+    if (error) {
+      toast.error("Errore nel salvataggio");
+      return;
+    }
+
+    toast.success("Benvenuto! Completa il tuo profilo quando vuoi");
+    onComplete({ full_name: formData.full_name || "Utente", city: formData.city || "Italia", onboarding_completed: true });
+  };
+
   const handleComplete = async () => {
+    if (!formData.full_name || !formData.city) {
+      toast.error("Completa i campi obbligatori");
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -64,7 +93,7 @@ const OnboardingDialog = ({ open, userId, initialRole, onComplete }: OnboardingD
 
       if (roleError) console.error("Error inserting role:", roleError);
 
-      toast.success("Profilo completato! 🎉");
+      toast.success("🎉 Profilo completato con successo!");
       onComplete({ ...formData, onboarding_completed: true });
     } catch (error) {
       console.error("Error completing onboarding:", error);
@@ -76,32 +105,20 @@ const OnboardingDialog = ({ open, userId, initialRole, onComplete }: OnboardingD
 
   return (
     <Dialog open={open}>
-      <DialogContent className="sm:max-w-[540px] glass-card border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+      <DialogContent className="sm:max-w-[500px] glass-card border-primary/20">
         <DialogHeader>
-          <DialogTitle className="text-3xl font-bold flex items-center gap-3">
-            Benvenuto su Recruit Base
-            <span className="text-2xl animate-bounce-soft">✨</span>
+          <DialogTitle className="text-2xl font-semibold text-center bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            {motivationalMessages[step - 1]}
           </DialogTitle>
-          <DialogDescription className="text-base text-muted-foreground">
-            Step {step} di 3 · Completa il tuo profilo per iniziare
-          </DialogDescription>
+          <p className="text-center text-muted-foreground text-sm mt-2">
+            Step {step} di {totalSteps}
+          </p>
         </DialogHeader>
 
-        {/* Progress Indicator */}
-        <div className="flex gap-2 mb-2">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                i <= step 
-                  ? 'bg-primary shadow-[0_0_8px_rgba(0,122,255,0.4)]' 
-                  : 'bg-muted'
-              }`}
-            />
-          ))}
-        </div>
+        <div className="space-y-6 py-4">
+          <Progress value={progress} className="h-2" />
 
-        <div className="py-6 min-h-[280px] relative overflow-hidden">
+          <div className="py-6 min-h-[280px] relative overflow-hidden">
           {/* Step 1: Nome */}
           <div
             className={`absolute inset-0 transition-all duration-500 ${
@@ -223,41 +240,54 @@ const OnboardingDialog = ({ open, userId, initialRole, onComplete }: OnboardingD
               </CardContent>
             </Card>
           </div>
+          </div>
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center pt-4 gap-3">
-          {step > 1 ? (
-            <Button 
-              variant="outline" 
-              onClick={handleBack} 
-              disabled={loading}
-              className="h-11 px-6 apple-button border-border/50"
-            >
-              Indietro
-            </Button>
-          ) : (
-            <div />
-          )}
+        <div className="flex justify-between gap-2 pt-4 border-t">
+          <Button
+            variant="ghost"
+            onClick={handleSkip}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Salta
+          </Button>
           
-          {step < 3 ? (
-            <Button 
-              onClick={handleNext} 
-              size="lg" 
-              className="h-11 px-8 ml-auto apple-button bg-primary hover:bg-primary/90 shadow-[0_4px_16px_rgba(0,122,255,0.3)]"
-            >
-              Avanti
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleComplete} 
-              disabled={loading} 
-              size="lg" 
-              className="h-11 px-8 ml-auto apple-button bg-primary hover:bg-primary/90 shadow-[0_4px_16px_rgba(0,122,255,0.3)]"
-            >
-              {loading ? "Completamento..." : "Completa ✨"}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {step > 1 && (
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={loading}
+              >
+                Indietro
+              </Button>
+            )}
+            
+            {step < totalSteps ? (
+              <Button
+                onClick={handleNext}
+                className="apple-button"
+              >
+                Avanti
+              </Button>
+            ) : (
+              <Button
+                onClick={handleComplete}
+                disabled={loading}
+                className="apple-button bg-gradient-to-r from-primary to-primary/80"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvataggio...
+                  </>
+                ) : (
+                  "Completa"
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

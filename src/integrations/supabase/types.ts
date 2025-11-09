@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_type: string
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ambassador_earnings: {
         Row: {
           ambassador_id: string
@@ -329,11 +358,13 @@ export type Database = {
           bio: string | null
           city: string | null
           created_at: string | null
+          email_verified: boolean | null
           full_name: string
           id: string
           is_premium: boolean | null
           job_title: string | null
           linkedin_url: string | null
+          linkedin_verified: boolean | null
           onboarding_completed: boolean | null
           referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -345,11 +376,13 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          email_verified?: boolean | null
           full_name: string
           id: string
           is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
           referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -361,11 +394,13 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          email_verified?: boolean | null
           full_name?: string
           id?: string
           is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
           referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
@@ -416,6 +451,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_insights: {
+        Row: {
+          date: string | null
+          id: string
+          metric_type: string
+          metric_value: number | null
+          user_id: string
+        }
+        Insert: {
+          date?: string | null
+          id?: string
+          metric_type: string
+          metric_value?: number | null
+          user_id: string
+        }
+        Update: {
+          date?: string | null
+          id?: string
+          metric_type?: string
+          metric_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_insights_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -442,6 +509,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      award_achievement: {
+        Args: { p_badge_type: string; p_user_id: string }
+        Returns: undefined
+      }
       calculate_match_score: {
         Args: { p_candidate_id: string; p_job_offer_id: string }
         Returns: number
