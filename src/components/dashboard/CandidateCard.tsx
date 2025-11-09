@@ -62,11 +62,11 @@ const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCar
                 variant="outline"
                 size="sm"
                 onClick={async () => {
-                  const { data } = await supabase.storage.from("cvs").createSignedUrl(
-                    candidate.cv_url.split("/cvs/")[1],
-                    60
-                  );
-                  if (data) window.open(data.signedUrl, "_blank");
+                  const path = candidate.cv_url.includes("/cvs/")
+                    ? candidate.cv_url.split("/cvs/")[1]
+                    : candidate.cv_url;
+                  const { data, error } = await supabase.storage.from("cvs").createSignedUrl(path, 60);
+                  if (!error && data) window.open(data.signedUrl, "_blank");
                 }}
               >
                 <FileText className="mr-2 h-4 w-4" />

@@ -38,18 +38,14 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("cvs")
-        .getPublicUrl(fileName);
-
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ cv_url: publicUrl })
+        .update({ cv_url: fileName })
         .eq("id", userId);
 
       if (updateError) throw updateError;
 
-      onUploadComplete(publicUrl);
+      onUploadComplete(fileName);
       toast.success("CV caricato con successo!");
     } catch (error) {
       console.error("Error uploading CV:", error);
