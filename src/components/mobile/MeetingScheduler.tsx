@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MeetingSchedulerProps {
   candidateId: string;
@@ -20,14 +21,29 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
     "14:00", "15:00", "16:00", "17:00"
   ];
 
-  const handleSchedule = () => {
+  const handleSchedule = async () => {
     if (!date || !selectedTime) {
       toast.error("Seleziona data e ora");
       return;
     }
 
-    toast.success(`Call programmata con ${candidateName} per ${date.toLocaleDateString()} alle ${selectedTime}`);
-    setOpen(false);
+    try {
+      const { error } = await supabase.from("meetings").insert({
+        candidate_id: candidateId,
+        recruiter_id: (await supabase.auth.getUser()).data.user?.id,
+        scheduled_date: date.toISOString(),
+        scheduled_time: selectedTime,
+        status: "scheduled"
+      });
+
+      if (error) throw error;
+
+      toast.success(`Call programmata con ${candidateName} per ${date.toLocaleDateString()} alle ${selectedTime}`);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error scheduling meeting:", error);
+      toast.error("Errore nella programmazione");
+    }
   };
 
   return (

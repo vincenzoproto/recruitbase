@@ -14,6 +14,7 @@ import { MatchesList } from "@/components/match/MatchesList";
 import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
+import { CVUploader } from "@/components/candidate/CVUploader";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -322,42 +323,59 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                     : "Modifica"}
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div>
-                  <span className="font-medium">Nome: </span>
-                  <span>{profile.full_name}</span>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div>
+                    <span className="font-medium">Nome: </span>
+                    <span>{profile.full_name}</span>
+                  </div>
+                  {profile.city && (
+                    <div>
+                      <span className="font-medium">Città: </span>
+                      <span>{profile.city}</span>
+                    </div>
+                  )}
+                  {profile.job_title && (
+                    <div>
+                      <span className="font-medium">Ruolo: </span>
+                      <span>{profile.job_title}</span>
+                    </div>
+                  )}
+                  {profile.skills && profile.skills.length > 0 && (
+                    <div>
+                      <span className="font-medium">Competenze: </span>
+                      <span>{profile.skills.join(", ")}</span>
+                    </div>
+                  )}
+                  {profile.linkedin_url && (
+                    <div>
+                      <span className="font-medium">LinkedIn: </span>
+                      <a
+                        href={profile.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Visualizza profilo
+                      </a>
+                    </div>
+                  )}
+                  {profile.phone_number && (
+                    <div>
+                      <span className="font-medium">Telefono: </span>
+                      <span>{profile.phone_number}</span>
+                    </div>
+                  )}
                 </div>
-                {profile.city && (
-                  <div>
-                    <span className="font-medium">Città: </span>
-                    <span>{profile.city}</span>
-                  </div>
-                )}
-                {profile.job_title && (
-                  <div>
-                    <span className="font-medium">Ruolo: </span>
-                    <span>{profile.job_title}</span>
-                  </div>
-                )}
-                {profile.skills && profile.skills.length > 0 && (
-                  <div>
-                    <span className="font-medium">Competenze: </span>
-                    <span>{profile.skills.join(", ")}</span>
-                  </div>
-                )}
-                {profile.linkedin_url && (
-                  <div>
-                    <span className="font-medium">LinkedIn: </span>
-                    <a
-                      href={profile.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      Visualizza profilo
-                    </a>
-                  </div>
-                )}
+
+                <div>
+                  <p className="font-medium mb-2">Curriculum Vitae</p>
+                  <CVUploader
+                    userId={profile.id}
+                    currentCvUrl={profile.cv_url}
+                    onUploadComplete={() => window.location.reload()}
+                  />
+                </div>
               </CardContent>
             </Card>
           )}

@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2 } from "lucide-react";
+import { CVCopilot } from "@/components/candidate/CVCopilot";
 
 interface JobOfferCardProps {
   job: any;
@@ -56,23 +57,29 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate }: JobOfferCardPro
 
         <p className="text-sm text-muted-foreground line-clamp-3">{job.description}</p>
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="space-y-2 pt-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
             Pubblicata il {formatDate(job.created_at)}
           </div>
 
           {isCandidate && onApply && (
-            <Button onClick={onApply} disabled={hasApplied} size="sm">
-              {hasApplied ? (
-                <>
-                  <CheckCircle2 className="mr-1 h-4 w-4" />
-                  Candidato
-                </>
-              ) : (
-                "Candidati Ora"
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={onApply} disabled={hasApplied} size="sm" className="flex-1">
+                {hasApplied ? (
+                  <>
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    Candidato
+                  </>
+                ) : (
+                  "Candidati Ora"
+                )}
+              </Button>
+              <CVCopilot
+                jobTitle={job.title}
+                jobDescription={job.description}
+              />
+            </div>
           )}
         </div>
       </CardContent>

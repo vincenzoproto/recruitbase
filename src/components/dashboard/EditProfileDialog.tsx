@@ -29,6 +29,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     bio: profile.bio || "",
     skills: profile.skills?.join(", ") || "",
     linkedin_url: profile.linkedin_url || "",
+    phone_number: profile.phone_number || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,6 +51,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           bio: formData.bio,
           skills: skillsArray,
           linkedin_url: formData.linkedin_url,
+          phone_number: formData.phone_number,
         })
         .eq("id", profile.id);
 
@@ -126,15 +128,28 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="linkedin_url">LinkedIn Profile URL</Label>
-            <Input
-              id="linkedin_url"
-              type="url"
-              value={formData.linkedin_url}
-              onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
-              placeholder="https://www.linkedin.com/in/tuoprofilo"
-            />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="linkedin_url">LinkedIn Profile URL</Label>
+              <Input
+                id="linkedin_url"
+                type="url"
+                value={formData.linkedin_url}
+                onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
+                placeholder="https://www.linkedin.com/in/tuoprofilo"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone_number">Telefono (con prefisso)</Label>
+              <Input
+                id="phone_number"
+                type="tel"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                placeholder="+39 333 1234567"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-2">

@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, ExternalLink, Star } from "lucide-react";
+import { MapPin, Briefcase, ExternalLink, Star, FileText } from "lucide-react";
+import { ContactButtons } from "@/components/candidate/ContactButtons";
+import { MeetingScheduler } from "@/components/mobile/MeetingScheduler";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CandidateCardProps {
   candidate: any;
@@ -52,29 +55,47 @@ const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCar
 
         {candidate.bio && <p className="text-sm text-muted-foreground line-clamp-2">{candidate.bio}</p>}
 
-        <div className="flex gap-2">
-          {candidate.linkedin_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => window.open(candidate.linkedin_url, "_blank")}
-            >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              LinkedIn
-            </Button>
-          )}
-          <Button
-            size="sm"
-            className="flex-1"
-            onClick={() => {
-              const subject = encodeURIComponent(`Opportunità di lavoro - Recruit Base`);
-              const body = encodeURIComponent(`Ciao ${candidate.full_name},\n\nSono interessato al tuo profilo su Recruit Base.\n\nCordiali saluti`);
-              window.location.href = `mailto:?subject=${subject}&body=${body}`;
-            }}
-          >
-            Contatta
-          </Button>
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {candidate.cv_url && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const { data } = await supabase.storage.from("cvs").createSignedUrl(
+                    candidate.cv_url.split("/cvs/")[1],
+                    60
+                  );
+                  if (data) window.open(data.signedUrl, "_blank");
+                }}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                CV
+              </Button>
+            )}
+            {candidate.linkedin_url && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(candidate.linkedin_url, "_blank")}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                LinkedIn
+              </Button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <ContactButtons
+              email={candidate.id}
+              phone={candidate.phone_number}
+              name={candidate.full_name}
+            />
+            <MeetingScheduler
+              candidateId={candidate.id}
+              candidateName={candidate.full_name}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

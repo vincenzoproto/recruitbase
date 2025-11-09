@@ -537,6 +537,54 @@ export type Database = {
           },
         ]
       }
+      meetings: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          recruiter_id: string
+          scheduled_date: string
+          scheduled_time: string
+          status: string | null
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          recruiter_id: string
+          scheduled_date: string
+          scheduled_time: string
+          status?: string | null
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          recruiter_id?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -660,6 +708,7 @@ export type Database = {
           bio: string | null
           city: string | null
           created_at: string | null
+          cv_url: string | null
           email_verified: boolean | null
           engagement_score: number | null
           full_name: string
@@ -671,6 +720,7 @@ export type Database = {
           linkedin_url: string | null
           linkedin_verified: boolean | null
           onboarding_completed: boolean | null
+          phone_number: string | null
           pipeline_stage_id: string | null
           referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -685,6 +735,7 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          cv_url?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
           full_name: string
@@ -696,6 +747,7 @@ export type Database = {
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
+          phone_number?: string | null
           pipeline_stage_id?: string | null
           referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -710,6 +762,7 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          cv_url?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
           full_name?: string
@@ -721,6 +774,7 @@ export type Database = {
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
+          phone_number?: string | null
           pipeline_stage_id?: string | null
           referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
