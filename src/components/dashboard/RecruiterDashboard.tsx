@@ -31,6 +31,14 @@ import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { ReferralLeaderboard } from "@/components/mobile/ReferralLeaderboard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { LiveMetrics } from "@/components/premium/LiveMetrics";
+import { AICandidateMatcher } from "@/components/premium/AICandidateMatcher";
+import { QuickActionsBar } from "@/components/premium/QuickActionsBar";
+import { LeaderboardGlobal } from "@/components/premium/LeaderboardGlobal";
+import { AcademySection } from "@/components/premium/AcademySection";
+import { AIInsightsChart } from "@/components/premium/AIInsightsChart";
+import { PersonalBrandCard } from "@/components/premium/PersonalBrandCard";
+import { hapticFeedback } from "@/lib/haptics";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -199,11 +207,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   };
 
   const handleSignOut = async () => {
+    await hapticFeedback.medium();
     await supabase.auth.signOut();
     navigate("/auth");
   };
 
   const handleToggleFavorite = async (candidateId: string) => {
+    await hapticFeedback.light();
     const isFavorite = favorites.some((f) => f.candidate_id === candidateId);
 
     if (isFavorite) {
@@ -217,6 +227,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         toast.error("Errore nella rimozione dai preferiti");
         return;
       }
+      await hapticFeedback.success();
       toast.success("Rimosso dai preferiti");
     } else {
       const { error } = await supabase
@@ -230,6 +241,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         toast.error("Errore nell'aggiunta ai preferiti");
         return;
       }
+      await hapticFeedback.success();
       toast.success("Aggiunto ai preferiti");
     }
 
@@ -247,7 +259,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   };
 
   // Tab navigation order for swipe gestures
-  const tabOrder = ["pipeline", "offers", "candidates", "favorites", "analytics", "matches"];
+  const tabOrder = ["pipeline", "offers", "candidates", "favorites", "analytics", "matches", "community", "academy", "profile"];
   
   const handleSwipeLeft = () => {
     if (!isMobile) return;
@@ -355,6 +367,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           />
         </div>
 
+        {/* Live Metrics Premium */}
+        {profile?.id && (
+          <div className="mb-6">
+            <LiveMetrics userId={profile.id} />
+          </div>
+        )}
+
         <div className="mb-6">
           <TRSDashboardCard recruiterId={profile.id} />
         </div>
@@ -460,13 +479,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="candidates" className="animate-fade-in">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Candidati Disponibili
-                </CardTitle>
-              </CardHeader>
+            <div className="space-y-6">
+              {/* AI Candidate Matcher */}
+              {profile?.id && (
+                <AICandidateMatcher recruiterId={profile.id} />
+              )}
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Candidati Disponibili
+                  </CardTitle>
+                </CardHeader>
               <CardContent className="space-y-4">
                 {candidates.length === 0 && (
                   <Button onClick={loadCandidates} variant="outline" className="w-full">
@@ -501,6 +526,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 )}
               </CardContent>
             </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="favorites" className="animate-fade-in">
@@ -533,7 +559,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <AnalyticsChart data={analyticsData} userRole="recruiter" />
+            <div className="space-y-6">
+              {profile?.id && (
+                <AIInsightsChart userId={profile.id} />
+              )}
+              <AnalyticsChart data={analyticsData} userRole="recruiter" />
+            </div>
           </TabsContent>
 
           <TabsContent value="matches" className="animate-fade-in">
@@ -548,6 +579,27 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 <MatchesList userId={profile.id} userRole="recruiter" />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="community" className="animate-fade-in">
+            <LeaderboardGlobal />
+          </TabsContent>
+
+          <TabsContent value="academy" className="animate-fade-in">
+            <AcademySection />
+          </TabsContent>
+
+          <TabsContent value="profile" className="animate-fade-in">
+            <div className="space-y-6">
+              <PersonalBrandCard profile={profile} />
+              
+              <Card className="p-6">
+                <h3 className="font-semibold mb-4">Impostazioni Profilo</h3>
+                <p className="text-sm text-muted-foreground">
+                  Funzionalità in arrivo
+                </p>
+              </Card>
+            </div>
           </TabsContent>
           </div>
         </Tabs>
@@ -566,6 +618,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
         <LinkedInIntegration />
       </main>
+
+      <QuickActionsBar 
+        onCreateJob={() => setShowCreateJob(true)}
+      />
 
       <MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 

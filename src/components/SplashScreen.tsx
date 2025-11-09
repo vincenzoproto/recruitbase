@@ -33,10 +33,12 @@ const SplashScreen = ({ userName, onComplete }: SplashScreenProps) => {
       }`}
     >
       <div className="text-center space-y-8 px-6">
-        {/* Logo with Glow Effect */}
+        {/* Logo with Glow Effect & Pulse */}
         <div className="relative">
           <div className="w-28 h-28 glass-card rounded-[2rem] flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(255,255,255,0.3)] animate-bounce-soft">
-            <Briefcase className="h-14 w-14 text-white" strokeWidth={1.5} />
+            <div className="animate-pulse">
+              <Briefcase className="h-14 w-14 text-white" strokeWidth={1.5} />
+            </div>
           </div>
         </div>
         
@@ -51,7 +53,7 @@ const SplashScreen = ({ userName, onComplete }: SplashScreenProps) => {
             </p>
           ) : (
             <p className="text-white/85 text-lg font-light animate-slide-up">
-              Crea la tua connessione perfetta<br />tra talento e opportunità ✨
+              Connetti talento e visione ✨
             </p>
           )}
         </div>
