@@ -47,90 +47,66 @@ const Index = () => {
             </div>
             
             {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight">
               Recruit Base TRM
               <br />
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
-                L'unico sistema che misura
-              </span>
-              <br />
-              <span className="text-4xl md:text-6xl">
-                la qualità delle relazioni di talento.
+              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                Misura la qualità delle relazioni di talento.
               </span>
             </h1>
             
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Il nostro algoritmo proprietario <span className="font-semibold text-foreground">Talent Relationship Score™</span> analizza 
-              empatia, frequenza di contatto e engagement reale per aiutarti a costruire 
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Algoritmo proprietario <span className="font-semibold text-foreground">Talent Relationship Score™</span> per costruire 
               <span className="font-semibold text-foreground"> relazioni durature</span> con i migliori candidati.
             </p>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
               <Button 
                 size="lg" 
-                className="h-14 px-10 text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105 animate-pulse"
-                onClick={() => setShowTRSDialog(true)}
-              >
-                Scopri come funziona
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="h-14 px-10 text-lg font-semibold transition-all hover:scale-105"
+                className="h-12 px-8 font-bold"
                 onClick={() => navigate("/auth")}
               >
                 Inizia Gratis
               </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="h-12 px-8"
+                onClick={() => setShowTRSDialog(true)}
+              >
+                Scopri come funziona
+              </Button>
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span>30 giorni gratis</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span>Algoritmo esclusivo</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span>Nessuna carta richiesta</span>
-              </div>
+            <div className="flex items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
+              <span>✓ 30 giorni gratis</span>
+              <span>✓ Algoritmo esclusivo</span>
+              <span>✓ Nessuna carta</span>
             </div>
 
             {/* Visual Element */}
-            <div className="pt-12">
-              <div className="relative max-w-4xl mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-3xl rounded-full" />
-                <Card className="relative border-primary/20 bg-card/50 backdrop-blur">
-                  <CardContent className="p-8">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex-1 text-left">
-                        <p className="text-sm text-muted-foreground mb-2">Esempio di TRS</p>
-                        <div className="flex items-center gap-3">
-                          <span className="text-4xl font-bold text-foreground font-mono">87</span>
-                          <span className="text-lg font-semibold text-primary">TRS™</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="relative w-full bg-muted rounded-full h-4 overflow-hidden">
-                          <div 
-                            className="bg-gradient-to-r from-green-500 to-green-400 h-full rounded-full transition-all duration-1000 ease-out animate-pulse"
-                            style={{ width: '87%' }}
-                          />
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-2 text-center">
-                          Relazione forte e attiva
-                        </p>
+            <div className="pt-8">
+              <Card className="max-w-2xl mx-auto border-primary/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl font-bold text-foreground font-mono">87</span>
+                      <span className="font-semibold text-primary">TRS™</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="relative w-full bg-muted rounded-full h-3 overflow-hidden">
+                        <div 
+                          className="bg-green-500 h-full rounded-full"
+                          style={{ width: '87%' }}
+                        />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -190,21 +166,20 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20">
-        <Card className="border-none shadow-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground">
-          <CardContent className="py-12 text-center space-y-6">
-            <h3 className="text-3xl md:text-4xl font-bold">Pronto a rivoluzionare il recruiting?</h3>
-            <p className="text-lg opacity-90 max-w-2xl mx-auto">
-              Unisciti a Recruit Base TRM e scopri il potere del tuo network di talenti
+      <section className="container mx-auto px-4 py-16">
+        <Card className="border-none shadow-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
+          <CardContent className="py-10 text-center space-y-4">
+            <h3 className="text-2xl md:text-3xl font-bold">Pronto a iniziare?</h3>
+            <p className="text-lg opacity-90">
+              Scopri il potere del tuo network di talenti
             </p>
             <Button 
               size="lg" 
               variant="secondary" 
-              className="h-14 px-10 text-lg font-bold"
+              className="h-12 px-8 font-bold"
               onClick={() => navigate("/auth")}
             >
-              Accedi a Recruit Base TRM
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Inizia Gratis
             </Button>
           </CardContent>
         </Card>
