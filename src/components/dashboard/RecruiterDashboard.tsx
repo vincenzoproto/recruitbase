@@ -2,42 +2,23 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, Users, LogOut, Star, Gift, TrendingUp, UserCheck } from "lucide-react";
+import { Plus, Briefcase, LogOut, Gift, UserCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
 import JobOfferCard from "./JobOfferCard";
-import CandidateCard from "./CandidateCard";
 import LinkedInIntegration from "../LinkedInIntegration";
 import StatsCard from "./StatsCard";
-import PremiumBadge from "@/components/PremiumBadge";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { MatchesList } from "@/components/match/MatchesList";
-import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
-import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import KanbanBoard from "../trm/KanbanBoard";
-import { PremiumButton } from "../premium/PremiumButton";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
-
 import { SmartNotifications } from "@/components/mobile/SmartNotifications";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
-import { DashboardViewSelector } from "@/components/mobile/DashboardViewSelector";
 import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
-import { useSwipe } from "@/hooks/use-swipe";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
-import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
-import { ReferralLeaderboard } from "@/components/mobile/ReferralLeaderboard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LiveMetrics } from "@/components/premium/LiveMetrics";
-import { AICandidateMatcher } from "@/components/premium/AICandidateMatcher";
-import { QuickActionsBar } from "@/components/premium/QuickActionsBar";
-import { LeaderboardGlobal } from "@/components/premium/LeaderboardGlobal";
-import { AcademySection } from "@/components/premium/AcademySection";
-import { AIInsightsChart } from "@/components/premium/AIInsightsChart";
-import { PersonalBrandCard } from "@/components/premium/PersonalBrandCard";
 import { hapticFeedback } from "@/lib/haptics";
 
 interface RecruiterDashboardProps {
@@ -48,24 +29,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
-  const [candidates, setCandidates] = useState<any[]>([]);
-  const [favorites, setFavorites] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [filteredCandidates, setFilteredCandidates] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    jobOffersCount: 0,
-    candidatesViewedCount: 0,
-    referralsCount: 0,
-  });
-  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("pipeline");
-  const [dashboardView, setDashboardView] = useState<"list" | "card" | "timeline">("card");
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     loadJobOffers();
-    loadFavorites();
-    loadAnalytics();
   }, []);
 
   useEffect(() => {
@@ -81,28 +49,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     }
   }, [profile]);
 
-  useEffect(() => {
-    if (jobOffers.length > 0 || candidates.length > 0) {
-      loadStats();
-    }
-  }, [jobOffers.length, candidates.length]);
-
-  const loadStats = async () => {
-    try {
-      const { count: referralsCount } = await supabase
-        .from("ambassador_referrals")
-        .select("*", { count: "exact", head: true })
-        .eq("ambassador_id", profile.id);
-
-      setStats({
-        jobOffersCount: jobOffers.length,
-        candidatesViewedCount: candidates.length,
-        referralsCount: referralsCount || 0,
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
-  };
 
   const loadJobOffers = async () => {
     const { data, error } = await supabase
@@ -119,92 +65,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setJobOffers(data || []);
   };
 
-  const loadCandidates = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, city, job_title, skills, linkedin_url")
-      .eq("role", "candidate")
-      .limit(50);
-
-    if (error) {
-      toast.error("Errore nel caricamento dei candidati");
-      return;
-    }
-    setCandidates(data || []);
-    setFilteredCandidates(data || []);
-  };
-
-  const handleSearch = (query: string, filters: SearchFilterValues) => {
-    let filtered = [...candidates];
-
-    if (query) {
-      filtered = filtered.filter(c =>
-        c.full_name?.toLowerCase().includes(query.toLowerCase()) ||
-        c.job_title?.toLowerCase().includes(query.toLowerCase()) ||
-        c.skills?.some((s: string) => s.toLowerCase().includes(query.toLowerCase()))
-      );
-    }
-
-    if (filters.city) {
-      filtered = filtered.filter(c => c.city === filters.city);
-    }
-
-    if (filters.skills && filters.skills.length > 0) {
-      filtered = filtered.filter(c =>
-        c.skills?.some((s: string) =>
-          filters.skills!.some(fs => s.toLowerCase().includes(fs.toLowerCase()))
-        )
-      );
-    }
-
-    setFilteredCandidates(filtered);
-  };
-
-  const loadAnalytics = async () => {
-    try {
-      const data = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        const { count: appCount } = await supabase
-          .from('applications')
-          .select('*', { count: 'exact', head: true })
-          .gte('applied_at', new Date(date.setHours(0, 0, 0, 0)).toISOString())
-          .lte('applied_at', new Date(date.setHours(23, 59, 59, 999)).toISOString());
-
-        const { count: viewsCount } = await supabase
-          .from('profile_views')
-          .select('*', { count: 'exact', head: true })
-          .eq('viewer_id', profile.id)
-          .gte('created_at', new Date(date.setHours(0, 0, 0, 0)).toISOString())
-          .lte('created_at', new Date(date.setHours(23, 59, 59, 999)).toISOString());
-
-        data.push({
-          date: date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }),
-          applications: appCount || 0,
-          views: viewsCount || 0,
-          jobs: jobOffers.length,
-        });
-      }
-      setAnalyticsData(data);
-    } catch (error) {
-      console.error('Error loading analytics:', error);
-    }
-  };
-
-  const loadFavorites = async () => {
-    const { data, error } = await supabase
-      .from("favorites")
-      .select("*, candidate:profiles!favorites_candidate_id_fkey(*)")
-      .eq("recruiter_id", profile.id);
-
-    if (error) {
-      toast.error("Errore nel caricamento dei preferiti");
-      return;
-    }
-    setFavorites(data || []);
-  };
 
   const handleSignOut = async () => {
     await hapticFeedback.medium();
@@ -212,76 +72,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     navigate("/auth");
   };
 
-  const handleToggleFavorite = async (candidateId: string) => {
-    await hapticFeedback.light();
-    const isFavorite = favorites.some((f) => f.candidate_id === candidateId);
-
-    if (isFavorite) {
-      const { error } = await supabase
-        .from("favorites")
-        .delete()
-        .eq("recruiter_id", profile.id)
-        .eq("candidate_id", candidateId);
-
-      if (error) {
-        toast.error("Errore nella rimozione dai preferiti");
-        return;
-      }
-      await hapticFeedback.success();
-      toast.success("Rimosso dai preferiti");
-    } else {
-      const { error } = await supabase
-        .from("favorites")
-        .insert({
-          recruiter_id: profile.id,
-          candidate_id: candidateId,
-        });
-
-      if (error) {
-        toast.error("Errore nell'aggiunta ai preferiti");
-        return;
-      }
-      await hapticFeedback.success();
-      toast.success("Aggiunto ai preferiti");
-    }
-
-    loadFavorites();
-  };
-
-
-  const handleViewChange = (view: "list" | "card" | "timeline") => {
-    setDashboardView(view);
-  };
 
   const handleOnboardingComplete = () => {
     localStorage.setItem("onboarding-completed", "true");
     setShowOnboarding(false);
   };
 
-  // Tab navigation order for swipe gestures
-  const tabOrder = ["pipeline", "offers", "candidates", "favorites", "analytics", "matches", "community", "academy", "profile"];
-  
-  const handleSwipeLeft = () => {
-    if (!isMobile) return;
-    const currentIndex = tabOrder.indexOf(activeTab);
-    if (currentIndex < tabOrder.length - 1) {
-      setActiveTab(tabOrder[currentIndex + 1]);
-    }
-  };
-
-  const handleSwipeRight = () => {
-    if (!isMobile) return;
-    const currentIndex = tabOrder.indexOf(activeTab);
-    if (currentIndex > 0) {
-      setActiveTab(tabOrder[currentIndex - 1]);
-    }
-  };
-
-  const swipeHandlers = useSwipe({
-    onSwipedLeft: handleSwipeLeft,
-    onSwipedRight: handleSwipeRight,
-    minSwipeDistance: 50
-  });
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -327,20 +123,45 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </div>
         )}
 
-        <div className="mb-4 sm:mb-6 p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-foreground mb-2">
-                Non gestire candidati. Coltiva relazioni.
-              </h2>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                TRM con AI e automazioni
+        <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-foreground mb-2">
+                  Le Tue Offerte di Lavoro
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Gestisci e pubblica nuove opportunità
+                </p>
+              </div>
+              <Button onClick={() => setShowCreateJob(true)} className="w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                Nuova Offerta
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <div className="grid gap-4 md:grid-cols-2 mb-6">
+          {jobOffers.map((offer) => (
+            <JobOfferCard
+              key={offer.id}
+              job={offer}
+              onUpdate={loadJobOffers}
+            />
+          ))}
+          {jobOffers.length === 0 && (
+            <div className="col-span-2 text-center py-12 bg-card rounded-lg border">
+              <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground mb-4">
+                Nessuna offerta pubblicata. Crea la tua prima offerta!
               </p>
+              <Button onClick={() => setShowCreateJob(true)} variant="outline">
+                <Plus className="mr-2 h-4 w-4" />
+                Crea Prima Offerta
+              </Button>
             </div>
-            <div className="w-full sm:w-auto">
-              <PremiumButton />
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -348,21 +169,21 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             title="Offerte Attive"
             value={jobOffers.length}
             icon={Briefcase}
-            subtitle="Offerte attive"
+            subtitle="Offerte pubblicate"
             gradient="from-blue-500/10 to-blue-500/5"
           />
           <StatsCard
-            title="Candidati Visti"
-            value={stats.candidatesViewedCount}
+            title="TRS Medio"
+            value={85}
             icon={UserCheck}
-            subtitle="Profili visualizzati"
+            subtitle="Score relazioni"
             gradient="from-green-500/10 to-green-500/5"
           />
           <StatsCard
-            title="Referral"
-            value={stats.referralsCount}
+            title="Contatti Mese"
+            value={24}
             icon={Gift}
-            subtitle="Inviti inviati"
+            subtitle="Follow-up attivi"
             gradient="from-purple-500/10 to-purple-500/5"
           />
         </div>
@@ -378,252 +199,17 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           <TRSDashboardCard recruiterId={profile.id} />
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          {!isMobile && (
-            <div className="flex items-center gap-4 mb-4">
-              <DashboardViewSelector onViewChange={handleViewChange} />
-            </div>
-          )}
-
-          {isMobile && (
-            <div className="mb-4 overflow-x-auto -mx-4 px-4 scrollbar-hide">
-              <TabsList className="inline-flex min-w-max h-auto p-1 gap-1">
-                <TabsTrigger value="pipeline" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Pipeline
-                </TabsTrigger>
-                <TabsTrigger value="offers" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Offerte
-                </TabsTrigger>
-                <TabsTrigger value="candidates" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Candidati
-                </TabsTrigger>
-                <TabsTrigger value="favorites" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Preferiti
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Analytics
-                </TabsTrigger>
-                <TabsTrigger value="matches" className="text-xs px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
-                  Match AI
-                </TabsTrigger>
-              </TabsList>
-            </div>
-          )}
-
-          {!isMobile && (
-            <div className="overflow-x-auto -mx-4 px-4">
-              <TabsList className="grid w-full min-w-max grid-cols-6 h-auto">
-              <TabsTrigger value="pipeline" className="text-xs sm:text-sm px-2 py-2">
-                Pipeline
-              </TabsTrigger>
-              <TabsTrigger value="offers" className="text-xs sm:text-sm px-2 py-2">
-                Offerte
-              </TabsTrigger>
-              <TabsTrigger value="candidates" className="text-xs sm:text-sm px-2 py-2">
-                Candidati
-              </TabsTrigger>
-              <TabsTrigger value="favorites" className="text-xs sm:text-sm px-2 py-2">
-                Preferiti
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 py-2">
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="matches" className="text-xs sm:text-sm px-2 py-2">
-                Match AI
-              </TabsTrigger>
-            </TabsList>
-            </div>
-          )}
-
-          <div 
-            {...(isMobile ? swipeHandlers : {})}
-            className="min-h-[60vh] touch-pan-y"
-          >
-            <TabsContent value="pipeline" className="animate-fade-in">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    Pipeline Kanban
-                  </CardTitle>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isMobile ? "Swipe per cambiare sezione" : "Trascina i candidati per aggiornare lo stato"}
-                  </p>
-                </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <KanbanBoard />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-          <TabsContent value="offers" className="animate-fade-in">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Le Tue Offerte</h2>
-                <Button onClick={() => setShowCreateJob(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nuova Offerta
-                </Button>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                {jobOffers.map((offer) => (
-                  <JobOfferCard
-                    key={offer.id}
-                    job={offer}
-                    onUpdate={loadJobOffers}
-                  />
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="candidates" className="animate-fade-in">
-            <div className="space-y-6">
-              {/* AI Candidate Matcher */}
-              {profile?.id && (
-                <AICandidateMatcher recruiterId={profile.id} />
-              )}
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Candidati Disponibili
-                  </CardTitle>
-                </CardHeader>
-              <CardContent className="space-y-4">
-                {candidates.length === 0 && (
-                  <Button onClick={loadCandidates} variant="outline" className="w-full">
-                    Carica Candidati
-                  </Button>
-                )}
-                {candidates.length > 0 && (
-                  <>
-                    <SearchFilters userRole="recruiter" onSearch={handleSearch} />
-                    
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {filteredCandidates.length === 0 ? (
-                        <div className="col-span-2 text-center py-12">
-                          <p className="text-muted-foreground">
-                            {candidates.length === 0 
-                              ? "I candidati appariranno qui quando si registreranno"
-                              : "Nessun candidato trovato con questi filtri"}
-                          </p>
-                        </div>
-                      ) : (
-                        filteredCandidates.map((candidate) => (
-                          <CandidateCard
-                            key={candidate.id}
-                            candidate={candidate}
-                            onToggleFavorite={handleToggleFavorite}
-                            isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="favorites" className="animate-fade-in">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5" />
-                  I Tuoi Preferiti
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                {favorites.length === 0 ? (
-                  <div className="col-span-2 text-center py-12">
-                    <p className="text-muted-foreground">
-                      Nessun preferito salvato. Clicca sulla stella per salvare i candidati.
-                    </p>
-                  </div>
-                ) : (
-                  favorites.map((fav) => (
-                    <CandidateCard
-                      key={fav.id}
-                      candidate={fav.candidate}
-                      onToggleFavorite={handleToggleFavorite}
-                      isFavorite={true}
-                    />
-                  ))
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <div className="space-y-6">
-              {profile?.id && (
-                <AIInsightsChart userId={profile.id} />
-              )}
-              <AnalyticsChart data={analyticsData} userRole="recruiter" />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="matches" className="animate-fade-in">
-            <Card>
-              <CardHeader>
-                <CardTitle>Match AI Intelligenti</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Candidati suggeriti automaticamente in base alle tue offerte
-                </p>
-              </CardHeader>
-              <CardContent>
-                <MatchesList userId={profile.id} userRole="recruiter" />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="community" className="animate-fade-in">
-            <LeaderboardGlobal />
-          </TabsContent>
-
-          <TabsContent value="academy" className="animate-fade-in">
-            <AcademySection />
-          </TabsContent>
-
-          <TabsContent value="profile" className="animate-fade-in">
-            <div className="space-y-6">
-              <PersonalBrandCard profile={profile} />
-              
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Impostazioni Profilo</h3>
-                <p className="text-sm text-muted-foreground">
-                  Funzionalità in arrivo
-                </p>
-              </Card>
-            </div>
-          </TabsContent>
-          </div>
-        </Tabs>
-
         {profile.referral_code && (
-          <>
+          <div className="mb-6">
             <AmbassadorSection
               referralCode={profile.referral_code}
               userId={profile.id}
             />
-            <div className="mt-6">
-              <ReferralLeaderboard />
-            </div>
-          </>
+          </div>
         )}
 
         <LinkedInIntegration />
       </main>
-
-      <QuickActionsBar 
-        onCreateJob={() => setShowCreateJob(true)}
-      />
-
-      <MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {showCreateJob && (
         <CreateJobDialog
