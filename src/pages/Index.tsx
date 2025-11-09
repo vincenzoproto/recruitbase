@@ -31,36 +31,63 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
-          <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">
-            Connetti Talenti e <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Opportunità</span>
+        <div className="max-w-4xl mx-auto space-y-8 animate-slide-up">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <span className="text-sm font-semibold text-primary">✨ Nuovo</span>
+            <span className="text-sm text-muted-foreground">30 giorni di prova gratuita Premium</span>
+          </div>
+          
+          <h2 className="text-5xl md:text-7xl font-bold text-foreground leading-tight">
+            Trova il talento perfetto.<br />
+            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+              In pochi click.
+            </span>
           </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground">
-            La piattaforma moderna per recruiter e candidati.<br />
-            <span className="font-semibold text-foreground">Semplice, veloce, professionale.</span>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            La piattaforma professionale che connette recruiter e candidati.<br />
+            <span className="font-semibold text-foreground">Veloce. Intuitiva. Efficace.</span>
           </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
             <Button 
               size="lg" 
-              className="h-12 px-8 text-lg font-semibold transition-all hover:scale-105 shadow-lg hover:shadow-xl"
+              className="h-14 px-10 text-lg font-bold transition-all hover:scale-105 shadow-lg hover:shadow-2xl"
               onClick={() => navigate("/auth")}
             >
-              Inizia Gratis
+              🎉 Prova Gratis 30 Giorni
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="h-12 px-8 text-lg font-semibold transition-all hover:scale-105"
-              onClick={() => navigate("/auth")}
+              className="h-14 px-8 text-lg font-semibold transition-all hover:scale-105 hover:bg-accent"
+              onClick={() => {
+                document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
-              Scopri di Più
+              Scopri Come Funziona
             </Button>
+          </div>
+
+          <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span>Nessuna carta richiesta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span>Setup in 2 minuti</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span>Cancella quando vuoi</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section id="features" className="container mx-auto px-4 py-16 scroll-mt-20">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
             <CardContent className="pt-8 text-center space-y-4">

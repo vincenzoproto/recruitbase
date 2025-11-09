@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, Users, LogOut, Star } from "lucide-react";
+import { Plus, Briefcase, Users, LogOut, Star, Gift, TrendingUp, UserCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
 import JobOfferCard from "./JobOfferCard";
 import CandidateCard from "./CandidateCard";
 import LinkedInIntegration from "../LinkedInIntegration";
+import StatsCard from "./StatsCard";
+import PremiumBadge from "@/components/PremiumBadge";
+import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -22,11 +25,35 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [showCreateJob, setShowCreateJob] = useState(false);
   const [showCandidates, setShowCandidates] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [stats, setStats] = useState({
+    jobOffersCount: 0,
+    candidatesViewedCount: 0,
+    referralsCount: 0,
+  });
 
   useEffect(() => {
     loadJobOffers();
     loadFavorites();
+    loadStats();
   }, []);
+
+  const loadStats = async () => {
+    try {
+      // Count referrals
+      const { count: referralsCount } = await supabase
+        .from("ambassador_referrals")
+        .select("*", { count: "exact", head: true })
+        .eq("ambassador_id", profile.id);
+
+      setStats({
+        jobOffersCount: jobOffers.length,
+        candidatesViewedCount: candidates.length,
+        referralsCount: referralsCount || 0,
+      });
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
+  };
 
   const loadJobOffers = async () => {
     // Carica solo i campi essenziali per performance
@@ -128,10 +155,42 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       <main className="container mx-auto px-4 py-8 space-y-6">
         <Card className="border-none shadow-md animate-fade-in bg-gradient-to-r from-card to-accent/20">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl">👋 Benvenuto, {profile.full_name}</CardTitle>
-            <CardDescription className="text-base">Gestisci le tue offerte di lavoro e trova i migliori candidati</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl flex items-center gap-3">
+                  👋 Benvenuto, {profile.full_name}
+                  <PremiumBadge isPremium={profile.is_premium} size="md" />
+                </CardTitle>
+                <CardDescription className="text-base">Gestisci le tue offerte di lavoro e trova i migliori candidati</CardDescription>
+              </div>
+            </div>
           </CardHeader>
         </Card>
+
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatsCard
+            title="Offerte Pubblicate"
+            value={stats.jobOffersCount}
+            icon={Briefcase}
+            subtitle="Offerte di lavoro attive"
+            gradient="from-blue-500/10 to-blue-500/5"
+          />
+          <StatsCard
+            title="Candidati Visti"
+            value={stats.candidatesViewedCount}
+            icon={UserCheck}
+            subtitle="Profili visualizzati"
+            gradient="from-green-500/10 to-green-500/5"
+          />
+          <StatsCard
+            title="Referral Attivi"
+            value={stats.referralsCount}
+            icon={Gift}
+            subtitle="Inviti inviati"
+            gradient="from-purple-500/10 to-purple-500/5"
+          />
+        </div>
 
         <Card className="border-none shadow-lg bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground overflow-hidden relative animate-scale-in hover:shadow-xl transition-shadow">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
@@ -279,6 +338,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {profile.referral_code && (
+          <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
         )}
 
         <LinkedInIntegration />

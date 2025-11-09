@@ -5,6 +5,7 @@ import { useAuthCache } from "@/hooks/useAuthCache";
 import { toast } from "sonner";
 import SplashScreen from "@/components/SplashScreen";
 import RoleSetup from "@/components/dashboard/RoleSetup";
+import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
 
 // Lazy load dashboard components
 const RecruiterDashboard = lazy(() => import("@/components/dashboard/RecruiterDashboard"));
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [showRoleSetup, setShowRoleSetup] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const redirectTimeoutRef = useRef<NodeJS.Timeout>();
   const hasShownWelcome = useRef(false);
 
@@ -66,7 +68,7 @@ const Dashboard = () => {
       // Carica i dati freschi in background (solo campi essenziali)
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, role, full_name, is_premium, referral_code, city")
+        .select("id, role, full_name, is_premium, referral_code, city, onboarding_completed")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -83,6 +85,9 @@ const Dashboard = () => {
         // Se role è null/undefined, mostra setup
         if (!data.role) {
           setShowRoleSetup(true);
+        } else if (!data.onboarding_completed) {
+          // Se il profilo esiste ma onboarding non completato
+          setShowOnboarding(true);
         }
       } else {
         // Profilo non esiste, crealo automaticamente
@@ -199,6 +204,13 @@ const Dashboard = () => {
     return <RoleSetup userId={profile.id} onComplete={handleRoleSetupComplete} />;
   }
 
+  // Mostra onboarding se necessario
+  const handleOnboardingComplete = (data: any) => {
+    setShowOnboarding(false);
+    setProfile({ ...profile, ...data });
+    cacheProfile({ ...profile, ...data });
+  };
+
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -220,7 +232,15 @@ const Dashboard = () => {
       )}
       
       {!showSplash && (
-        <Suspense fallback={
+        <>
+          <OnboardingDialog
+            open={showOnboarding}
+            userId={profile.id}
+            initialRole={profile.role}
+            onComplete={handleOnboardingComplete}
+          />
+          
+          <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center bg-background">
             <div className="text-center space-y-4 animate-fade-in">
               <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -234,6 +254,7 @@ const Dashboard = () => {
             <CandidateDashboard profile={profile} />
           )}
         </Suspense>
+        </>
       )}
     </>
   );
