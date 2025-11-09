@@ -22,39 +22,55 @@ export const ReferralLeaderboard = () => {
   }, []);
 
   const loadLeaderboard = async () => {
-    const { data } = await supabase
-      .from("ambassador_referrals")
-      .select(`
-        ambassador_id,
-        profiles!ambassador_referrals_ambassador_id_fkey (
-          id,
-          full_name,
-          avatar_url
-        )
-      `);
+    try {
+      // 1) Carica tutti i referral (solo ambassador_id) e raggruppa lato client
+      const { data: refData, error: refErr } = await supabase
+        .from("ambassador_referrals")
+        .select("ambassador_id");
+      if (refErr) throw refErr;
 
-    if (data) {
-      const grouped = data.reduce((acc: any, curr: any) => {
+      const grouped = (refData || []).reduce((acc: any, curr: any) => {
         const id = curr.ambassador_id;
         if (!acc[id]) {
-          acc[id] = {
-            id,
-            full_name: curr.profiles?.full_name || "Utente",
-            avatar_url: curr.profiles?.avatar_url,
-            referral_count: 0,
-            earnings: 0
-          };
+          acc[id] = { id, referral_count: 0, earnings: 0 };
         }
         acc[id].referral_count += 1;
         acc[id].earnings += 10;
         return acc;
-      }, {});
+      }, {} as Record<string, LeaderboardEntry>);
 
-      const sorted = Object.values(grouped)
-        .sort((a: any, b: any) => b.referral_count - a.referral_count)
+      const ids = Object.keys(grouped);
+      if (ids.length === 0) {
+        setLeaders([]);
+        return;
+      }
+
+      // 2) Recupera i profili degli ambassador in un'unica query
+      const { data: profilesData, error: profErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", ids);
+      if (profErr) throw profErr;
+
+      const withProfiles = ids.map((id) => {
+        const prof = profilesData?.find((p) => p.id === id);
+        return {
+          id,
+          full_name: prof?.full_name || "Utente",
+          avatar_url: prof?.avatar_url || "",
+          referral_count: (grouped as any)[id].referral_count,
+          earnings: (grouped as any)[id].earnings,
+        } as LeaderboardEntry;
+      });
+
+      const sorted = withProfiles
+        .sort((a, b) => b.referral_count - a.referral_count)
         .slice(0, 10);
 
-      setLeaders(sorted as LeaderboardEntry[]);
+      setLeaders(sorted);
+    } catch (e) {
+      console.error("Error loading referral leaderboard:", e);
+      setLeaders([]);
     }
   };
 
