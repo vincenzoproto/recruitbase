@@ -212,6 +212,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           bio: string | null
           city: string | null
           created_at: string | null
@@ -220,12 +221,14 @@ export type Database = {
           is_premium: boolean | null
           job_title: string | null
           linkedin_url: string | null
+          onboarding_completed: boolean | null
           referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills: string[] | null
           updated_at: string | null
         }
         Insert: {
+          avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
@@ -234,12 +237,14 @@ export type Database = {
           is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          onboarding_completed?: boolean | null
           referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
@@ -248,6 +253,7 @@ export type Database = {
           is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          onboarding_completed?: boolean | null
           referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
@@ -297,12 +303,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       experience_level: "entry" | "junior" | "mid" | "senior" | "lead"
