@@ -8,7 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Briefcase, UserCircle } from "lucide-react";
+import { Briefcase, UserCircle, Fingerprint } from "lucide-react";
+import { biometricAuth } from "@/lib/biometric-auth";
+import { hapticFeedback } from "@/lib/haptics";
+import { BiometricSetup } from "@/components/pwa/BiometricSetup";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -19,6 +22,17 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"recruiter" | "candidate">("candidate");
+  const [showBiometricSetup, setShowBiometricSetup] = useState(false);
+  const [biometricUserId, setBiometricUserId] = useState<string>("");
+  const [biometricUserName, setBiometricUserName] = useState<string>("");
+  const [canUseBiometric, setCanUseBiometric] = useState(false);
+
+  // Check if biometric auth is available
+  useEffect(() => {
+    biometricAuth.isAvailable().then(available => {
+      setCanUseBiometric(available && biometricAuth.isEnabled());
+    });
+  }, []);
 
   // Guardia di navigazione: redirect solo se c'è una sessione attiva
   useEffect(() => {

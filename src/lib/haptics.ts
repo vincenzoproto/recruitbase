@@ -1,53 +1,62 @@
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
-
+// Web Vibration API for haptic feedback
 export const hapticFeedback = {
   light: async () => {
     try {
-      await Haptics.impact({ style: ImpactStyle.Light });
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   },
   
   medium: async () => {
     try {
-      await Haptics.impact({ style: ImpactStyle.Medium });
+      if ('vibrate' in navigator) {
+        navigator.vibrate(20);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   },
   
   heavy: async () => {
     try {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
+      if ('vibrate' in navigator) {
+        navigator.vibrate(30);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   },
   
   success: async () => {
     try {
-      await Haptics.notification({ type: 'SUCCESS' as any });
+      if ('vibrate' in navigator) {
+        navigator.vibrate([10, 50, 10]);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   },
   
   error: async () => {
     try {
-      await Haptics.notification({ type: 'ERROR' as any });
+      if ('vibrate' in navigator) {
+        navigator.vibrate([50, 50, 50]);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   },
   
   selection: async () => {
     try {
-      await Haptics.selectionStart();
-      await Haptics.selectionChanged();
-      await Haptics.selectionEnd();
+      if ('vibrate' in navigator) {
+        navigator.vibrate(5);
+      }
     } catch (e) {
-      // Haptics not available on web, silently fail
+      // Haptics not available, silently fail
     }
   }
 };
