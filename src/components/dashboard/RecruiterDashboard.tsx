@@ -25,6 +25,7 @@ import { SmartNotifications } from "@/components/mobile/SmartNotifications";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { DashboardViewSelector } from "@/components/mobile/DashboardViewSelector";
+import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { ReferralLeaderboard } from "@/components/mobile/ReferralLeaderboard";
@@ -50,12 +51,26 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("pipeline");
   const [dashboardView, setDashboardView] = useState<"list" | "card" | "timeline">("card");
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     loadJobOffers();
     loadFavorites();
     loadAnalytics();
   }, []);
+
+  useEffect(() => {
+    // Mostra l'onboarding solo dopo che il profilo è caricato e solo se non è stato completato
+    if (profile?.id && profile?.role === "recruiter") {
+      const onboardingCompleted = localStorage.getItem("onboarding-completed");
+      if (!onboardingCompleted) {
+        // Ritarda di 500ms per permettere il caricamento completo della dashboard
+        setTimeout(() => {
+          setShowOnboarding(true);
+        }, 500);
+      }
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (jobOffers.length > 0 || candidates.length > 0) {
@@ -225,8 +240,14 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setDashboardView(view);
   };
 
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("onboarding-completed", "true");
+    setShowOnboarding(false);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />
