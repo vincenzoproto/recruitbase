@@ -124,7 +124,7 @@ const Auth = () => {
 
         if (profileError) throw profileError;
 
-        // Send welcome email (only on signup)
+        // Send welcome email
         try {
           await supabase.functions.invoke("send-welcome-email", {
             body: { name: fullName, email },
@@ -141,7 +141,7 @@ const Auth = () => {
               .from("profiles")
               .select("id")
               .eq("referral_code", referralCode)
-              .maybeSingle();
+              .single();
 
             if (ambassador) {
               await supabase.from("ambassador_referrals").insert({
@@ -169,57 +169,12 @@ const Auth = () => {
         });
 
         toast.success("Account creato con successo!");
-        sessionStorage.setItem("show_welcome", "true");
         navigate("/dashboard");
       }
     } catch (error: any) {
       toast.error(error.message || "Errore durante la registrazione");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const ensureProfileExists = async (userId: string, userEmail: string) => {
-    // Check if profile exists
-    const { data: existingProfile } = await supabase
-      .from("profiles")
-      .select("id, full_name, created_at")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (!existingProfile) {
-      // Create profile with default values
-      const defaultName = userEmail.split("@")[0];
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: userId,
-          role: "candidate",
-          full_name: defaultName,
-        });
-
-      if (profileError) throw profileError;
-
-      // Send welcome email for new profile
-      try {
-        await supabase.functions.invoke("send-welcome-email", {
-          body: { name: defaultName, email: userEmail },
-        });
-      } catch (emailError) {
-        console.error("Error sending welcome email:", emailError);
-      }
-
-      // Create trial subscription
-      const trialStart = new Date();
-      const trialEnd = new Date();
-      trialEnd.setDate(trialEnd.getDate() + 30);
-
-      await supabase.from("subscriptions").insert({
-        user_id: userId,
-        status: "trial",
-        trial_start: trialStart.toISOString(),
-        trial_end: trialEnd.toISOString(),
-      });
     }
   };
 
@@ -235,7 +190,7 @@ const Auth = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -247,11 +202,6 @@ const Auth = () => {
           throw error;
         }
         return;
-      }
-
-      if (data.user) {
-        // Ensure profile exists (create if needed)
-        await ensureProfileExists(data.user.id, data.user.email!);
       }
 
       sessionStorage.setItem("show_welcome", "true");
