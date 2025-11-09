@@ -56,6 +56,50 @@ const Auth = () => {
 
         if (profileError) throw profileError;
 
+        // Send welcome email
+        try {
+          await supabase.functions.invoke("send-welcome-email", {
+            body: { name: fullName, email },
+          });
+        } catch (emailError) {
+          console.error("Error sending welcome email:", emailError);
+        }
+
+        // Check for referral code
+        const referralCode = localStorage.getItem("referral_code");
+        if (referralCode) {
+          try {
+            const { data: ambassador } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("referral_code", referralCode)
+              .single();
+
+            if (ambassador) {
+              await supabase.from("ambassador_referrals").insert({
+                ambassador_id: ambassador.id,
+                referred_user_id: authData.user.id,
+                referral_code: referralCode,
+              });
+            }
+            localStorage.removeItem("referral_code");
+          } catch (refError) {
+            console.error("Error creating referral:", refError);
+          }
+        }
+
+        // Create trial subscription
+        const trialStart = new Date();
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + 30);
+
+        await supabase.from("subscriptions").insert({
+          user_id: authData.user.id,
+          status: "trial",
+          trial_start: trialStart.toISOString(),
+          trial_end: trialEnd.toISOString(),
+        });
+
         toast.success("Account creato con successo!");
         navigate("/dashboard");
       }

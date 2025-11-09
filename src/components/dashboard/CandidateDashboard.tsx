@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Briefcase, LogOut, User } from "lucide-react";
+import { Briefcase, LogOut, User, CheckCircle, Clock, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
 import JobOfferCard from "./JobOfferCard";
+import { Badge } from "@/components/ui/badge";
+import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -91,6 +92,29 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
+        <Card className="border-none shadow-md animate-fade-in bg-gradient-to-r from-card to-accent/20">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  👋 Benvenuto, {profile.full_name}
+                  {profile.is_premium && (
+                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-none">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Premium
+                    </Badge>
+                  )}
+                </CardTitle>
+                <CardDescription className="text-base">Trova il lavoro perfetto per te</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {profile.referral_code && (
+          <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
+        )}
+
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
