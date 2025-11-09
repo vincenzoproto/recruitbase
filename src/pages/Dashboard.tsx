@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import SplashScreen from "@/components/SplashScreen";
 import RoleSetup from "@/components/dashboard/RoleSetup";
 import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Lazy load dashboard components
 const RecruiterDashboard = lazy(() => import("@/components/dashboard/RecruiterDashboard"));
@@ -226,6 +227,16 @@ const Dashboard = () => {
             onComplete={handleOnboardingComplete}
           />
           
+          <ErrorBoundary 
+            fallback={
+              <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center space-y-4 animate-fade-in">
+                  <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-lg text-muted-foreground">Caricamento dashboard...</p>
+                </div>
+              </div>
+            }
+          >
           <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center bg-background">
             <div className="text-center space-y-4 animate-fade-in">
@@ -240,6 +251,7 @@ const Dashboard = () => {
             <CandidateDashboard profile={profile} />
           )}
         </Suspense>
+        </ErrorBoundary>
         </>
       )}
     </>
