@@ -1,8 +1,10 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthCache } from "@/hooks/useAuthCache";
+import { toast } from "sonner";
 import SplashScreen from "@/components/SplashScreen";
+import RoleSetup from "@/components/dashboard/RoleSetup";
 
 // Lazy load dashboard components
 const RecruiterDashboard = lazy(() => import("@/components/dashboard/RecruiterDashboard"));
@@ -10,18 +12,40 @@ const CandidateDashboard = lazy(() => import("@/components/dashboard/CandidateDa
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, session, cachedProfile, isLoadingFromCache, cacheProfile } = useAuthCache();
+  const { user, session, cachedProfile, isLoadingFromCache, cacheProfile, sessionExpired } = useAuthCache();
   const [profile, setProfile] = useState<any>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [showRoleSetup, setShowRoleSetup] = useState(false);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout>();
+  const hasShownWelcome = useRef(false);
 
+  // Guardia di navigazione: redirect ad /auth solo se session è definitivamente assente
   useEffect(() => {
-    if (!isLoadingFromCache) {
-      if (!session && !user) {
-        navigate("/auth");
+    if (!isLoadingFromCache && !session && !user) {
+      // Debounce redirect per evitare loop
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
       }
+      redirectTimeoutRef.current = setTimeout(() => {
+        navigate("/auth", { replace: true });
+      }, 100);
     }
+
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
   }, [user, session, navigate, isLoadingFromCache]);
+
+  // Gestione sessione scaduta
+  useEffect(() => {
+    if (sessionExpired) {
+      toast.error("Sessione scaduta, effettua di nuovo l'accesso");
+      navigate("/auth", { replace: true });
+    }
+  }, [sessionExpired, navigate]);
 
   useEffect(() => {
     if (user && !isLoadingFromCache) {
@@ -44,19 +68,94 @@ const Dashboard = () => {
         .from("profiles")
         .select("id, role, full_name, is_premium, referral_code, city")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = no rows found, lo gestiamo sotto
+        throw error;
+      }
       
-      // Aggiorna cache e stato
       if (data) {
+        // Profilo esiste
         cacheProfile(data);
         setProfile(data);
+
+        // Se role è null/undefined, mostra setup
+        if (!data.role) {
+          setShowRoleSetup(true);
+        }
+      } else {
+        // Profilo non esiste, crealo automaticamente
+        await createProfile();
       }
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
       setIsLoadingProfile(false);
+    }
+  };
+
+  const createProfile = async () => {
+    if (!user) return;
+
+    try {
+      // Estrai nome dalla email se non disponibile
+      const nameFromEmail = user.email?.split('@')[0] || 'Utente';
+      
+      const { data: newProfile, error: insertError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          full_name: user.user_metadata?.full_name || nameFromEmail,
+          role: "recruiter", // Default
+        })
+        .select("id, role, full_name, is_premium, referral_code, city")
+        .single();
+
+      if (insertError) throw insertError;
+
+      if (newProfile) {
+        cacheProfile(newProfile);
+        setProfile(newProfile);
+
+        // Invia email di benvenuto
+        try {
+          await supabase.functions.invoke("send-welcome-email", {
+            body: { 
+              name: newProfile.full_name, 
+              email: user.email 
+            },
+          });
+        } catch (emailError) {
+          console.error("Error sending welcome email:", emailError);
+        }
+
+        // Crea trial subscription
+        const trialStart = new Date();
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + 30);
+
+        await supabase.from("subscriptions").insert({
+          user_id: user.id,
+          status: "trial",
+          trial_start: trialStart.toISOString(),
+          trial_end: trialEnd.toISOString(),
+        });
+
+        toast.success("Profilo creato con successo!");
+      }
+    } catch (error: any) {
+      console.error("Error creating profile:", error);
+      toast.error("Errore nella creazione del profilo");
+    }
+  };
+
+  const handleRoleSetupComplete = (role: string) => {
+    setShowRoleSetup(false);
+    if (profile) {
+      const updatedProfile = { ...profile, role };
+      setProfile(updatedProfile);
+      cacheProfile(updatedProfile);
     }
   };
 
@@ -70,6 +169,20 @@ const Dashboard = () => {
     }
   }, [isLoadingProfile, profile]);
 
+  // Welcome toast al primo accesso
+  useEffect(() => {
+    if (!showSplash && profile && !hasShownWelcome.current) {
+      const shouldShowWelcome = sessionStorage.getItem("show_welcome");
+      if (shouldShowWelcome === "true") {
+        toast.success(`Benvenuto/a, ${profile.full_name || "utente"} 👋`, {
+          duration: 4000,
+        });
+        sessionStorage.removeItem("show_welcome");
+        hasShownWelcome.current = true;
+      }
+    }
+  }, [showSplash, profile]);
+
   if (isLoadingFromCache || (isLoadingProfile && !cachedProfile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -81,10 +194,18 @@ const Dashboard = () => {
     );
   }
 
+  // Mostra setup ruolo se necessario
+  if (showRoleSetup && profile) {
+    return <RoleSetup userId={profile.id} onComplete={handleRoleSetupComplete} />;
+  }
+
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-muted-foreground">Profilo non trovato</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-lg text-muted-foreground">Preparazione profilo...</p>
+        </div>
       </div>
     );
   }

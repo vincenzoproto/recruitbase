@@ -19,6 +19,7 @@ export const useAuthCache = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [cachedProfile, setCachedProfile] = useState<CachedProfile | null>(null);
   const [isLoadingFromCache, setIsLoadingFromCache] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   // Carica dal cache al mount
   useEffect(() => {
@@ -50,6 +51,18 @@ export const useAuthCache = () => {
         if (event === "SIGNED_OUT") {
           localStorage.removeItem(CACHE_KEY);
           setCachedProfile(null);
+          setSessionExpired(false);
+        }
+
+        // Gestione token scaduto
+        if (event === "TOKEN_REFRESHED" && !session) {
+          setSessionExpired(true);
+          localStorage.removeItem(CACHE_KEY);
+          setCachedProfile(null);
+        }
+
+        if (event === "USER_UPDATED" && session) {
+          setSessionExpired(false);
         }
       }
     );
@@ -85,6 +98,7 @@ export const useAuthCache = () => {
     session,
     cachedProfile,
     isLoadingFromCache,
+    sessionExpired,
     cacheProfile,
     invalidateCache,
   };

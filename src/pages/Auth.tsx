@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,61 @@ import { Briefcase, UserCircle } from "lucide-react";
 const Auth = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"recruiter" | "candidate">("candidate");
+  const redirectTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // Guardia di navigazione con debounce per evitare loop
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/dashboard");
+    let isMounted = true;
+
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (isMounted && session) {
+          // Debounce redirect per evitare doppi push
+          if (redirectTimeoutRef.current) {
+            clearTimeout(redirectTimeoutRef.current);
+          }
+          redirectTimeoutRef.current = setTimeout(() => {
+            if (isMounted) {
+              navigate("/dashboard", { replace: true });
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        if (isMounted) {
+          setCheckingSession(false);
+        }
       }
-    });
+    };
+
+    checkSession();
+
+    return () => {
+      isMounted = false;
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
   }, [navigate]);
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-lg text-muted-foreground">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,8 +143,18 @@ const Auth = () => {
           trial_end: trialEnd.toISOString(),
         });
 
+        // Segnala il primo login per mostrare il welcome toast
+        sessionStorage.setItem("show_welcome", "true");
+
         toast.success("Account creato con successo!");
-        navigate("/dashboard");
+        
+        // Debounce redirect
+        if (redirectTimeoutRef.current) {
+          clearTimeout(redirectTimeoutRef.current);
+        }
+        redirectTimeoutRef.current = setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
       }
     } catch (error: any) {
       toast.error(error.message || "Errore durante la registrazione");
@@ -119,15 +172,27 @@ const Auth = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
+      if (data.user) {
+        // Segnala il primo login per mostrare il welcome toast
+        sessionStorage.setItem("show_welcome", "true");
+      }
+
       toast.success("Login effettuato!");
-      navigate("/dashboard");
+      
+      // Debounce redirect
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+      redirectTimeoutRef.current = setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 100);
     } catch (error: any) {
       toast.error(error.message || "Errore durante il login");
     } finally {
