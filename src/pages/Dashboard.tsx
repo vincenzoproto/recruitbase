@@ -73,10 +73,8 @@ const Dashboard = () => {
         // Se role è null/undefined, mostra setup
         if (!data.role) {
           setShowRoleSetup(true);
-        } else if (!data.onboarding_completed) {
-          // Se il profilo esiste ma onboarding non completato
-          setShowOnboarding(true);
         }
+        // Onboarding disabilitato temporaneamente
       } else {
         // Profilo non esiste, crealo automaticamente
         await createProfile();
