@@ -210,6 +210,119 @@ export type Database = {
           },
         ]
       }
+      matches: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          id: string
+          job_offer_id: string
+          match_score: number
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          id?: string
+          job_offer_id: string
+          match_score: number
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          id?: string
+          job_offer_id?: string
+          match_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_job_offer_id_fkey"
+            columns: ["job_offer_id"]
+            isOneToOne: false
+            referencedRelation: "job_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          read: boolean | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          link: string | null
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_views: {
+        Row: {
+          created_at: string | null
+          id: string
+          viewed_profile_id: string
+          viewer_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          viewed_profile_id: string
+          viewer_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          viewed_profile_id?: string
+          viewer_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -329,6 +442,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_match_score: {
+        Args: { p_candidate_id: string; p_job_offer_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]

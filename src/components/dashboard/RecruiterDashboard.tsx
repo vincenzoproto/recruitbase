@@ -12,6 +12,10 @@ import LinkedInIntegration from "../LinkedInIntegration";
 import StatsCard from "./StatsCard";
 import PremiumBadge from "@/components/PremiumBadge";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { MatchesList } from "@/components/match/MatchesList";
+import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
+import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -25,15 +29,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [showCreateJob, setShowCreateJob] = useState(false);
   const [showCandidates, setShowCandidates] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [filteredCandidates, setFilteredCandidates] = useState<any[]>([]);
   const [stats, setStats] = useState({
     jobOffersCount: 0,
     candidatesViewedCount: 0,
     referralsCount: 0,
   });
+  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
 
   useEffect(() => {
     loadJobOffers();
     loadFavorites();
+    loadAnalytics();
   }, []);
 
   useEffect(() => {
@@ -77,18 +85,83 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   };
 
   const loadCandidates = async () => {
-    // Carica solo campi essenziali per lista candidati
     const { data, error } = await supabase
       .from("profiles")
       .select("id, full_name, city, job_title, skills, linkedin_url")
       .eq("role", "candidate")
-      .limit(50); // Limita a 50 candidati iniziali
+      .limit(50);
 
     if (error) {
       toast.error("Errore nel caricamento dei candidati");
       return;
     }
     setCandidates(data || []);
+    setFilteredCandidates(data || []);
+  };
+
+  const handleSearch = (query: string, filters: SearchFilterValues) => {
+    let filtered = [...candidates];
+
+    // Filter by query
+    if (query) {
+      filtered = filtered.filter(c =>
+        c.full_name?.toLowerCase().includes(query.toLowerCase()) ||
+        c.job_title?.toLowerCase().includes(query.toLowerCase()) ||
+        c.skills?.some((s: string) => s.toLowerCase().includes(query.toLowerCase()))
+      );
+    }
+
+    // Filter by city
+    if (filters.city) {
+      filtered = filtered.filter(c => c.city === filters.city);
+    }
+
+    // Filter by skills
+    if (filters.skills && filters.skills.length > 0) {
+      filtered = filtered.filter(c =>
+        c.skills?.some((s: string) =>
+          filters.skills!.some(fs => s.toLowerCase().includes(fs.toLowerCase()))
+        )
+      );
+    }
+
+    setFilteredCandidates(filtered);
+  };
+
+  const loadAnalytics = async () => {
+    try {
+      // Generate mock analytics for last 7 days
+      const data = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        // Get applications count for this date
+        const { count: appCount } = await supabase
+          .from('applications')
+          .select('*', { count: 'exact', head: true })
+          .gte('applied_at', new Date(date.setHours(0, 0, 0, 0)).toISOString())
+          .lte('applied_at', new Date(date.setHours(23, 59, 59, 999)).toISOString());
+
+        // Get profile views count
+        const { count: viewsCount } = await supabase
+          .from('profile_views')
+          .select('*', { count: 'exact', head: true })
+          .eq('viewer_id', profile.id)
+          .gte('created_at', new Date(date.setHours(0, 0, 0, 0)).toISOString())
+          .lte('created_at', new Date(date.setHours(23, 59, 59, 999)).toISOString());
+
+        data.push({
+          date: date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }),
+          applications: appCount || 0,
+          views: viewsCount || 0,
+          jobs: jobOffers.length,
+        });
+      }
+      setAnalyticsData(data);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    }
   };
 
   const loadFavorites = async () => {
@@ -150,10 +223,13 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
             <p className="text-sm text-muted-foreground">Dashboard Recruiter</p>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Esci
-          </Button>
+          <div className="flex items-center gap-2">
+            <NotificationBell userId={profile.id} />
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Esci
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -227,7 +303,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <Button
             onClick={() => setShowCreateJob(true)}
             size="lg"
@@ -245,6 +321,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               setShowCandidates(!showCandidates);
               if (!showCandidates) loadCandidates();
               setShowFavorites(false);
+              setShowAnalytics(false);
             }}
             className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
             style={{ animationDelay: "0.1s" }}
@@ -265,6 +342,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             onClick={() => {
               setShowFavorites(!showFavorites);
               setShowCandidates(false);
+              setShowAnalytics(false);
             }}
             className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
             style={{ animationDelay: "0.2s" }}
@@ -277,7 +355,32 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               <div className="text-xs text-muted-foreground mt-1">{favorites.length} salvati</div>
             </div>
           </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              setShowAnalytics(!showAnalytics);
+              setShowCandidates(false);
+              setShowFavorites(false);
+            }}
+            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
+            style={{ animationDelay: "0.3s" }}
+          >
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-7 w-7 text-primary" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-base">Analytics</div>
+              <div className="text-xs text-muted-foreground mt-1">Statistiche dettagliate</div>
+            </div>
+          </Button>
         </div>
+
+        <MatchesList userId={profile.id} userRole="recruiter" />
+
+        {showAnalytics && (
+          <AnalyticsChart data={analyticsData} userRole="recruiter" />
+        )}
 
         {showCandidates && (
           <Card>
@@ -287,27 +390,35 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 Candidati Disponibili
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              {candidates.length === 0 ? (
-                <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Users className="h-10 w-10 text-primary" />
+            <CardContent className="space-y-4">
+              <SearchFilters userRole="recruiter" onSearch={handleSearch} />
+              
+              <div className="grid gap-4 md:grid-cols-2">
+                {filteredCandidates.length === 0 ? (
+                  <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                      <Users className="h-10 w-10 text-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-lg font-semibold text-foreground">Nessun candidato trovato</p>
+                      <p className="text-sm text-muted-foreground">
+                        {candidates.length === 0 
+                          ? "I candidati appariranno qui quando si registreranno"
+                          : "Prova a modificare i filtri di ricerca"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold text-foreground">Nessun candidato trovato</p>
-                    <p className="text-sm text-muted-foreground">I candidati appariranno qui quando si registreranno</p>
-                  </div>
-                </div>
-              ) : (
-                candidates.map((candidate) => (
-                  <CandidateCard
-                    key={candidate.id}
-                    candidate={candidate}
-                    onToggleFavorite={handleToggleFavorite}
-                    isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
-                  />
-                ))
-              )}
+                ) : (
+                  filteredCandidates.map((candidate) => (
+                    <CandidateCard
+                      key={candidate.id}
+                      candidate={candidate}
+                      onToggleFavorite={handleToggleFavorite}
+                      isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
+                    />
+                  ))
+                )}
+              </div>
             </CardContent>
           </Card>
         )}

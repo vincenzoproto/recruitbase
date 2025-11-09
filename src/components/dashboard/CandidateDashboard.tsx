@@ -9,6 +9,9 @@ import EditProfileDialog from "./EditProfileDialog";
 import JobOfferCard from "./JobOfferCard";
 import { Badge } from "@/components/ui/badge";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { MatchesList } from "@/components/match/MatchesList";
+import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -17,6 +20,7 @@ interface CandidateDashboardProps {
 const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const navigate = useNavigate();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [showEditProfile, setShowEditProfile] = useState(false);
 
@@ -26,19 +30,49 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   }, []);
 
   const loadJobOffers = async () => {
-    // Carica solo campi essenziali per performance
     const { data, error } = await supabase
       .from("job_offers")
       .select("id, title, city, sector, experience_level, description, created_at")
       .eq("is_active", true)
       .order("created_at", { ascending: false })
-      .limit(30); // Limita a 30 offerte iniziali
+      .limit(30);
 
     if (error) {
       toast.error("Errore nel caricamento delle offerte");
       return;
     }
     setJobOffers(data || []);
+    setFilteredJobs(data || []);
+  };
+
+  const handleSearch = (query: string, filters: SearchFilterValues) => {
+    let filtered = [...jobOffers];
+
+    // Filter by query
+    if (query) {
+      filtered = filtered.filter(j =>
+        j.title?.toLowerCase().includes(query.toLowerCase()) ||
+        j.description?.toLowerCase().includes(query.toLowerCase()) ||
+        j.sector?.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // Filter by city
+    if (filters.city) {
+      filtered = filtered.filter(j => j.city === filters.city);
+    }
+
+    // Filter by sector
+    if (filters.sector) {
+      filtered = filtered.filter(j => j.sector === filters.sector);
+    }
+
+    // Filter by experience level
+    if (filters.experienceLevel) {
+      filtered = filtered.filter(j => j.experience_level === filters.experienceLevel);
+    }
+
+    setFilteredJobs(filtered);
   };
 
   const loadApplications = async () => {
@@ -86,10 +120,13 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
             <p className="text-sm text-muted-foreground">Dashboard Candidato</p>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Esci
-          </Button>
+          <div className="flex items-center gap-2">
+            <NotificationBell userId={profile.id} />
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Esci
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -116,6 +153,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
         {profile.referral_code && (
           <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
         )}
+
+        <MatchesList userId={profile.id} userRole="candidate" />
 
         <Card>
           <CardHeader>
@@ -214,31 +253,39 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                 : `${jobOffers.length} offerte disponibili`}
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            {jobOffers.length === 0 ? (
-              <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Briefcase className="h-10 w-10 text-primary" />
+          <CardContent className="space-y-4">
+            <SearchFilters userRole="candidate" onSearch={handleSearch} />
+            
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredJobs.length === 0 ? (
+                <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Briefcase className="h-10 w-10 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-foreground">Nessuna offerta trovata</p>
+                    <p className="text-sm text-muted-foreground">
+                      {jobOffers.length === 0
+                        ? "Torna più tardi per scoprire nuove opportunità"
+                        : "Prova a modificare i filtri di ricerca"}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-lg font-semibold text-foreground">Nessuna offerta disponibile</p>
-                  <p className="text-sm text-muted-foreground">Torna più tardi per scoprire nuove opportunità</p>
-                </div>
-              </div>
-            ) : (
-              jobOffers.map((job) => {
-                const hasApplied = applications.some((app) => app.job_offer_id === job.id);
-                return (
-                  <JobOfferCard
-                    key={job.id}
-                    job={job}
-                    onApply={() => handleApply(job.id)}
-                    hasApplied={hasApplied}
-                    isCandidate
-                  />
-                );
-              })
-            )}
+              ) : (
+                filteredJobs.map((job) => {
+                  const hasApplied = applications.some((app) => app.job_offer_id === job.id);
+                  return (
+                    <JobOfferCard
+                      key={job.id}
+                      job={job}
+                      onApply={() => handleApply(job.id)}
+                      hasApplied={hasApplied}
+                      isCandidate
+                    />
+                  );
+                })
+              )}
+            </div>
           </CardContent>
         </Card>
       </main>
