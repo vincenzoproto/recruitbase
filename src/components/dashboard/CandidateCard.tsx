@@ -11,8 +11,8 @@ interface CandidateCardProps {
 
 const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCardProps) => {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader>
+    <Card className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-lg">{candidate.full_name}</CardTitle>

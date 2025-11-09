@@ -122,27 +122,38 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Benvenuto, {profile.full_name}</CardTitle>
-            <CardDescription>Gestisci le tue offerte di lavoro e trova i migliori candidati</CardDescription>
+        <Card className="border-none shadow-md animate-fade-in bg-gradient-to-r from-card to-accent/20">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl">👋 Benvenuto, {profile.full_name}</CardTitle>
+            <CardDescription className="text-base">Gestisci le tue offerte di lavoro e trova i migliori candidati</CardDescription>
           </CardHeader>
         </Card>
 
-        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-          <CardContent className="p-6">
+        <Card className="border-none shadow-lg bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground overflow-hidden relative animate-scale-in hover:shadow-xl transition-shadow">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+          <CardContent className="p-6 relative">
             <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="text-xl font-bold mb-2">🚀 Passa a Premium</h3>
-                <p className="text-primary-foreground/90 mb-1">Sblocca tutte le funzionalità avanzate</p>
-                <p className="text-sm text-primary-foreground/70">✓ 30 giorni di prova gratuita • ✓ Contatti illimitati • ✓ Ricerca avanzata</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Star className="h-6 w-6 fill-current" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Passa a Premium</h3>
+                </div>
+                <p className="text-primary-foreground/95 text-base font-medium">Sblocca tutte le funzionalità avanzate</p>
+                <div className="flex flex-wrap gap-2 text-sm">
+                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ 30 giorni gratis</span>
+                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ Contatti illimitati</span>
+                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ Ricerca avanzata</span>
+                </div>
               </div>
               <Button 
                 size="lg" 
                 variant="secondary"
+                className="h-12 px-8 font-bold shadow-lg hover:scale-105 transition-transform"
                 onClick={() => window.open('https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00', '_blank')}
               >
-                Attiva Premium
+                Attiva Ora
               </Button>
             </div>
           </CardContent>
@@ -152,10 +163,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           <Button
             onClick={() => setShowCreateJob(true)}
             size="lg"
-            className="h-24 flex flex-col items-center justify-center gap-2"
+            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] animate-fade-in"
           >
-            <Plus className="h-8 w-8" />
-            <span className="font-semibold">Nuova Offerta</span>
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+              <Plus className="h-7 w-7" />
+            </div>
+            <span className="font-bold text-base">Nuova Offerta</span>
           </Button>
           <Button
             variant="outline"
@@ -165,13 +178,18 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               if (!showCandidates) loadCandidates();
               setShowFavorites(false);
             }}
-            className="h-24 flex flex-col items-center justify-center gap-2"
+            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
+            style={{ animationDelay: "0.1s" }}
           >
-            <Users className="h-8 w-8" />
-            <span className="font-semibold">Cerca Candidati</span>
-            {candidates.length > 0 && (
-              <span className="text-xs text-muted-foreground">{candidates.length} disponibili</span>
-            )}
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="h-7 w-7 text-primary" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-base">Cerca Candidati</div>
+              {candidates.length > 0 && (
+                <div className="text-xs text-muted-foreground mt-1">{candidates.length} disponibili</div>
+              )}
+            </div>
           </Button>
           <Button
             variant="outline"
@@ -180,11 +198,16 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               setShowFavorites(!showFavorites);
               setShowCandidates(false);
             }}
-            className="h-24 flex flex-col items-center justify-center gap-2"
+            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
+            style={{ animationDelay: "0.2s" }}
           >
-            <Star className="h-8 w-8" />
-            <span className="font-semibold">Preferiti</span>
-            <span className="text-xs text-muted-foreground">{favorites.length} salvati</span>
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Star className="h-7 w-7 text-primary" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-base">Preferiti</div>
+              <div className="text-xs text-muted-foreground mt-1">{favorites.length} salvati</div>
+            </div>
           </Button>
         </div>
 
@@ -197,14 +220,26 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              {candidates.map((candidate) => (
-                <CandidateCard
-                  key={candidate.id}
-                  candidate={candidate}
-                  onToggleFavorite={handleToggleFavorite}
-                  isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
-                />
-              ))}
+              {candidates.length === 0 ? (
+                <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Users className="h-10 w-10 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-foreground">Nessun candidato trovato</p>
+                    <p className="text-sm text-muted-foreground">I candidati appariranno qui quando si registreranno</p>
+                  </div>
+                </div>
+              ) : (
+                candidates.map((candidate) => (
+                  <CandidateCard
+                    key={candidate.id}
+                    candidate={candidate}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
+                  />
+                ))
+              )}
             </CardContent>
           </Card>
         )}
@@ -219,9 +254,15 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               {favorites.length === 0 ? (
-                <p className="text-muted-foreground col-span-2 text-center py-8">
-                  Nessun candidato salvato. Clicca sulla stella per aggiungere ai preferiti!
-                </p>
+                <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Star className="h-10 w-10 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-foreground">Nessun preferito salvato</p>
+                    <p className="text-sm text-muted-foreground">Clicca sulla stella per salvare i candidati che ti interessano</p>
+                  </div>
+                </div>
               ) : (
                 favorites.map((fav) => (
                   <CandidateCard
@@ -247,9 +288,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             {jobOffers.length === 0 ? (
-              <p className="text-muted-foreground col-span-2 text-center py-8">
-                Nessuna offerta pubblicata. Clicca su "Nuova Offerta" per iniziare!
-              </p>
+              <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Briefcase className="h-10 w-10 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg font-semibold text-foreground">Nessuna offerta pubblicata</p>
+                  <p className="text-sm text-muted-foreground">Clicca su "Nuova Offerta" per iniziare a trovare candidati!</p>
+                </div>
+                <Button onClick={() => setShowCreateJob(true)} size="lg" className="mt-4">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Crea la tua prima offerta
+                </Button>
+              </div>
             ) : (
               jobOffers.map((job) => (
                 <JobOfferCard key={job.id} job={job} onUpdate={loadJobOffers} />

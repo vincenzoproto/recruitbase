@@ -31,18 +31,28 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-5xl font-bold text-foreground leading-tight">
-            Connetti Talenti e Opportunità
+        <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
+          <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">
+            Connetti Talenti e <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Opportunità</span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            La piattaforma moderna per recruiter e candidati. Semplice, veloce, professionale.
+          <p className="text-xl md:text-2xl text-muted-foreground">
+            La piattaforma moderna per recruiter e candidati.<br />
+            <span className="font-semibold text-foreground">Semplice, veloce, professionale.</span>
           </p>
-          <div className="flex gap-4 justify-center pt-4">
-            <Button size="lg" onClick={() => navigate("/auth")}>
-              Inizia Subito
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <Button 
+              size="lg" 
+              className="h-12 px-8 text-lg font-semibold transition-all hover:scale-105 shadow-lg hover:shadow-xl"
+              onClick={() => navigate("/auth")}
+            >
+              Inizia Gratis
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="h-12 px-8 text-lg font-semibold transition-all hover:scale-105"
+              onClick={() => navigate("/auth")}
+            >
               Scopri di Più
             </Button>
           </div>
@@ -51,50 +61,50 @@ const Index = () => {
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-none shadow-lg">
-            <CardContent className="pt-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Users className="h-6 w-6 text-primary" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Users className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg">Per Candidati</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-bold text-lg">Per Candidati</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Crea il tuo profilo e candidati alle migliori offerte in pochi clic
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg">
-            <CardContent className="pt-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Briefcase className="h-6 w-6 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Briefcase className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg">Per Recruiter</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-bold text-lg">Per Recruiter</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Pubblica offerte e trova i candidati perfetti per la tua azienda
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg">
-            <CardContent className="pt-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Target className="h-6 w-6 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Target className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg">Matching Preciso</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-bold text-lg">Matching Preciso</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Sistema di ricerca avanzato per trovare il match perfetto
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg">
-            <CardContent className="pt-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Zap className="h-6 w-6 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <CardContent className="pt-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Zap className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg">Veloce & Intuitivo</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-bold text-lg">Veloce & Intuitivo</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Interfaccia moderna e facile da usare, anche da smartphone
               </p>
             </CardContent>

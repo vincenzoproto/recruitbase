@@ -190,9 +190,15 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             {jobOffers.length === 0 ? (
-              <p className="text-muted-foreground col-span-2 text-center py-8">
-                Nessuna offerta disponibile al momento
-              </p>
+              <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Briefcase className="h-10 w-10 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg font-semibold text-foreground">Nessuna offerta disponibile</p>
+                  <p className="text-sm text-muted-foreground">Torna più tardi per scoprire nuove opportunità</p>
+                </div>
+              </div>
             ) : (
               jobOffers.map((job) => {
                 const hasApplied = applications.some((app) => app.job_offer_id === job.id);

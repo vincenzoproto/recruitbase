@@ -29,8 +29,8 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate }: JobOfferCardPro
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader>
+    <Card className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-xl">{job.title}</CardTitle>

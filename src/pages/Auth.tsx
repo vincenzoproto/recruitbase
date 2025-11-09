@@ -92,11 +92,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-accent p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Recruit Base</CardTitle>
-          <CardDescription>Connetti recruiter e candidati</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-accent via-background to-accent/50 p-4">
+      <Card className="w-full max-w-md shadow-xl animate-scale-in border-border/50">
+        <CardHeader className="text-center space-y-3 pb-6">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+            <Briefcase className="h-8 w-8 text-primary" />
+          </div>
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Recruit Base
+          </CardTitle>
+          <CardDescription className="text-base">Connetti recruiter e candidati in modo semplice</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin">
@@ -105,98 +110,115 @@ const Auth = () => {
               <TabsTrigger value="signup">Registrati</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="animate-fade-in">
+              <form onSubmit={handleSignIn} className="space-y-5 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="email-signin">Email</Label>
+                  <Label htmlFor="email-signin" className="text-sm font-medium">Email</Label>
                   <Input
                     id="email-signin"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nome@esempio.com"
+                    className="h-11"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password-signin">Password</Label>
+                  <Label htmlFor="password-signin" className="text-sm font-medium">Password</Label>
                   <Input
                     id="password-signin"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    className="h-11"
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 font-semibold transition-all hover:scale-[1.02]" 
+                  disabled={loading}
+                >
                   {loading ? "Accesso..." : "Accedi"}
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
+            <TabsContent value="signup" className="animate-fade-in">
+              <form onSubmit={handleSignUp} className="space-y-5 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="fullname">Nome completo</Label>
+                  <Label htmlFor="fullname" className="text-sm font-medium">Nome completo</Label>
                   <Input
                     id="fullname"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Mario Rossi"
+                    className="h-11"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email-signup">Email</Label>
+                  <Label htmlFor="email-signup" className="text-sm font-medium">Email</Label>
                   <Input
                     id="email-signup"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nome@esempio.com"
+                    className="h-11"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password-signup">Password</Label>
+                  <Label htmlFor="password-signup" className="text-sm font-medium">Password</Label>
                   <Input
                     id="password-signup"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    className="h-11"
                     required
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label>Tipo di account</Label>
+                  <Label className="text-sm font-medium">Tipo di account</Label>
                   <RadioGroup value={role} onValueChange={(value: any) => setRole(value)}>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+                    <div className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:border-primary/50 hover:bg-accent/50 transition-all cursor-pointer group">
                       <RadioGroupItem value="candidate" id="candidate" />
-                      <Label htmlFor="candidate" className="flex items-center gap-2 cursor-pointer flex-1">
-                        <UserCircle className="w-5 h-5 text-primary" />
+                      <Label htmlFor="candidate" className="flex items-center gap-3 cursor-pointer flex-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <UserCircle className="w-5 h-5 text-primary" />
+                        </div>
                         <div>
-                          <div className="font-medium">Candidato</div>
+                          <div className="font-semibold">Candidato</div>
                           <div className="text-xs text-muted-foreground">Cerca opportunità di lavoro</div>
                         </div>
                       </Label>
                     </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+                    <div className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:border-primary/50 hover:bg-accent/50 transition-all cursor-pointer group">
                       <RadioGroupItem value="recruiter" id="recruiter" />
-                      <Label htmlFor="recruiter" className="flex items-center gap-2 cursor-pointer flex-1">
-                        <Briefcase className="w-5 h-5 text-primary" />
+                      <Label htmlFor="recruiter" className="flex items-center gap-3 cursor-pointer flex-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <Briefcase className="w-5 h-5 text-primary" />
+                        </div>
                         <div>
-                          <div className="font-medium">Recruiter</div>
+                          <div className="font-semibold">Recruiter</div>
                           <div className="text-xs text-muted-foreground">Pubblica offerte e trova talenti</div>
                         </div>
                       </Label>
                     </div>
                   </RadioGroup>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Registrazione..." : "Crea account"}
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 font-semibold transition-all hover:scale-[1.02]" 
+                  disabled={loading}
+                >
+                  {loading ? "Registrazione..." : "Crea Account Gratis"}
                 </Button>
               </form>
             </TabsContent>
