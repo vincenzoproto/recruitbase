@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Briefcase, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -92,21 +93,44 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
       <main className="container mx-auto px-4 py-8 space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Benvenuto, {profile.full_name}</CardTitle>
-            <CardDescription>Trova le migliori opportunità di lavoro per te</CardDescription>
+            <div className="flex items-center justify-between">
+              <CardTitle>Benvenuto, {profile.full_name}</CardTitle>
+              {!profile.city || !profile.job_title || !profile.skills?.length ? (
+                <Badge variant="outline" className="text-amber-600 border-amber-600">
+                  Profilo incompleto
+                </Badge>
+              ) : (
+                <Badge variant="default" className="bg-green-600">
+                  Profilo completo ✓
+                </Badge>
+              )}
+            </div>
+            <CardDescription>
+              {!profile.city || !profile.job_title || !profile.skills?.length
+                ? "Completa il tuo profilo per aumentare le tue possibilità!"
+                : "Trova le migliori opportunità di lavoro per te"}
+            </CardDescription>
           </CardHeader>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-xl">
                 <User className="h-5 w-5" />
                 Il Tuo Profilo
               </CardTitle>
-              <CardDescription>Completa il tuo profilo per aumentare le tue possibilità</CardDescription>
+              <CardDescription>
+                {!profile.city || !profile.job_title || !profile.skills?.length
+                  ? "⚠️ Completa il profilo per essere più visibile ai recruiter"
+                  : "Il tuo profilo è completo e visibile ai recruiter"}
+              </CardDescription>
             </div>
-            <Button onClick={() => setShowEditProfile(true)}>Modifica Profilo</Button>
+            <Button onClick={() => setShowEditProfile(true)} size="lg">
+              {!profile.city || !profile.job_title || !profile.skills?.length
+                ? "Completa Profilo"
+                : "Modifica"}
+            </Button>
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
@@ -149,10 +173,20 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5" />
-              Offerte Disponibili
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5" />
+                Offerte Disponibili
+              </CardTitle>
+              {applications.length > 0 && (
+                <Badge variant="secondary">{applications.length} candidature inviate</Badge>
+              )}
+            </div>
+            <CardDescription>
+              {jobOffers.length === 0
+                ? "Nessuna offerta disponibile al momento"
+                : `${jobOffers.length} offerte disponibili`}
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             {jobOffers.length === 0 ? (

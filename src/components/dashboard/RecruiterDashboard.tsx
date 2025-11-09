@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
 import JobOfferCard from "./JobOfferCard";
 import CandidateCard from "./CandidateCard";
+import LinkedInIntegration from "../LinkedInIntegration";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -128,16 +129,37 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </CardHeader>
         </Card>
 
+        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 className="text-xl font-bold mb-2">🚀 Passa a Premium</h3>
+                <p className="text-primary-foreground/90 mb-1">Sblocca tutte le funzionalità avanzate</p>
+                <p className="text-sm text-primary-foreground/70">✓ 30 giorni di prova gratuita • ✓ Contatti illimitati • ✓ Ricerca avanzata</p>
+              </div>
+              <Button 
+                size="lg" 
+                variant="secondary"
+                onClick={() => window.open('https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00', '_blank')}
+              >
+                Attiva Premium
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid gap-4 md:grid-cols-3">
           <Button
             onClick={() => setShowCreateJob(true)}
+            size="lg"
             className="h-24 flex flex-col items-center justify-center gap-2"
           >
             <Plus className="h-8 w-8" />
-            <span>Nuova Offerta</span>
+            <span className="font-semibold">Nuova Offerta</span>
           </Button>
           <Button
             variant="outline"
+            size="lg"
             onClick={() => {
               setShowCandidates(!showCandidates);
               if (!showCandidates) loadCandidates();
@@ -146,10 +168,14 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             className="h-24 flex flex-col items-center justify-center gap-2"
           >
             <Users className="h-8 w-8" />
-            <span>Cerca Candidati</span>
+            <span className="font-semibold">Cerca Candidati</span>
+            {candidates.length > 0 && (
+              <span className="text-xs text-muted-foreground">{candidates.length} disponibili</span>
+            )}
           </Button>
           <Button
             variant="outline"
+            size="lg"
             onClick={() => {
               setShowFavorites(!showFavorites);
               setShowCandidates(false);
@@ -157,7 +183,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             className="h-24 flex flex-col items-center justify-center gap-2"
           >
             <Star className="h-8 w-8" />
-            <span>Preferiti ({favorites.length})</span>
+            <span className="font-semibold">Preferiti</span>
+            <span className="text-xs text-muted-foreground">{favorites.length} salvati</span>
           </Button>
         </div>
 
@@ -191,17 +218,25 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              {favorites.map((fav) => (
-                <CandidateCard
-                  key={fav.id}
-                  candidate={fav.candidate}
-                  onToggleFavorite={handleToggleFavorite}
-                  isFavorite={true}
-                />
-              ))}
+              {favorites.length === 0 ? (
+                <p className="text-muted-foreground col-span-2 text-center py-8">
+                  Nessun candidato salvato. Clicca sulla stella per aggiungere ai preferiti!
+                </p>
+              ) : (
+                favorites.map((fav) => (
+                  <CandidateCard
+                    key={fav.id}
+                    candidate={fav.candidate}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={true}
+                  />
+                ))
+              )}
             </CardContent>
           </Card>
         )}
+
+        <LinkedInIntegration />
 
         <Card>
           <CardHeader>

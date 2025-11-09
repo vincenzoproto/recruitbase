@@ -52,17 +52,30 @@ const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCar
 
         {candidate.bio && <p className="text-sm text-muted-foreground line-clamp-2">{candidate.bio}</p>}
 
-        {candidate.linkedin_url && (
+        <div className="flex gap-2">
+          {candidate.linkedin_url && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open(candidate.linkedin_url, "_blank")}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              LinkedIn
+            </Button>
+          )}
           <Button
-            variant="outline"
             size="sm"
-            className="w-full"
-            onClick={() => window.open(candidate.linkedin_url, "_blank")}
+            className="flex-1"
+            onClick={() => {
+              const subject = encodeURIComponent(`Opportunità di lavoro - Recruit Base`);
+              const body = encodeURIComponent(`Ciao ${candidate.full_name},\n\nSono interessato al tuo profilo su Recruit Base.\n\nCordiali saluti`);
+              window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            }}
           >
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Visualizza LinkedIn
+            Contatta
           </Button>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
