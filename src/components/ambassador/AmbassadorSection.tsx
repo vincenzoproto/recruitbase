@@ -34,7 +34,7 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
       // Carica referrals solo se necessario (limita a 10 più recenti)
       const { data: referralData, error: refError } = await supabase
         .from("ambassador_referrals")
-        .select("id, status, signup_date, referred_user:profiles!ambassador_referrals_referred_user_id_fkey(full_name)")
+        .select("id, status, signup_date, referred_user_id")
         .eq("ambassador_id", userId)
         .order("created_at", { ascending: false })
         .limit(10);
@@ -209,7 +209,7 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
               {referrals.slice(0, 5).map((ref) => (
                 <div key={ref.id} className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
                   <div>
-                    <p className="font-medium">{ref.referred_user?.full_name || "Utente"}</p>
+                    <p className="font-medium">Recruiter Invitato</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(ref.signup_date).toLocaleDateString("it-IT")}
                     </p>
