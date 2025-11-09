@@ -17,6 +17,8 @@ export const WeeklyInsights = ({ userId }: WeeklyInsightsProps) => {
   });
 
   useEffect(() => {
+    if (!userId) return;
+    
     const today = new Date().getDay();
     const lastShown = localStorage.getItem("last-insights-shown");
     const shouldShow = today === 1 && lastShown !== new Date().toDateString();
@@ -26,7 +28,7 @@ export const WeeklyInsights = ({ userId }: WeeklyInsightsProps) => {
       setOpen(true);
       localStorage.setItem("last-insights-shown", new Date().toDateString());
     }
-  }, []);
+  }, [userId]);
 
   const loadInsights = async () => {
     const { data: candidates } = await supabase

@@ -13,7 +13,9 @@ export const RecruiterScore = ({ userId }: RecruiterScoreProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    calculateScore();
+    if (userId) {
+      calculateScore();
+    }
   }, [userId]);
 
   const calculateScore = async () => {

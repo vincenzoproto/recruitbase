@@ -13,7 +13,9 @@ export const SmartNotifications = ({ userId }: SmartNotificationsProps) => {
   const [lowTRSCount, setLowTRSCount] = useState(0);
 
   useEffect(() => {
-    loadLowTRSCandidates();
+    if (userId) {
+      loadLowTRSCandidates();
+    }
   }, [userId]);
 
   const loadLowTRSCandidates = async () => {

@@ -228,12 +228,22 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setShowOnboarding(false);
   };
 
+  const handleViewChange = (view: "list" | "card" | "timeline") => {
+    setDashboardView(view);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
-      <WeeklyInsights userId={profile.id} />
-      <SmartNotifications userId={profile.id} />
-      <RBCopilot />
+      {showOnboarding && profile?.id && (
+        <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
+      )}
+      {profile?.id && (
+        <>
+          <WeeklyInsights userId={profile.id} />
+          <SmartNotifications userId={profile.id} />
+          <RBCopilot />
+        </>
+      )}
       
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
@@ -262,9 +272,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
-        <div className="mb-4">
-          <RecruiterScore userId={profile.id} />
-        </div>
+        {profile?.id && (
+          <div className="mb-4">
+            <RecruiterScore userId={profile.id} />
+          </div>
+        )}
 
         <div className="mb-4 sm:mb-6 p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -311,9 +323,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <div className="flex items-center gap-4 mb-4">
-            <DashboardViewSelector onViewChange={setDashboardView} />
-          </div>
+          {!isMobile && (
+            <div className="flex items-center gap-4 mb-4">
+              <DashboardViewSelector onViewChange={handleViewChange} />
+            </div>
+          )}
 
           {!isMobile && (
             <div className="overflow-x-auto -mx-4 px-4">
