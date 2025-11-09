@@ -11,11 +11,20 @@ const Index = () => {
   const [showTRSDialog, setShowTRSDialog] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
+    let mounted = true;
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (!mounted) return;
+        navigate(session ? "/dashboard" : "/auth", { replace: true });
+      })
+      .catch(() => {
+        if (!mounted) return;
+        navigate("/auth", { replace: true });
+      });
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   return (
