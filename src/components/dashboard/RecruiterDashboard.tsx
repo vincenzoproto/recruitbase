@@ -12,12 +12,14 @@ import StatsCard from "./StatsCard";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
+import KanbanBoard from "../trm/KanbanBoard";
 import { SmartNotifications } from "@/components/mobile/SmartNotifications";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSwipe } from "@/hooks/use-swipe";
 import { LiveMetrics } from "@/components/premium/LiveMetrics";
 import { hapticFeedback } from "@/lib/haptics";
 
@@ -30,6 +32,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
+  const [showPipeline, setShowPipeline] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -78,6 +81,27 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setShowOnboarding(false);
   };
 
+  // Swipe per passare da Pipeline a Offerte
+  const handleSwipeLeft = () => {
+    if (!isMobile) return;
+    if (showPipeline) {
+      setShowPipeline(false);
+    }
+  };
+
+  const handleSwipeRight = () => {
+    if (!isMobile) return;
+    if (!showPipeline) {
+      setShowPipeline(true);
+    }
+  };
+
+  const swipeHandlers = useSwipe({
+    onSwipedLeft: handleSwipeLeft,
+    onSwipedRight: handleSwipeRight,
+    minSwipeDistance: 50
+  });
+
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -125,41 +149,91 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
         <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
           <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col gap-4">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-2">
-                  Le Tue Offerte di Lavoro
+                  {showPipeline ? "Pipeline Kanban TRS" : "Le Tue Offerte di Lavoro"}
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  Gestisci e pubblica nuove opportunità
+                  {showPipeline 
+                    ? "Gestisci i candidati per stato" 
+                    : "Gestisci e pubblica nuove opportunità"}
                 </p>
+                {isMobile && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    👉 Swipe per cambiare sezione
+                  </p>
+                )}
               </div>
-              <Button onClick={() => setShowCreateJob(true)} className="w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                Nuova Offerta
-              </Button>
+              <div className="flex gap-2 flex-shrink-0">
+                <Button 
+                  onClick={() => setShowPipeline(true)} 
+                  variant={showPipeline ? "default" : "outline"}
+                  size="sm"
+                >
+                  Pipeline
+                </Button>
+                <Button 
+                  onClick={() => setShowPipeline(false)} 
+                  variant={!showPipeline ? "default" : "outline"}
+                  size="sm"
+                >
+                  Offerte
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
         
-        <div className="grid gap-4 md:grid-cols-2 mb-6">
-          {jobOffers.map((offer) => (
-            <JobOfferCard
-              key={offer.id}
-              job={offer}
-              onUpdate={loadJobOffers}
-            />
-          ))}
-          {jobOffers.length === 0 && (
-            <div className="col-span-2 text-center py-12 bg-card rounded-lg border">
-              <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">
-                Nessuna offerta pubblicata. Crea la tua prima offerta!
-              </p>
-              <Button onClick={() => setShowCreateJob(true)} variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                Crea Prima Offerta
-              </Button>
+        <div 
+          {...(isMobile ? swipeHandlers : {})}
+          className="min-h-[60vh] touch-pan-y mb-6"
+        >
+          {showPipeline ? (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Pipeline Kanban
+                </CardTitle>
+                <CardDescription>
+                  Trascina i candidati per aggiornare lo stato
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <KanbanBoard />
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex justify-end">
+                <Button onClick={() => setShowCreateJob(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nuova Offerta
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {jobOffers.map((offer) => (
+                  <JobOfferCard
+                    key={offer.id}
+                    job={offer}
+                    onUpdate={loadJobOffers}
+                  />
+                ))}
+                {jobOffers.length === 0 && (
+                  <div className="col-span-2 text-center py-12 bg-card rounded-lg border">
+                    <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground mb-4">
+                      Nessuna offerta pubblicata. Crea la tua prima offerta!
+                    </p>
+                    <Button onClick={() => setShowCreateJob(true)} variant="outline">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Crea Prima Offerta
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
