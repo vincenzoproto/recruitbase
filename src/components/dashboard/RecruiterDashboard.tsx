@@ -32,8 +32,15 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [showPipeline, setShowPipeline] = useState(true);
+  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Pipeline, 2: Offerte, 3: Insights
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  const views = [
+    { id: 0, name: "Home", icon: "📊" },
+    { id: 1, name: "Pipeline", icon: "📋" },
+    { id: 2, name: "Offerte", icon: "💼" },
+    { id: 3, name: "Insights", icon: "📈" }
+  ];
 
   useEffect(() => {
     loadJobOffers();
@@ -81,18 +88,20 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setShowOnboarding(false);
   };
 
-  // Swipe per passare da Pipeline a Offerte
+  // Swipe per navigare tra le viste
   const handleSwipeLeft = () => {
     if (!isMobile) return;
-    if (showPipeline) {
-      setShowPipeline(false);
+    if (currentView < views.length - 1) {
+      setCurrentView(currentView + 1);
+      hapticFeedback.light();
     }
   };
 
   const handleSwipeRight = () => {
     if (!isMobile) return;
-    if (!showPipeline) {
-      setShowPipeline(true);
+    if (currentView > 0) {
+      setCurrentView(currentView - 1);
+      hapticFeedback.light();
     }
   };
 
@@ -141,55 +150,107 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
-        {profile?.id && (
-          <div className="mb-4">
-            <RecruiterScore userId={profile.id} />
+        {/* View Indicators - solo mobile */}
+        {isMobile && (
+          <div className="flex justify-center gap-2 mb-4">
+            {views.map((view) => (
+              <button
+                key={view.id}
+                onClick={() => {
+                  setCurrentView(view.id);
+                  hapticFeedback.light();
+                }}
+                className={`h-2 rounded-full transition-all ${
+                  currentView === view.id 
+                    ? "w-8 bg-primary" 
+                    : "w-2 bg-muted-foreground/30"
+                }`}
+              />
+            ))}
           </div>
         )}
 
-        <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-foreground mb-2">
-                  {showPipeline ? "Pipeline Kanban TRS" : "Le Tue Offerte di Lavoro"}
-                </h2>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {showPipeline 
-                    ? "Gestisci i candidati per stato" 
-                    : "Gestisci e pubblica nuove opportunità"}
-                </p>
-                {isMobile && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    👉 Swipe per cambiare sezione
+        {/* Header Vista Corrente - solo mobile */}
+        {isMobile && (
+          <Card className="mb-4 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <span>{views[currentView].icon}</span>
+                    {views[currentView].name}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    👈 Swipe per navigare 👉
                   </p>
-                )}
+                </div>
+                <div className="flex gap-1">
+                  {views.map((view) => (
+                    <Button
+                      key={view.id}
+                      onClick={() => {
+                        setCurrentView(view.id);
+                        hapticFeedback.light();
+                      }}
+                      variant={currentView === view.id ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                    >
+                      {view.icon}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              <div className="flex gap-2 flex-shrink-0">
-                <Button 
-                  onClick={() => setShowPipeline(true)} 
-                  variant={showPipeline ? "default" : "outline"}
-                  size="sm"
-                >
-                  Pipeline
-                </Button>
-                <Button 
-                  onClick={() => setShowPipeline(false)} 
-                  variant={!showPipeline ? "default" : "outline"}
-                  size="sm"
-                >
-                  Offerte
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
         
         <div 
           {...(isMobile ? swipeHandlers : {})}
           className="min-h-[60vh] touch-pan-y mb-6"
         >
-          {showPipeline ? (
+          {/* Vista 0: Home */}
+          {(!isMobile || currentView === 0) && (
+            <div className="space-y-4 animate-fade-in">
+              {profile?.id && (
+                <RecruiterScore userId={profile.id} />
+              )}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <StatsCard
+                  title="Offerte Attive"
+                  value={jobOffers.length}
+                  icon={Briefcase}
+                  subtitle="Offerte pubblicate"
+                  gradient="from-blue-500/10 to-blue-500/5"
+                />
+                <StatsCard
+                  title="TRS Medio"
+                  value={85}
+                  icon={UserCheck}
+                  subtitle="Score relazioni"
+                  gradient="from-green-500/10 to-green-500/5"
+                />
+                <StatsCard
+                  title="Contatti Mese"
+                  value={24}
+                  icon={Gift}
+                  subtitle="Follow-up attivi"
+                  gradient="from-purple-500/10 to-purple-500/5"
+                />
+              </div>
+
+              {profile.referral_code && (
+                <AmbassadorSection
+                  referralCode={profile.referral_code}
+                  userId={profile.id}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Vista 1: Pipeline */}
+          {(!isMobile || currentView === 1) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -204,7 +265,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 <KanbanBoard />
               </CardContent>
             </Card>
-          ) : (
+          )}
+
+          {/* Vista 2: Offerte */}
+          {(!isMobile || currentView === 2) && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex justify-end">
                 <Button onClick={() => setShowCreateJob(true)}>
@@ -236,51 +300,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               </div>
             </div>
           )}
+
+          {/* Vista 3: Insights */}
+          {(!isMobile || currentView === 3) && (
+            <div className="space-y-4 animate-fade-in">
+              {profile?.id && (
+                <>
+                  <LiveMetrics userId={profile.id} />
+                  <TRSDashboardCard recruiterId={profile.id} />
+                </>
+              )}
+            </div>
+          )}
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <StatsCard
-            title="Offerte Attive"
-            value={jobOffers.length}
-            icon={Briefcase}
-            subtitle="Offerte pubblicate"
-            gradient="from-blue-500/10 to-blue-500/5"
-          />
-          <StatsCard
-            title="TRS Medio"
-            value={85}
-            icon={UserCheck}
-            subtitle="Score relazioni"
-            gradient="from-green-500/10 to-green-500/5"
-          />
-          <StatsCard
-            title="Contatti Mese"
-            value={24}
-            icon={Gift}
-            subtitle="Follow-up attivi"
-            gradient="from-purple-500/10 to-purple-500/5"
-          />
-        </div>
-
-        {/* Live Metrics Premium */}
-        {profile?.id && (
-          <div className="mb-6">
-            <LiveMetrics userId={profile.id} />
-          </div>
-        )}
-
-        <div className="mb-6">
-          <TRSDashboardCard recruiterId={profile.id} />
-        </div>
-
-        {profile.referral_code && (
-          <div className="mb-6">
-            <AmbassadorSection
-              referralCode={profile.referral_code}
-              userId={profile.id}
-            />
-          </div>
-        )}
 
         <LinkedInIntegration />
       </main>
