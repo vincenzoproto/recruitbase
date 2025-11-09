@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KanbanBoard from "../trm/KanbanBoard";
 import { PremiumButton } from "../premium/PremiumButton";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
-import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
+
 import { SmartNotifications } from "@/components/mobile/SmartNotifications";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
@@ -48,9 +48,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     referralsCount: 0,
   });
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    return !localStorage.getItem("onboarding-completed");
-  });
   const [activeTab, setActiveTab] = useState("pipeline");
   const [dashboardView, setDashboardView] = useState<"list" | "card" | "timeline">("card");
 
@@ -223,10 +220,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     loadFavorites();
   };
 
-  const handleOnboardingComplete = () => {
-    localStorage.setItem("onboarding-completed", "true");
-    setShowOnboarding(false);
-  };
 
   const handleViewChange = (view: "list" | "card" | "timeline") => {
     setDashboardView(view);
@@ -234,9 +227,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      {showOnboarding && profile?.id && (
-        <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
-      )}
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />
