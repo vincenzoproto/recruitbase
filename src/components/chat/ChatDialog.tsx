@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { pushNotifications } from "@/lib/push-notifications";
 
 interface Message {
   id: string;
@@ -60,11 +61,37 @@ export const ChatDialog = ({
             table: 'messages',
             filter: `sender_id=eq.${otherUserId},receiver_id=eq.${currentUserId}`,
           },
-          (payload) => {
+          async (payload) => {
             console.log('New message received:', payload);
             const message = payload.new as Message;
             setMessages(prev => [...prev, message]);
             markMessagesAsRead();
+            
+            // Show toast notification
+            toast.success(`Nuovo messaggio da ${otherUserName}`, {
+              description: message.content,
+            });
+
+            // Show push notification if dialog is not focused
+            if (pushNotifications.isSupported() && document.hidden) {
+              await pushNotifications.showNotification(
+                `Nuovo messaggio da ${otherUserName}`,
+                {
+                  body: message.content,
+                  tag: 'chat-message',
+                  requireInteraction: false,
+                }
+              );
+            }
+
+            // Create in-app notification
+            await supabase.from('notifications').insert({
+              user_id: currentUserId,
+              type: 'message',
+              title: `Nuovo messaggio da ${otherUserName}`,
+              message: message.content,
+              read: false,
+            });
           }
         )
         .on(
@@ -94,7 +121,7 @@ export const ChatDialog = ({
         supabase.removeChannel(channel);
       };
     }
-  }, [open, currentUserId, otherUserId]);
+  }, [open, currentUserId, otherUserId, otherUserName]);
 
   useEffect(() => {
     scrollToBottom();
