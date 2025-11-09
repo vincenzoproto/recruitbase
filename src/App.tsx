@@ -10,6 +10,8 @@ import Invite from "./pages/Invite";
 import InviteRef from "./pages/InviteRef";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
+import Social from "./pages/Social";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,9 @@ const App = () => (
             <Route path="/invite/:code" element={<Invite />} />
             <Route path="/invite" element={<InviteRef />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/social" element={<Social />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

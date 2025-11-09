@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, LogOut, User, CheckCircle, Clock, Crown } from "lucide-react";
+import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
@@ -206,6 +206,14 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             <p className="text-sm text-muted-foreground">Dashboard Candidato</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+              <User className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Profilo</span>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/social')}>
+              <Rss className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Social</span>
+            </Button>
             <NotificationBell 
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}

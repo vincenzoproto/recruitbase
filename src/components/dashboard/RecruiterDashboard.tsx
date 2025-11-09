@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send } from "lucide-react";
+import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send, User, Rss } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
@@ -321,6 +321,24 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/profile')}
+              className="gap-1"
+            >
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Profilo</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/social')}
+              className="gap-1"
+            >
+              <Rss className="h-4 w-4" />
+              <span className="hidden sm:inline">Social</span>
+            </Button>
             <NotificationBell 
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
