@@ -2,7 +2,6 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthCache } from "@/hooks/useAuthCache";
-import { toast } from "sonner";
 import SplashScreen from "@/components/SplashScreen";
 
 // Lazy load dashboard components
@@ -70,20 +69,6 @@ const Dashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [isLoadingProfile, profile]);
-
-  // Welcome toast al primo accesso dopo login
-  useEffect(() => {
-    if (!showSplash && profile) {
-      const shouldShowWelcome = sessionStorage.getItem("show_welcome");
-      if (shouldShowWelcome === "true") {
-        const displayName = profile.full_name || user?.email || "Utente";
-        toast.success(`Benvenuto/a, ${displayName} 👋`, {
-          duration: 4000,
-        });
-        sessionStorage.removeItem("show_welcome");
-      }
-    }
-  }, [showSplash, profile, user]);
 
   if (isLoadingFromCache || (isLoadingProfile && !cachedProfile)) {
     return (
