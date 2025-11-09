@@ -3,9 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, User, Mail } from "lucide-react";
+import { Star, User } from "lucide-react";
 import { toast } from "sonner";
 import CandidateDetailDialog from "./CandidateDetailDialog";
+import TRSBadge from "./TRSBadge";
 
 interface PipelineStage {
   id: string;
@@ -24,6 +25,7 @@ interface Candidate {
   is_favorite: boolean;
   last_contact_date: string;
   pipeline_stage_id: string;
+  talent_relationship_score: number;
 }
 
 const KanbanBoard = () => {
@@ -62,7 +64,7 @@ const KanbanBoard = () => {
       if (candidateIds.length > 0) {
         const { data: candidatesData } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, full_name, job_title, city, skills, engagement_score, is_favorite, last_contact_date, pipeline_stage_id, talent_relationship_score')
           .in('id', candidateIds)
           .eq('role', 'candidate');
 
@@ -212,6 +214,10 @@ const KanbanBoard = () => {
                       ))}
                     </div>
                   )}
+
+                  <div className="mt-3 pt-2 border-t">
+                    <TRSBadge score={candidate.talent_relationship_score || 0} size="sm" />
+                  </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                     <span>Engagement: {candidate.engagement_score || 0}</span>

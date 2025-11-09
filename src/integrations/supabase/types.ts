@@ -570,6 +570,8 @@ export type Database = {
           referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills: string[] | null
+          talent_relationship_score: number | null
+          trs_last_updated: string | null
           updated_at: string | null
         }
         Insert: {
@@ -593,6 +595,8 @@ export type Database = {
           referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
+          talent_relationship_score?: number | null
+          trs_last_updated?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -616,6 +620,8 @@ export type Database = {
           referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
+          talent_relationship_score?: number | null
+          trs_last_updated?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -734,6 +740,10 @@ export type Database = {
       }
       calculate_match_score: {
         Args: { p_candidate_id: string; p_job_offer_id: string }
+        Returns: number
+      }
+      calculate_trs: {
+        Args: { candidate_uuid: string; recruiter_uuid: string }
         Returns: number
       }
       candidates_needing_followup: {

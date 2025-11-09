@@ -19,6 +19,7 @@ import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KanbanBoard from "../trm/KanbanBoard";
 import { PremiumButton } from "../premium/PremiumButton";
+import TRSDashboardCard from "../trm/TRSDashboardCard";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -272,6 +273,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             gradient="from-purple-500/10 to-purple-500/5"
           />
         </div>
+
+        <TRSDashboardCard recruiterId={profile.id} />
 
         <Tabs defaultValue="pipeline" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6">
