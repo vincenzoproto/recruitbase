@@ -46,32 +46,51 @@ export const ChatDialog = ({
       loadMessages();
       markMessagesAsRead();
 
-      // Real-time subscription
+      // Real-time subscription with unique channel per conversation
+      const channelName = `chat-${[currentUserId, otherUserId].sort().join('-')}`;
+      console.log('Subscribing to channel:', channelName);
+      
       const channel = supabase
-        .channel('chat-messages')
+        .channel(channelName)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'messages',
+            filter: `sender_id=eq.${otherUserId},receiver_id=eq.${currentUserId}`,
           },
           (payload) => {
+            console.log('New message received:', payload);
             const message = payload.new as Message;
-            if (
-              (message.sender_id === currentUserId && message.receiver_id === otherUserId) ||
-              (message.sender_id === otherUserId && message.receiver_id === currentUserId)
-            ) {
-              setMessages(prev => [...prev, message]);
-              if (message.receiver_id === currentUserId) {
-                markMessagesAsRead();
-              }
-            }
+            setMessages(prev => [...prev, message]);
+            markMessagesAsRead();
           }
         )
-        .subscribe();
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `sender_id=eq.${currentUserId},receiver_id=eq.${otherUserId}`,
+          },
+          (payload) => {
+            console.log('Message sent confirmed:', payload);
+            const message = payload.new as Message;
+            // Only add if not already in the list (prevent duplicates)
+            setMessages(prev => {
+              if (prev.find(m => m.id === message.id)) return prev;
+              return [...prev, message];
+            });
+          }
+        )
+        .subscribe((status) => {
+          console.log('Channel subscription status:', status);
+        });
 
       return () => {
+        console.log('Unsubscribing from channel:', channelName);
         supabase.removeChannel(channel);
       };
     }
@@ -110,21 +129,28 @@ export const ChatDialog = ({
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
-    const { error } = await supabase
+    const messageContent = newMessage.trim();
+    setNewMessage(""); // Clear immediately for better UX
+
+    const { data, error } = await supabase
       .from('messages')
       .insert({
         sender_id: currentUserId,
         receiver_id: otherUserId,
-        content: newMessage.trim(),
-      });
+        content: messageContent,
+      })
+      .select()
+      .single();
 
     if (error) {
       toast.error("Errore nell'invio del messaggio");
       console.error('Error sending message:', error);
+      setNewMessage(messageContent); // Restore message on error
       return;
     }
 
-    setNewMessage("");
+    console.log('Message sent successfully:', data);
+    toast.success("Messaggio inviato");
   };
 
   const scrollToBottom = () => {
