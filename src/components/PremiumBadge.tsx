@@ -35,12 +35,13 @@ const PremiumBadge = ({ isPremium, size = "md", showIcon = true, variant = "defa
   return (
     <Badge 
       className={`
-        bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600
+        bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500
         text-white border-none
-        shadow-lg hover:shadow-xl
-        transition-all duration-300
+        shadow-[0_4px_16px_rgba(251,191,36,0.4)] hover:shadow-[0_6px_24px_rgba(251,191,36,0.5)]
+        smooth-transition
         ${sizeClasses[size]}
-        animate-pulse
+        animate-glow
+        rounded-full
       `}
     >
       {showIcon && <Crown className={`${iconSizes[size]} mr-1`} />}
