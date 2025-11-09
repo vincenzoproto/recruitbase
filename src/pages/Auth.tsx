@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Briefcase, UserCircle } from "lucide-react";
+import { Briefcase, UserCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,6 +19,13 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"recruiter" | "candidate">("candidate");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -24,7 +33,66 @@ const Auth = () => {
         navigate("/dashboard");
       }
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed successfully');
+      } else if (event === 'SIGNED_OUT') {
+        navigate("/auth");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("L'email è obbligatoria");
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError("Inserisci un'email valida");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    if (!password) {
+      setPasswordError("La password è obbligatoria");
+      return false;
+    }
+    if (password.length < 6) {
+      setPasswordError("La password deve contenere almeno 6 caratteri");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateEmail(resetEmail)) return;
+
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Email di reset inviata! Controlla la tua casella di posta.");
+      setResetDialogOpen(false);
+      setResetEmail("");
+    } catch (error: any) {
+      toast.error(error.message || "Errore durante l'invio dell'email");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,8 +180,11 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Inserisci email e password");
+    
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    if (!isEmailValid || !isPasswordValid) {
       return;
     }
 
@@ -124,9 +195,16 @@ const Auth = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          toast.error("Credenziali non valide. Controlla email e password.");
+        } else {
+          throw error;
+        }
+        return;
+      }
 
-      toast.success("Login effettuato!");
+      sessionStorage.setItem("show_welcome", "true");
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Errore durante il login");
@@ -162,30 +240,120 @@ const Auth = () => {
                     id="email-signin"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError("");
+                    }}
+                    onBlur={() => validateEmail(email)}
                     placeholder="nome@esempio.com"
-                    className="h-11"
-                    required
+                    className={`h-11 ${emailError ? "border-destructive" : ""}`}
+                    disabled={loading}
                   />
+                  {emailError && <p className="text-sm text-destructive">{emailError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signin" className="text-sm font-medium">Password</Label>
-                  <Input
-                    id="password-signin"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-11"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password-signin"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setPasswordError("");
+                      }}
+                      onBlur={() => validatePassword(password)}
+                      placeholder="••••••••"
+                      className={`h-11 pr-10 ${passwordError ? "border-destructive" : ""}`}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      disabled={loading}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      disabled={loading}
+                    />
+                    <Label htmlFor="remember" className="text-sm cursor-pointer">
+                      Ricordami
+                    </Label>
+                  </div>
+                  
+                  <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-sm text-primary hover:underline"
+                        disabled={loading}
+                      >
+                        Password dimenticata?
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription>
+                          Inserisci la tua email per ricevere il link di reset della password
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handlePasswordReset} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="reset-email">Email</Label>
+                          <Input
+                            id="reset-email"
+                            type="email"
+                            value={resetEmail}
+                            onChange={(e) => {
+                              setResetEmail(e.target.value);
+                              setEmailError("");
+                            }}
+                            placeholder="nome@esempio.com"
+                            className={emailError ? "border-destructive" : ""}
+                            disabled={resetLoading}
+                          />
+                          {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+                        </div>
+                        <Button type="submit" className="w-full" disabled={resetLoading}>
+                          {resetLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Invio in corso...
+                            </>
+                          ) : (
+                            "Invia link di reset"
+                          )}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
                 <Button 
                   type="submit" 
                   className="w-full h-11 font-semibold transition-all hover:scale-[1.02]" 
                   disabled={loading}
                 >
-                  {loading ? "Accesso..." : "Accedi"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Accesso in corso...
+                    </>
+                  ) : (
+                    "Accedi"
+                  )}
                 </Button>
               </form>
             </TabsContent>
@@ -218,15 +386,26 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signup" className="text-sm font-medium">Password</Label>
-                  <Input
-                    id="password-signup"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-11"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password-signup"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="h-11 pr-10"
+                      required
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      disabled={loading}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Tipo di account</Label>
@@ -262,7 +441,14 @@ const Auth = () => {
                   className="w-full h-11 font-semibold transition-all hover:scale-[1.02]" 
                   disabled={loading}
                 >
-                  {loading ? "Registrazione..." : "Crea Account Gratis"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Registrazione in corso...
+                    </>
+                  ) : (
+                    "Crea Account Gratis"
+                  )}
                 </Button>
               </form>
             </TabsContent>
