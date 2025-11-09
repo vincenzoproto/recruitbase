@@ -8,11 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface CandidateCardProps {
   candidate: any;
+  currentUserId: string;
   onToggleFavorite: (candidateId: string) => void;
   isFavorite: boolean;
 }
 
-const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCardProps) => {
+const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite }: CandidateCardProps) => {
   return (
     <Card className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50">
       <CardHeader className="pb-3">
@@ -87,7 +88,8 @@ const CandidateCard = ({ candidate, onToggleFavorite, isFavorite }: CandidateCar
 
           <div className="flex flex-wrap gap-2">
             <ContactButtons
-              email={candidate.id}
+              currentUserId={currentUserId}
+              targetUserId={candidate.id}
               phone={candidate.phone_number}
               name={candidate.full_name}
             />

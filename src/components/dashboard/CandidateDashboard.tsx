@@ -15,6 +15,7 @@ import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFil
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
 import { CVUploader } from "@/components/candidate/CVUploader";
+import RecruiterCard from "./RecruiterCard";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -27,16 +28,19 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const [applications, setApplications] = useState<any[]>([]);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const isMobile = useIsMobile();
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Offerte, 2: Profilo
+  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Offerte, 2: Recruiter, 3: Profilo
+  const [recruiters, setRecruiters] = useState<any[]>([]);
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
     { id: 1, name: "Offerte", icon: "💼" },
-    { id: 2, name: "Profilo", icon: "👤" },
+    { id: 2, name: "Recruiter", icon: "👔" },
+    { id: 3, name: "Profilo", icon: "👤" },
   ];
 
   useEffect(() => {
     loadJobOffers();
     loadApplications();
+    loadRecruiters();
   }, []);
 
   const loadJobOffers = async () => {
@@ -96,6 +100,25 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
       return;
     }
     setApplications(data || []);
+  };
+
+  const loadRecruiters = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("role", "recruiter")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        toast.error("Errore nel caricamento dei recruiter");
+        return;
+      }
+      setRecruiters(data || []);
+    } catch (error) {
+      console.error("Error loading recruiters:", error);
+    }
   };
 
   const handleSignOut = async () => {
@@ -302,8 +325,42 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 2: Profilo */}
+          {/* Vista 2: Recruiter */}
           {(!isMobile || currentView === 2) && (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Recruiter Disponibili
+                </CardTitle>
+                <CardDescription>
+                  {recruiters.length} recruiter attivi · Contattali per opportunità
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {recruiters.map((recruiter) => (
+                    <RecruiterCard
+                      key={recruiter.id}
+                      recruiter={recruiter}
+                      currentUserId={profile.id}
+                    />
+                  ))}
+                  {recruiters.length === 0 && (
+                    <div className="col-span-full text-center py-12 bg-card rounded-lg border">
+                      <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground mb-2">
+                        Nessun recruiter disponibile al momento
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vista 3: Profilo */}
+          {(!isMobile || currentView === 3) && (
             <Card className="animate-fade-in">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                 <div className="space-y-1">

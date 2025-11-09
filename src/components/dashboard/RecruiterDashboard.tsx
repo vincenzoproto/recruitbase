@@ -21,6 +21,7 @@ import { useSwipe } from "@/hooks/use-swipe";
 import { LiveMetrics } from "@/components/premium/LiveMetrics";
 import { hapticFeedback } from "@/lib/haptics";
 import { KPIWidget } from "./KPIWidget";
+import CandidateCard from "./CandidateCard";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 
 interface RecruiterDashboardProps {
@@ -32,8 +33,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Pipeline, 2: Offerte, 3: Insights
+  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Candidati, 2: Pipeline, 3: Offerte, 4: Insights
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [kpiData, setKpiData] = useState({
     avgTRS: 0,
     activeCandidates: 0,
@@ -42,14 +45,17 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
-    { id: 1, name: "Pipeline", icon: "📋" },
-    { id: 2, name: "Offerte", icon: "💼" },
-    { id: 3, name: "Insights", icon: "📈" }
+    { id: 1, name: "Candidati", icon: "👥" },
+    { id: 2, name: "Pipeline", icon: "📋" },
+    { id: 3, name: "Offerte", icon: "💼" },
+    { id: 4, name: "Insights", icon: "📈" }
   ];
 
   useEffect(() => {
     loadJobOffers();
     loadKPIData();
+    loadCandidates();
+    loadFavorites();
   }, []);
 
   useEffect(() => {
@@ -94,6 +100,73 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       });
     } catch (error) {
       console.error("Error loading KPI data:", error);
+    }
+  };
+
+  const loadCandidates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("role", "candidate")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        toast.error("Errore nel caricamento dei candidati");
+        return;
+      }
+      setCandidates(data || []);
+    } catch (error) {
+      console.error("Error loading candidates:", error);
+    }
+  };
+
+  const loadFavorites = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("favorites")
+        .select("candidate_id")
+        .eq("recruiter_id", profile.id);
+
+      if (error) throw error;
+      
+      const favSet = new Set(data?.map(f => f.candidate_id) || []);
+      setFavorites(favSet);
+    } catch (error) {
+      console.error("Error loading favorites:", error);
+    }
+  };
+
+  const toggleFavorite = async (candidateId: string) => {
+    try {
+      if (favorites.has(candidateId)) {
+        await supabase
+          .from("favorites")
+          .delete()
+          .eq("recruiter_id", profile.id)
+          .eq("candidate_id", candidateId);
+        
+        setFavorites(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(candidateId);
+          return newSet;
+        });
+        toast.success("Rimosso dai preferiti");
+      } else {
+        await supabase
+          .from("favorites")
+          .insert({
+            recruiter_id: profile.id,
+            candidate_id: candidateId,
+          });
+        
+        setFavorites(prev => new Set(prev).add(candidateId));
+        toast.success("Aggiunto ai preferiti");
+      }
+    } catch (error) {
+      toast.error("Errore nell'aggiornamento dei preferiti");
+      console.error("Error toggling favorite:", error);
     }
   };
 
@@ -286,8 +359,44 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 1: Pipeline */}
+          {/* Vista 1: Candidati */}
           {(!isMobile || currentView === 1) && (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Candidati Disponibili
+                </CardTitle>
+                <CardDescription>
+                  {candidates.length} candidati registrati · Contattali subito
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {candidates.map((candidate) => (
+                    <CandidateCard
+                      key={candidate.id}
+                      candidate={candidate}
+                      currentUserId={profile.id}
+                      onToggleFavorite={toggleFavorite}
+                      isFavorite={favorites.has(candidate.id)}
+                    />
+                  ))}
+                  {candidates.length === 0 && (
+                    <div className="col-span-full text-center py-12 bg-card rounded-lg border">
+                      <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground mb-2">
+                        Nessun candidato disponibile al momento
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vista 2: Pipeline */}
+          {(!isMobile || currentView === 2) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -304,8 +413,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 2: Offerte */}
-          {(!isMobile || currentView === 2) && (
+          {/* Vista 3: Offerte */}
+          {(!isMobile || currentView === 3) && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex justify-end">
                 <Button onClick={() => setShowCreateJob(true)}>
@@ -338,8 +447,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 3: Insights */}
-          {(!isMobile || currentView === 3) && (
+          {/* Vista 4: Insights */}
+          {(!isMobile || currentView === 4) && (
             <div className="space-y-4 animate-fade-in">
               {profile?.id && (
                 <>

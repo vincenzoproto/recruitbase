@@ -1,14 +1,17 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Mail, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle, MessageSquare } from "lucide-react";
+import { ChatDialog } from "@/components/chat/ChatDialog";
 
 interface ContactButtonsProps {
+  currentUserId?: string;
+  targetUserId?: string;
   email?: string;
   phone?: string;
   name: string;
 }
 
-export const ContactButtons = ({ email, phone, name }: ContactButtonsProps) => {
+export const ContactButtons = ({ currentUserId, targetUserId, email, phone, name }: ContactButtonsProps) => {
   const handleEmail = () => {
     if (email) {
       window.location.href = `mailto:${email}?subject=Opportunità di lavoro`;
@@ -24,17 +27,30 @@ export const ContactButtons = ({ email, phone, name }: ContactButtonsProps) => {
   };
 
   return (
-    <div className="flex gap-2">
-      {email && (
-        <Button variant="outline" size="sm" onClick={handleEmail} className="gap-2">
-          <Mail className="h-4 w-4" />
-          Email
-        </Button>
+    <div className="flex flex-wrap gap-2">
+      {currentUserId && targetUserId && (
+        <ChatDialog
+          currentUserId={currentUserId}
+          otherUserId={targetUserId}
+          otherUserName={name}
+          triggerButton={
+            <Button variant="default" size="sm" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Chat
+            </Button>
+          }
+        />
       )}
       {phone && (
         <Button variant="outline" size="sm" onClick={handleWhatsApp} className="gap-2">
           <MessageCircle className="h-4 w-4" />
           WhatsApp
+        </Button>
+      )}
+      {email && (
+        <Button variant="outline" size="sm" onClick={handleEmail} className="gap-2">
+          <Mail className="h-4 w-4" />
+          Email
         </Button>
       )}
     </div>
