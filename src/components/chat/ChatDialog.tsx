@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { MessageCircle, Send, X } from "lucide-react";
+import { MessageCircle, Send, X, Smile, Image, Mic, Phone, Check, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +22,8 @@ interface Message {
   content: string;
   read: boolean;
   created_at: string;
+  message_type?: string;
+  media_url?: string;
 }
 
 interface ChatDialogProps {
@@ -40,7 +42,13 @@ export const ChatDialog = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [open, setOpen] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const emojis = ["😊", "😂", "❤️", "👍", "🎉", "🔥", "💯", "✨", "👏", "💪", "🙏", "😍"];
 
   useEffect(() => {
     if (open) {
@@ -153,11 +161,11 @@ export const ChatDialog = ({
       .eq('read', false);
   };
 
-  const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+  const sendMessage = async (messageType = 'text', content?: string, mediaUrl?: string) => {
+    const messageContent = content || newMessage.trim();
+    if (!messageContent && !mediaUrl) return;
 
-    const messageContent = newMessage.trim();
-    setNewMessage(""); // Clear immediately for better UX
+    setNewMessage("");
 
     const { data, error } = await supabase
       .from('messages')
@@ -165,6 +173,8 @@ export const ChatDialog = ({
         sender_id: currentUserId,
         receiver_id: otherUserId,
         content: messageContent,
+        message_type: messageType,
+        media_url: mediaUrl,
       })
       .select()
       .single();
@@ -172,12 +182,81 @@ export const ChatDialog = ({
     if (error) {
       toast.error("Errore nell'invio del messaggio");
       console.error('Error sending message:', error);
-      setNewMessage(messageContent); // Restore message on error
+      if (!mediaUrl) setNewMessage(messageContent);
       return;
     }
 
     console.log('Message sent successfully:', data);
     toast.success("Messaggio inviato");
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Solo immagini supportate");
+      return;
+    }
+
+    const fileName = `${currentUserId}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('cvs')
+      .upload(fileName, file);
+
+    if (uploadError) {
+      toast.error("Errore caricamento immagine");
+      return;
+    }
+
+    const { data } = supabase.storage.from('cvs').getPublicUrl(fileName);
+    await sendMessage('image', 'Immagine', data.publicUrl);
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const fileName = `${currentUserId}/${Date.now()}.webm`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('cvs')
+          .upload(fileName, blob);
+
+        if (uploadError) {
+          toast.error("Errore caricamento audio");
+          return;
+        }
+
+        const { data } = supabase.storage.from('cvs').getPublicUrl(fileName);
+        await sendMessage('audio', 'Messaggio vocale', data.publicUrl);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      toast.info("Registrazione in corso...");
+    } catch (error) {
+      toast.error("Errore accesso microfono");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setMediaRecorder(null);
+      setIsRecording(false);
+    }
+  };
+
+  const startCall = () => {
+    toast.info("Funzione chiamata in sviluppo");
   };
 
   const scrollToBottom = () => {
@@ -202,13 +281,18 @@ export const ChatDialog = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] h-[600px] flex flex-col p-0">
         <DialogHeader className="p-4 border-b">
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {getInitials(otherUserName)}
-              </AvatarFallback>
-            </Avatar>
-            <DialogTitle>{otherUserName}</DialogTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {getInitials(otherUserName)}
+                </AvatarFallback>
+              </Avatar>
+              <DialogTitle>{otherUserName}</DialogTitle>
+            </div>
+            <Button variant="ghost" size="icon" onClick={startCall}>
+              <Phone className="h-5 w-5" />
+            </Button>
           </div>
         </DialogHeader>
 
@@ -228,13 +312,30 @@ export const ChatDialog = ({
                         : 'bg-muted'
                     }`}
                   >
-                    <p className="text-sm break-words">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {new Date(message.created_at).toLocaleTimeString('it-IT', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
+                    {message.message_type === 'image' && message.media_url && (
+                      <img src={message.media_url} alt="Immagine" className="max-w-full rounded mb-2" />
+                    )}
+                    {message.message_type === 'audio' && message.media_url && (
+                      <audio controls src={message.media_url} className="max-w-full" />
+                    )}
+                    {message.message_type === 'text' && (
+                      <p className="text-sm break-words">{message.content}</p>
+                    )}
+                    <div className="flex items-center gap-1 mt-1">
+                      <p className="text-xs opacity-70">
+                        {new Date(message.created_at).toLocaleTimeString('it-IT', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                      {isSender && (
+                        message.read ? (
+                          <CheckCheck className="h-3 w-3 opacity-70" />
+                        ) : (
+                          <Check className="h-3 w-3 opacity-70" />
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -243,7 +344,23 @@ export const ChatDialog = ({
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t space-y-2">
+          {showEmojiPicker && (
+            <div className="flex flex-wrap gap-2 p-2 bg-muted rounded-lg">
+              {emojis.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => {
+                    setNewMessage(newMessage + emoji);
+                    setShowEmojiPicker(false);
+                  }}
+                  className="text-2xl hover:scale-125 transition-transform"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -251,6 +368,38 @@ export const ChatDialog = ({
             }}
             className="flex gap-2"
           >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <Smile className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Image className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={isRecording ? stopRecording : startRecording}
+              className={isRecording ? "text-red-500" : ""}
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}

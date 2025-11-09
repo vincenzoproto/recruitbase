@@ -23,6 +23,7 @@ export interface SearchFilterValues {
   experienceLevel?: string;
   sector?: string;
   skills?: string[];
+  jobTitle?: string;
 }
 
 const CITIES = [
@@ -75,6 +76,7 @@ export const SearchFilters = ({ userRole, onSearch }: SearchFiltersProps) => {
     (filters.city ? 1 : 0) +
     (filters.experienceLevel ? 1 : 0) +
     (filters.sector ? 1 : 0) +
+    (filters.jobTitle ? 1 : 0) +
     selectedSkills.length;
 
   return (
@@ -178,6 +180,18 @@ export const SearchFilters = ({ userRole, onSearch }: SearchFiltersProps) => {
                 </Select>
               </div>
 
+              {/* Job Title (for recruiters) */}
+              {userRole === 'recruiter' && (
+                <div className="space-y-2">
+                  <Label>Ruolo</Label>
+                  <Input
+                    value={filters.jobTitle || ''}
+                    onChange={(e) => setFilters({ ...filters, jobTitle: e.target.value })}
+                    placeholder="Es: Frontend Developer, Marketing Manager..."
+                  />
+                </div>
+              )}
+
               {/* Skills (only for recruiters) */}
               {userRole === 'recruiter' && (
                 <div className="space-y-2">
@@ -240,6 +254,15 @@ export const SearchFilters = ({ userRole, onSearch }: SearchFiltersProps) => {
               <X
                 className="ml-1 h-3 w-3 cursor-pointer"
                 onClick={() => setFilters({ ...filters, sector: undefined })}
+              />
+            </Badge>
+          )}
+          {filters.jobTitle && (
+            <Badge variant="secondary">
+              👤 {filters.jobTitle}
+              <X
+                className="ml-1 h-3 w-3 cursor-pointer"
+                onClick={() => setFilters({ ...filters, jobTitle: undefined })}
               />
             </Badge>
           )}
