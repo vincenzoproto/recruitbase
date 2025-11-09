@@ -210,56 +210,59 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Briefcase className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Recruit Base TRM</h1>
-              <p className="text-sm text-muted-foreground">
-                {profile.full_name} - Talent Relationship Manager
+      <header className="border-b bg-card sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Briefcase className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">Recruit Base TRM</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                {profile.full_name}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationBell userId={profile.id} />
             <Button
               variant="outline"
+              size="sm"
               onClick={handleSignOut}
-              className="gap-2"
+              className="gap-1"
             >
               <LogOut className="h-4 w-4" />
-              Esci
+              <span className="hidden sm:inline">Esci</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-          <div className="flex items-center justify-between">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
+        <div className="mb-4 sm:mb-6 p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-foreground mb-2">
+              <h2 className="text-lg sm:text-xl font-bold text-foreground mb-2">
                 Non gestire candidati. Coltiva relazioni.
               </h2>
-              <p className="text-muted-foreground">
-                Trasforma il recruiting in un'esperienza fluida e relazionale con AI e automazioni.
+              <p className="text-sm sm:text-base text-muted-foreground">
+                TRM con AI e automazioni
               </p>
             </div>
-            <PremiumButton />
+            <div className="w-full sm:w-auto">
+              <PremiumButton />
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <StatsCard
             title="Offerte Attive"
             value={jobOffers.length}
             icon={Briefcase}
-            subtitle="Offerte di lavoro attive"
+            subtitle="Offerte attive"
             gradient="from-blue-500/10 to-blue-500/5"
           />
           <StatsCard
-            title="Candidati Visualizzati"
+            title="Candidati Visti"
             value={stats.candidatesViewedCount}
             icon={UserCheck}
             subtitle="Profili visualizzati"
@@ -274,30 +277,46 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           />
         </div>
 
-        <TRSDashboardCard recruiterId={profile.id} />
+        <div className="mb-6">
+          <TRSDashboardCard recruiterId={profile.id} />
+        </div>
 
-        <Tabs defaultValue="pipeline" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="pipeline">Pipeline Kanban</TabsTrigger>
-            <TabsTrigger value="offers">Offerte</TabsTrigger>
-            <TabsTrigger value="candidates">Candidati</TabsTrigger>
-            <TabsTrigger value="favorites">Preferiti</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="matches">Match AI</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="pipeline" className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="grid w-full min-w-max grid-cols-6 h-auto">
+              <TabsTrigger value="pipeline" className="text-xs sm:text-sm px-2 py-2">
+                Pipeline
+              </TabsTrigger>
+              <TabsTrigger value="offers" className="text-xs sm:text-sm px-2 py-2">
+                Offerte
+              </TabsTrigger>
+              <TabsTrigger value="candidates" className="text-xs sm:text-sm px-2 py-2">
+                Candidati
+              </TabsTrigger>
+              <TabsTrigger value="favorites" className="text-xs sm:text-sm px-2 py-2">
+                Preferiti
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 py-2">
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="matches" className="text-xs sm:text-sm px-2 py-2">
+                Match AI
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="pipeline">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
                   <Briefcase className="h-5 w-5" />
-                  Pipeline Kanban - Vista Completa
+                  Pipeline Kanban
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Trascina i candidati tra le fasi per aggiornare il loro stato
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Trascina i candidati per aggiornare lo stato
                 </p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 <KanbanBoard />
               </CardContent>
             </Card>

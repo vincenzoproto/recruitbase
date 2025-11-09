@@ -62,10 +62,10 @@ const Index = () => {
             </p>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <div className="flex flex-col gap-3 justify-center pt-6 w-full max-w-md mx-auto">
               <Button 
                 size="lg" 
-                className="h-12 px-8 font-bold"
+                className="w-full h-12 font-bold"
                 onClick={() => navigate("/auth")}
               >
                 Inizia Gratis
@@ -73,7 +73,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="h-12 px-8"
+                className="w-full h-12"
                 onClick={() => setShowTRSDialog(true)}
               >
                 Scopri come funziona
@@ -88,15 +88,15 @@ const Index = () => {
             </div>
 
             {/* Visual Element */}
-            <div className="pt-8">
-              <Card className="max-w-2xl mx-auto border-primary/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
+            <div className="pt-8 px-4">
+              <Card className="max-w-md mx-auto border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold text-foreground font-mono">87</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground font-mono">87</span>
                       <span className="font-semibold text-primary">TRS™</span>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 w-full">
                       <div className="relative w-full bg-muted rounded-full h-3 overflow-hidden">
                         <div 
                           className="bg-green-500 h-full rounded-full"
@@ -113,52 +113,52 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="container mx-auto px-4 py-16 scroll-mt-20">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
-            <CardContent className="pt-8 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
-                <Users className="h-7 w-7 text-primary" />
+      <section id="features" className="container mx-auto px-4 py-12 scroll-mt-20">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <CardContent className="pt-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Users className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Per Candidati</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Crea il tuo profilo e candidati alle migliori offerte in pochi clic
+              <h3 className="font-bold">Per Candidati</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Crea il tuo profilo e candidati alle migliori offerte
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <CardContent className="pt-8 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
-                <Briefcase className="h-7 w-7 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <CardContent className="pt-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Briefcase className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Per Recruiter</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Pubblica offerte e trova i candidati perfetti per la tua azienda
+              <h3 className="font-bold">Per Recruiter</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Pubblica offerte e trova i candidati perfetti
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <CardContent className="pt-8 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
-                <Target className="h-7 w-7 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <CardContent className="pt-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Target className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Matching Preciso</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Sistema di ricerca avanzato per trovare il match perfetto
+              <h3 className="font-bold">Matching Preciso</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Sistema di ricerca avanzato con TRS™
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <CardContent className="pt-8 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
-                <Zap className="h-7 w-7 text-primary" />
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+            <CardContent className="pt-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto">
+                <Zap className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-bold text-lg">Veloce & Intuitivo</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Interfaccia moderna e facile da usare, anche da smartphone
+              <h3 className="font-bold">Veloce & Intuitivo</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Interfaccia moderna, anche da smartphone
               </p>
             </CardContent>
           </Card>
@@ -166,17 +166,17 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-12">
         <Card className="border-none shadow-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
-          <CardContent className="py-10 text-center space-y-4">
-            <h3 className="text-2xl md:text-3xl font-bold">Pronto a iniziare?</h3>
-            <p className="text-lg opacity-90">
+          <CardContent className="py-8 text-center space-y-4 px-4">
+            <h3 className="text-xl md:text-2xl font-bold">Pronto a iniziare?</h3>
+            <p className="text-base opacity-90">
               Scopri il potere del tuo network di talenti
             </p>
             <Button 
               size="lg" 
               variant="secondary" 
-              className="h-12 px-8 font-bold"
+              className="w-full max-w-xs h-12 font-bold"
               onClick={() => navigate("/auth")}
             >
               Inizia Gratis
