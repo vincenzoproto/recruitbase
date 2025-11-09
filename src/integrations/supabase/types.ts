@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      academy_content: {
+        Row: {
+          article_text: string | null
+          category: string
+          content_type: string
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_premium: boolean | null
+          order_position: number | null
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          article_text?: string | null
+          category: string
+          content_type: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_premium?: boolean | null
+          order_position?: number | null
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          article_text?: string | null
+          category?: string
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_premium?: boolean | null
+          order_position?: number | null
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           badge_type: string
@@ -156,6 +198,39 @@ export type Database = {
           },
         ]
       }
+      biometric_credentials: {
+        Row: {
+          counter: number | null
+          created_at: string | null
+          credential_id: string
+          device_name: string | null
+          id: string
+          last_used: string | null
+          public_key: string
+          user_id: string
+        }
+        Insert: {
+          counter?: number | null
+          created_at?: string | null
+          credential_id: string
+          device_name?: string | null
+          id?: string
+          last_used?: string | null
+          public_key: string
+          user_id: string
+        }
+        Update: {
+          counter?: number | null
+          created_at?: string | null
+          credential_id?: string
+          device_name?: string | null
+          id?: string
+          last_used?: string | null
+          public_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       candidate_notes: {
         Row: {
           candidate_id: string
@@ -271,6 +346,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      daily_recruiter_metrics: {
+        Row: {
+          avg_response_time_hours: number | null
+          created_at: string | null
+          date: string
+          id: string
+          new_contacts_count: number | null
+          user_id: string
+          weekly_conversion_rate: number | null
+        }
+        Insert: {
+          avg_response_time_hours?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          new_contacts_count?: number | null
+          user_id: string
+          weekly_conversion_rate?: number | null
+        }
+        Update: {
+          avg_response_time_hours?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          new_contacts_count?: number | null
+          user_id?: string
+          weekly_conversion_rate?: number | null
+        }
+        Relationships: []
       }
       favorites: {
         Row: {
@@ -634,6 +739,51 @@ export type Database = {
           },
         ]
       }
+      recruiter_stats: {
+        Row: {
+          avg_response_time_hours: number | null
+          avg_trs: number | null
+          badge_type: string | null
+          country: string | null
+          created_at: string | null
+          id: string
+          last_updated: string | null
+          monthly_contacts: number | null
+          ranking_position: number | null
+          total_referral_earnings: number | null
+          user_id: string
+          weekly_conversion_rate: number | null
+        }
+        Insert: {
+          avg_response_time_hours?: number | null
+          avg_trs?: number | null
+          badge_type?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          monthly_contacts?: number | null
+          ranking_position?: number | null
+          total_referral_earnings?: number | null
+          user_id: string
+          weekly_conversion_rate?: number | null
+        }
+        Update: {
+          avg_response_time_hours?: number | null
+          avg_trs?: number | null
+          badge_type?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          monthly_contacts?: number | null
+          ranking_position?: number | null
+          total_referral_earnings?: number | null
+          user_id?: string
+          weekly_conversion_rate?: number | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -761,6 +911,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_recruiter_rankings: { Args: never; Returns: undefined }
     }
     Enums: {
       experience_level: "entry" | "junior" | "mid" | "senior" | "lead"
