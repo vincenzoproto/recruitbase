@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      ambassador_earnings: {
+        Row: {
+          ambassador_id: string
+          amount: number
+          created_at: string | null
+          id: string
+          paid_at: string | null
+          payment_requested_at: string | null
+          referral_id: string
+          status: string
+        }
+        Insert: {
+          ambassador_id: string
+          amount?: number
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_requested_at?: string | null
+          referral_id: string
+          status?: string
+        }
+        Update: {
+          ambassador_id?: string
+          amount?: number
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_requested_at?: string | null
+          referral_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambassador_earnings_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "ambassador_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ambassador_referrals: {
+        Row: {
+          ambassador_id: string
+          created_at: string | null
+          first_payment_date: string | null
+          id: string
+          referral_code: string
+          referred_user_id: string
+          signup_date: string | null
+          status: string
+        }
+        Insert: {
+          ambassador_id: string
+          created_at?: string | null
+          first_payment_date?: string | null
+          id?: string
+          referral_code: string
+          referred_user_id: string
+          signup_date?: string | null
+          status?: string
+        }
+        Update: {
+          ambassador_id?: string
+          created_at?: string | null
+          first_payment_date?: string | null
+          id?: string
+          referral_code?: string
+          referred_user_id?: string
+          signup_date?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       applications: {
         Row: {
           applied_at: string | null
@@ -143,8 +217,10 @@ export type Database = {
           created_at: string | null
           full_name: string
           id: string
+          is_premium: boolean | null
           job_title: string | null
           linkedin_url: string | null
+          referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills: string[] | null
           updated_at: string | null
@@ -155,8 +231,10 @@ export type Database = {
           created_at?: string | null
           full_name: string
           id: string
+          is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
           updated_at?: string | null
@@ -167,11 +245,55 @@ export type Database = {
           created_at?: string | null
           full_name?: string
           id?: string
+          is_premium?: boolean | null
           job_title?: string | null
           linkedin_url?: string | null
+          referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_end: string | null
+          trial_start: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_start?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_start?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
