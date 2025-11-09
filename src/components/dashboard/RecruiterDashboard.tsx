@@ -23,6 +23,8 @@ import { hapticFeedback } from "@/lib/haptics";
 import { KPIWidget } from "./KPIWidget";
 import CandidateCard from "./CandidateCard";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
+import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -42,6 +44,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     activeCandidates: 0,
     followUpsSent: 0,
   });
+  const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
+  const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
@@ -226,6 +230,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
+      <MeetingRequestDialog 
+        userId={profile.id}
+        open={meetingDialogOpen}
+        onOpenChange={setMeetingDialogOpen}
+      />
+      
       {profile?.id && (
         <>
           <WeeklyInsights userId={profile.id} />
@@ -245,7 +255,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <NotificationBell userId={profile.id} />
+            <NotificationBell 
+              userId={profile.id}
+              onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+            />
             <Button
               variant="outline"
               size="sm"

@@ -16,6 +16,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
 import { CVUploader } from "@/components/candidate/CVUploader";
 import RecruiterCard from "./RecruiterCard";
+import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
+import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -30,6 +32,9 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const isMobile = useIsMobile();
   const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Offerte, 2: Recruiter, 3: Profilo
   const [recruiters, setRecruiters] = useState<any[]>([]);
+  const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
+  const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
+
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
     { id: 1, name: "Offerte", icon: "💼" },
@@ -160,6 +165,12 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
+      <MeetingRequestDialog 
+        userId={profile.id}
+        open={meetingDialogOpen}
+        onOpenChange={setMeetingDialogOpen}
+      />
+      
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -167,7 +178,10 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             <p className="text-sm text-muted-foreground">Dashboard Candidato</p>
           </div>
           <div className="flex items-center gap-2">
-            <NotificationBell userId={profile.id} />
+            <NotificationBell 
+              userId={profile.id}
+              onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+            />
             <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Esci

@@ -28,21 +28,23 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
     }
 
     try {
+      const { data: user } = await supabase.auth.getUser();
+
       const { error } = await supabase.from("meetings").insert({
         candidate_id: candidateId,
-        recruiter_id: (await supabase.auth.getUser()).data.user?.id,
+        recruiter_id: user.user?.id,
         scheduled_date: date.toISOString(),
         scheduled_time: selectedTime,
-        status: "scheduled"
+        status: "pending"
       });
 
       if (error) throw error;
 
-      toast.success(`Call programmata con ${candidateName} per ${date.toLocaleDateString()} alle ${selectedTime}`);
+      toast.success(`Richiesta di call inviata a ${candidateName}. In attesa di conferma.`);
       setOpen(false);
     } catch (error) {
       console.error("Error scheduling meeting:", error);
-      toast.error("Errore nella programmazione");
+      toast.error("Errore nell'invio della richiesta");
     }
   };
 
