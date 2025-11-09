@@ -195,7 +195,7 @@ const Index = () => {
 
       {/* TRS Explanation Dialog */}
       <Dialog open={showTRSDialog} onOpenChange={setShowTRSDialog}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl md:text-3xl font-bold text-center mb-4">
               Come funziona il Talent Relationship Score™
@@ -259,7 +259,7 @@ const Index = () => {
                 🔒 Talent Relationship Score™ – Proprietary Metric
               </p>
               <p className="text-center text-sm text-muted-foreground italic">
-                Algoritmo esclusivo brevettabile di Recruit Base
+                Algoritmo esclusivo di Recruit Base
               </p>
             </div>
 

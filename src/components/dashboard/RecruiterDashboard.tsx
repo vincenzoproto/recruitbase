@@ -20,6 +20,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KanbanBoard from "../trm/KanbanBoard";
 import { PremiumButton } from "../premium/PremiumButton";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
+import { MobileOnboarding } from "@/components/mobile/MobileOnboarding";
+import { SmartNotifications } from "@/components/mobile/SmartNotifications";
+import { RecruiterScore } from "@/components/mobile/RecruiterScore";
+import { RBCopilot } from "@/components/mobile/RBCopilot";
+import { DashboardViewSelector } from "@/components/mobile/DashboardViewSelector";
+import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
+import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
+import { ReferralLeaderboard } from "@/components/mobile/ReferralLeaderboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -27,6 +36,7 @@ interface RecruiterDashboardProps {
 
 const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -38,6 +48,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     referralsCount: 0,
   });
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem("onboarding-completed");
+  });
+  const [activeTab, setActiveTab] = useState("pipeline");
+  const [dashboardView, setDashboardView] = useState<"list" | "card" | "timeline">("card");
 
   useEffect(() => {
     loadJobOffers();
@@ -208,8 +223,18 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     loadFavorites();
   };
 
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("onboarding-completed", "true");
+    setShowOnboarding(false);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <MobileOnboarding open={showOnboarding} onComplete={handleOnboardingComplete} />
+      <WeeklyInsights userId={profile.id} />
+      <SmartNotifications userId={profile.id} />
+      <RBCopilot />
+      
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -237,6 +262,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
+        <div className="mb-4">
+          <RecruiterScore userId={profile.id} />
+        </div>
+
         <div className="mb-4 sm:mb-6 p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -281,9 +310,14 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           <TRSDashboardCard recruiterId={profile.id} />
         </div>
 
-        <Tabs defaultValue="pipeline" className="space-y-4 sm:space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4">
-            <TabsList className="grid w-full min-w-max grid-cols-6 h-auto">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+          <div className="flex items-center gap-4 mb-4">
+            <DashboardViewSelector onViewChange={setDashboardView} />
+          </div>
+
+          {!isMobile && (
+            <div className="overflow-x-auto -mx-4 px-4">
+              <TabsList className="grid w-full min-w-max grid-cols-6 h-auto">
               <TabsTrigger value="pipeline" className="text-xs sm:text-sm px-2 py-2">
                 Pipeline
               </TabsTrigger>
@@ -303,7 +337,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 Match AI
               </TabsTrigger>
             </TabsList>
-          </div>
+            </div>
+          )}
 
           <TabsContent value="pipeline">
             <Card>
@@ -437,14 +472,21 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         </Tabs>
 
         {profile.referral_code && (
-          <AmbassadorSection
-            referralCode={profile.referral_code}
-            userId={profile.id}
-          />
+          <>
+            <AmbassadorSection
+              referralCode={profile.referral_code}
+              userId={profile.id}
+            />
+            <div className="mt-6">
+              <ReferralLeaderboard />
+            </div>
+          </>
         )}
 
         <LinkedInIntegration />
       </main>
+
+      <MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {showCreateJob && (
         <CreateJobDialog
