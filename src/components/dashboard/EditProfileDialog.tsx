@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { Upload } from "lucide-react";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -22,6 +24,9 @@ interface EditProfileDialogProps {
 
 const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfileDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     full_name: profile.full_name || "",
     city: profile.city || "",
@@ -31,6 +36,36 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     linkedin_url: profile.linkedin_url || "",
     phone_number: profile.phone_number || "",
   });
+
+  const uploadAvatar = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error("Carica solo immagini");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('cvs')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('cvs')
+        .getPublicUrl(fileName);
+
+      setAvatarUrl(publicUrl);
+      toast.success("Foto caricata!");
+    } catch (error: any) {
+      toast.error(error.message || "Errore nel caricamento");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +87,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           skills: skillsArray,
           linkedin_url: formData.linkedin_url,
           phone_number: formData.phone_number,
+          avatar_url: avatarUrl,
         })
         .eq("id", profile.id);
 
@@ -75,6 +111,33 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           <DialogDescription>Aggiorna le tue informazioni professionali</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col items-center space-y-4">
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback>{profile.full_name?.[0]?.toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadAvatar(file);
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {uploading ? "Caricamento..." : "Carica Foto"}
+            </Button>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="full_name">Nome Completo *</Label>
             <Input

@@ -25,9 +25,10 @@ interface NotificationBellProps {
   userId: string;
   onMeetingNotificationClick?: () => void;
   onMessageNotificationClick?: (senderId: string) => void;
+  onApplicationNotificationClick?: (candidateId: string) => void;
 }
 
-export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessageNotificationClick }: NotificationBellProps) => {
+export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessageNotificationClick, onApplicationNotificationClick }: NotificationBellProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -163,6 +164,9 @@ export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessage
                     }
                     if (notification.type === 'message' && onMessageNotificationClick && notification.link) {
                       onMessageNotificationClick(notification.link);
+                    }
+                    if (notification.type === 'new_application' && onApplicationNotificationClick && notification.link) {
+                      onApplicationNotificationClick(notification.link);
                     }
                     setOpen(false);
                   }}

@@ -19,6 +19,7 @@ import RecruiterCard from "./RecruiterCard";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
+import { GroupChatSection } from "@/components/chat/GroupChatSection";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -43,6 +44,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
     { id: 1, name: "Offerte", icon: "💼" },
     { id: 2, name: "Recruiter", icon: "👔" },
     { id: 3, name: "Profilo", icon: "👤" },
+    { id: 4, name: "Gruppi", icon: "💬" },
   ];
 
   useEffect(() => {
@@ -476,6 +478,13 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                 </div>
               </CardContent>
             </Card>
+          )}
+          
+          {/* Vista 4: Gruppi Chat */}
+          {(!isMobile || currentView === 4) && (
+            <div className="animate-fade-in">
+              <GroupChatSection />
+            </div>
           )}
         </div>
       </main>

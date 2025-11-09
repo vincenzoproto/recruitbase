@@ -26,6 +26,10 @@ import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
+import CandidateDetailDialog from "@/components/trm/CandidateDetailDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GroupChatSection } from "@/components/chat/GroupChatSection";
+import EditProfileDialog from "./EditProfileDialog";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -48,6 +52,9 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [chatUserName, setChatUserName] = useState<string>("");
+  const [candidateDetailOpen, setCandidateDetailOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
   const views = [
@@ -55,7 +62,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     { id: 1, name: "Candidati", icon: "👥" },
     { id: 2, name: "Pipeline", icon: "📋" },
     { id: 3, name: "Offerte", icon: "💼" },
-    { id: 4, name: "Insights", icon: "📈" }
+    { id: 4, name: "Insights", icon: "📈" },
+    { id: 5, name: "Gruppi Chat", icon: "💬" }
   ];
 
   useEffect(() => {
@@ -190,6 +198,19 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     }
   };
 
+  const handleOpenCandidateDetail = async (candidateId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", candidateId)
+      .single();
+    
+    if (data) {
+      setSelectedCandidate(data);
+      setCandidateDetailOpen(true);
+    }
+  };
+
 
   const loadJobOffers = async () => {
     const { data, error } = await supabase
@@ -261,6 +282,25 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           onOpenChange={(open) => !open && setChatUserId(null)}
         />
       )}
+
+      {selectedCandidate && (
+        <CandidateDetailDialog
+          candidate={selectedCandidate}
+          open={candidateDetailOpen}
+          onOpenChange={setCandidateDetailOpen}
+          onUpdate={loadCandidates}
+        />
+      )}
+
+      <EditProfileDialog
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+        profile={profile}
+        onSuccess={() => {
+          toast.success("Profilo aggiornato!");
+          window.location.reload();
+        }}
+      />
       
       {profile?.id && (
         <>
@@ -285,6 +325,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
               onMessageNotificationClick={handleOpenChat}
+              onApplicationNotificationClick={handleOpenCandidateDetail}
             />
             <Button
               variant="outline"
@@ -469,6 +510,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                     key={offer.id}
                     job={offer}
                     onUpdate={loadJobOffers}
+                    isRecruiter={true}
                   />
                 ))}
                 {jobOffers.length === 0 && (
@@ -496,6 +538,23 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                   <TRSDashboardCard recruiterId={profile.id} />
                 </>
               )}
+            </div>
+          )}
+
+          {/* Vista 5: Gruppi Chat */}
+          {(!isMobile || currentView === 5) && (
+            <div className="space-y-4 animate-fade-in">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Profilo e Impostazioni</CardTitle>
+                    <Button onClick={() => setEditProfileOpen(true)} variant="outline">
+                      Modifica Profilo
+                    </Button>
+                  </div>
+                </CardHeader>
+              </Card>
+              <GroupChatSection />
             </div>
           )}
         </div>
