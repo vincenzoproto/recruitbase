@@ -18,9 +18,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"recruiter" | "candidate">("candidate");
-  const redirectTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Guardia di navigazione con debounce per evitare loop
+  // Guardia di navigazione: redirect solo se c'è una sessione attiva
   useEffect(() => {
     let isMounted = true;
 
@@ -29,15 +28,7 @@ const Auth = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (isMounted && session) {
-          // Debounce redirect per evitare doppi push
-          if (redirectTimeoutRef.current) {
-            clearTimeout(redirectTimeoutRef.current);
-          }
-          redirectTimeoutRef.current = setTimeout(() => {
-            if (isMounted) {
-              navigate("/dashboard", { replace: true });
-            }
-          }, 100);
+          navigate("/dashboard", { replace: true });
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -52,9 +43,6 @@ const Auth = () => {
 
     return () => {
       isMounted = false;
-      if (redirectTimeoutRef.current) {
-        clearTimeout(redirectTimeoutRef.current);
-      }
     };
   }, [navigate]);
 
@@ -146,15 +134,8 @@ const Auth = () => {
         // Segnala il primo login per mostrare il welcome toast
         sessionStorage.setItem("show_welcome", "true");
 
-        toast.success("Account creato con successo!");
-        
-        // Debounce redirect
-        if (redirectTimeoutRef.current) {
-          clearTimeout(redirectTimeoutRef.current);
-        }
-        redirectTimeoutRef.current = setTimeout(() => {
-          navigate("/dashboard", { replace: true });
-        }, 100);
+      toast.success("Account creato con successo!");
+        navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {
       toast.error(error.message || "Errore durante la registrazione");
@@ -185,14 +166,7 @@ const Auth = () => {
       }
 
       toast.success("Login effettuato!");
-      
-      // Debounce redirect
-      if (redirectTimeoutRef.current) {
-        clearTimeout(redirectTimeoutRef.current);
-      }
-      redirectTimeoutRef.current = setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      navigate("/dashboard", { replace: true });
     } catch (error: any) {
       toast.error(error.message || "Errore durante il login");
     } finally {

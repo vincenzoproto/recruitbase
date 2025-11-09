@@ -19,27 +19,15 @@ const Dashboard = () => {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [showRoleSetup, setShowRoleSetup] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const redirectTimeoutRef = useRef<NodeJS.Timeout>();
   const hasShownWelcome = useRef(false);
 
   // Guardia di navigazione: redirect ad /auth solo se session è definitivamente assente
   useEffect(() => {
-    if (!isLoadingFromCache && !session && !user) {
-      // Debounce redirect per evitare loop
-      if (redirectTimeoutRef.current) {
-        clearTimeout(redirectTimeoutRef.current);
-      }
-      redirectTimeoutRef.current = setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 100);
+    // Aspetta che il check della cache sia completo E che non ci sia user/session
+    if (!isLoadingFromCache && !session && !user && !isLoadingProfile) {
+      navigate("/auth", { replace: true });
     }
-
-    return () => {
-      if (redirectTimeoutRef.current) {
-        clearTimeout(redirectTimeoutRef.current);
-      }
-    };
-  }, [user, session, navigate, isLoadingFromCache]);
+  }, [user, session, navigate, isLoadingFromCache, isLoadingProfile]);
 
   // Gestione sessione scaduta
   useEffect(() => {
