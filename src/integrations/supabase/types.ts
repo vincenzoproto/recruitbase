@@ -156,6 +156,122 @@ export type Database = {
           },
         ]
       }
+      candidate_notes: {
+        Row: {
+          candidate_id: string
+          content: string
+          created_at: string | null
+          id: string
+          recruiter_id: string
+        }
+        Insert: {
+          candidate_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          recruiter_id: string
+        }
+        Update: {
+          candidate_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          recruiter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_notes_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_notes_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidate_tags: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          id: string
+          tag_name: string
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          id?: string
+          tag_name: string
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          id?: string
+          tag_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_tags_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidate_tasks: {
+        Row: {
+          candidate_id: string
+          completed: boolean | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          recruiter_id: string
+          title: string
+        }
+        Insert: {
+          candidate_id: string
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          recruiter_id: string
+          title: string
+        }
+        Update: {
+          candidate_id?: string
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          recruiter_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_tasks_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_tasks_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           candidate_id: string
@@ -185,6 +301,51 @@ export type Database = {
           },
           {
             foreignKeyName: "favorites_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interactions: {
+        Row: {
+          candidate_id: string
+          content: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          recruiter_id: string
+          type: string
+        }
+        Insert: {
+          candidate_id: string
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recruiter_id: string
+          type: string
+        }
+        Update: {
+          candidate_id?: string
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recruiter_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interactions_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interactions_recruiter_id_fkey"
             columns: ["recruiter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -331,6 +492,41 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_stages: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          id: string
+          name: string
+          position: number
+          recruiter_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          position: number
+          recruiter_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          position?: number
+          recruiter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_stages_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_views: {
         Row: {
           created_at: string | null
@@ -354,60 +550,83 @@ export type Database = {
       }
       profiles: {
         Row: {
+          availability: string | null
           avatar_url: string | null
           bio: string | null
           city: string | null
           created_at: string | null
           email_verified: boolean | null
+          engagement_score: number | null
           full_name: string
           id: string
+          is_favorite: boolean | null
           is_premium: boolean | null
           job_title: string | null
+          last_contact_date: string | null
           linkedin_url: string | null
           linkedin_verified: boolean | null
           onboarding_completed: boolean | null
+          pipeline_stage_id: string | null
           referral_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills: string[] | null
           updated_at: string | null
         }
         Insert: {
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
           email_verified?: boolean | null
+          engagement_score?: number | null
           full_name: string
           id: string
+          is_favorite?: boolean | null
           is_premium?: boolean | null
           job_title?: string | null
+          last_contact_date?: string | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
+          pipeline_stage_id?: string | null
           referral_code?: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
           email_verified?: boolean | null
+          engagement_score?: number | null
           full_name?: string
           id?: string
+          is_favorite?: boolean | null
           is_premium?: boolean | null
           job_title?: string | null
+          last_contact_date?: string | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
+          pipeline_stage_id?: string | null
           referral_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_pipeline_stage_id_fkey"
+            columns: ["pipeline_stage_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_stages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -516,6 +735,14 @@ export type Database = {
       calculate_match_score: {
         Args: { p_candidate_id: string; p_job_offer_id: string }
         Returns: number
+      }
+      candidates_needing_followup: {
+        Args: { recruiter_uuid: string }
+        Returns: {
+          candidate_id: string
+          days_since_contact: number
+          full_name: string
+        }[]
       }
       has_role: {
         Args: {

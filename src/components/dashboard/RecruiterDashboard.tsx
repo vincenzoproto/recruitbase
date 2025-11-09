@@ -16,6 +16,9 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { MatchesList } from "@/components/match/MatchesList";
 import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
 import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import KanbanBoard from "../trm/KanbanBoard";
+import { PremiumButton } from "../premium/PremiumButton";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -27,9 +30,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [showCandidates, setShowCandidates] = useState(false);
-  const [showFavorites, setShowFavorites] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
   const [filteredCandidates, setFilteredCandidates] = useState<any[]>([]);
   const [stats, setStats] = useState({
     jobOffersCount: 0,
@@ -52,7 +52,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   const loadStats = async () => {
     try {
-      // Count referrals
       const { count: referralsCount } = await supabase
         .from("ambassador_referrals")
         .select("*", { count: "exact", head: true })
@@ -69,13 +68,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   };
 
   const loadJobOffers = async () => {
-    // Carica solo i campi essenziali per performance
     const { data, error } = await supabase
       .from("job_offers")
       .select("id, title, city, sector, experience_level, is_active, created_at")
       .eq("recruiter_id", profile.id)
       .order("created_at", { ascending: false })
-      .limit(20); // Limita inizialmente a 20 offerte
+      .limit(20);
 
     if (error) {
       toast.error("Errore nel caricamento delle offerte");
@@ -102,7 +100,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const handleSearch = (query: string, filters: SearchFilterValues) => {
     let filtered = [...candidates];
 
-    // Filter by query
     if (query) {
       filtered = filtered.filter(c =>
         c.full_name?.toLowerCase().includes(query.toLowerCase()) ||
@@ -111,12 +108,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       );
     }
 
-    // Filter by city
     if (filters.city) {
       filtered = filtered.filter(c => c.city === filters.city);
     }
 
-    // Filter by skills
     if (filters.skills && filters.skills.length > 0) {
       filtered = filtered.filter(c =>
         c.skills?.some((s: string) =>
@@ -130,20 +125,17 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   const loadAnalytics = async () => {
     try {
-      // Generate mock analytics for last 7 days
       const data = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         
-        // Get applications count for this date
         const { count: appCount } = await supabase
           .from('applications')
           .select('*', { count: 'exact', head: true })
           .gte('applied_at', new Date(date.setHours(0, 0, 0, 0)).toISOString())
           .lte('applied_at', new Date(date.setHours(23, 59, 59, 999)).toISOString());
 
-        // Get profile views count
         const { count: viewsCount } = await supabase
           .from('profile_views')
           .select('*', { count: 'exact', head: true })
@@ -219,53 +211,61 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
-            <p className="text-sm text-muted-foreground">Dashboard Recruiter</p>
+          <div className="flex items-center gap-3">
+            <Briefcase className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Recruit Base TRM</h1>
+              <p className="text-sm text-muted-foreground">
+                {profile.full_name} - Talent Relationship Manager
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <NotificationBell userId={profile.id} />
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="gap-2"
+            >
+              <LogOut className="h-4 w-4" />
               Esci
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6">
-        <Card className="border-none shadow-md animate-fade-in bg-gradient-to-r from-card to-accent/20">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl flex items-center gap-3">
-                  👋 Benvenuto, {profile.full_name}
-                  <PremiumBadge isPremium={profile.is_premium} size="md" />
-                </CardTitle>
-                <CardDescription className="text-base">Gestisci le tue offerte di lavoro e trova i migliori candidati</CardDescription>
-              </div>
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-6 p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-foreground mb-2">
+                Non gestire candidati. Coltiva relazioni.
+              </h2>
+              <p className="text-muted-foreground">
+                Trasforma il recruiting in un'esperienza fluida e relazionale con AI e automazioni.
+              </p>
             </div>
-          </CardHeader>
-        </Card>
+            <PremiumButton />
+          </div>
+        </div>
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard
-            title="Offerte Pubblicate"
-            value={stats.jobOffersCount}
+            title="Offerte Attive"
+            value={jobOffers.length}
             icon={Briefcase}
             subtitle="Offerte di lavoro attive"
             gradient="from-blue-500/10 to-blue-500/5"
           />
           <StatsCard
-            title="Candidati Visti"
+            title="Candidati Visualizzati"
             value={stats.candidatesViewedCount}
             icon={UserCheck}
             subtitle="Profili visualizzati"
             gradient="from-green-500/10 to-green-500/5"
           />
           <StatsCard
-            title="Referral Attivi"
+            title="Referral"
             value={stats.referralsCount}
             icon={Gift}
             subtitle="Inviti inviati"
@@ -273,232 +273,165 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           />
         </div>
 
-        <Card className="border-none shadow-lg bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground overflow-hidden relative animate-scale-in hover:shadow-xl transition-shadow">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
-          <CardContent className="p-6 relative">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <Star className="h-6 w-6 fill-current" />
-                  </div>
-                  <h3 className="text-2xl font-bold">Passa a Premium</h3>
-                </div>
-                <p className="text-primary-foreground/95 text-base font-medium">Sblocca tutte le funzionalità avanzate</p>
-                <div className="flex flex-wrap gap-2 text-sm">
-                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ 30 giorni gratis</span>
-                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ Contatti illimitati</span>
-                  <span className="px-3 py-1 bg-white/20 rounded-full">✓ Ricerca avanzata</span>
-                </div>
+        <Tabs defaultValue="pipeline" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="pipeline">Pipeline Kanban</TabsTrigger>
+            <TabsTrigger value="offers">Offerte</TabsTrigger>
+            <TabsTrigger value="candidates">Candidati</TabsTrigger>
+            <TabsTrigger value="favorites">Preferiti</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="matches">Match AI</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="pipeline">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Pipeline Kanban - Vista Completa
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Trascina i candidati tra le fasi per aggiornare il loro stato
+                </p>
+              </CardHeader>
+              <CardContent>
+                <KanbanBoard />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="offers">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Le Tue Offerte</h2>
+                <Button onClick={() => setShowCreateJob(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nuova Offerta
+                </Button>
               </div>
-              <Button 
-                size="lg" 
-                variant="secondary"
-                className="h-12 px-8 font-bold shadow-lg hover:scale-105 transition-transform"
-                onClick={() => window.open('https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00', '_blank')}
-              >
-                Attiva Ora
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Button
-            onClick={() => setShowCreateJob(true)}
-            size="lg"
-            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] animate-fade-in"
-          >
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <Plus className="h-7 w-7" />
-            </div>
-            <span className="font-bold text-base">Nuova Offerta</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              setShowCandidates(!showCandidates);
-              if (!showCandidates) loadCandidates();
-              setShowFavorites(false);
-              setShowAnalytics(false);
-            }}
-            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
-            style={{ animationDelay: "0.1s" }}
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Users className="h-7 w-7 text-primary" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-base">Cerca Candidati</div>
-              {candidates.length > 0 && (
-                <div className="text-xs text-muted-foreground mt-1">{candidates.length} disponibili</div>
-              )}
-            </div>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              setShowFavorites(!showFavorites);
-              setShowCandidates(false);
-              setShowAnalytics(false);
-            }}
-            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
-            style={{ animationDelay: "0.2s" }}
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Star className="h-7 w-7 text-primary" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-base">Preferiti</div>
-              <div className="text-xs text-muted-foreground mt-1">{favorites.length} salvati</div>
-            </div>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              setShowAnalytics(!showAnalytics);
-              setShowCandidates(false);
-              setShowFavorites(false);
-            }}
-            className="h-28 flex flex-col items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] hover:border-primary/50 animate-fade-in"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="h-7 w-7 text-primary" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-base">Analytics</div>
-              <div className="text-xs text-muted-foreground mt-1">Statistiche dettagliate</div>
-            </div>
-          </Button>
-        </div>
-
-        <MatchesList userId={profile.id} userRole="recruiter" />
-
-        {showAnalytics && (
-          <AnalyticsChart data={analyticsData} userRole="recruiter" />
-        )}
-
-        {showCandidates && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Candidati Disponibili
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <SearchFilters userRole="recruiter" onSearch={handleSearch} />
-              
               <div className="grid gap-4 md:grid-cols-2">
-                {filteredCandidates.length === 0 ? (
-                  <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                      <Users className="h-10 w-10 text-primary" />
+                {jobOffers.map((offer) => (
+                  <JobOfferCard
+                    key={offer.id}
+                    job={offer}
+                    onUpdate={loadJobOffers}
+                  />
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="candidates">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Candidati Disponibili
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {candidates.length === 0 && (
+                  <Button onClick={loadCandidates} variant="outline" className="w-full">
+                    Carica Candidati
+                  </Button>
+                )}
+                {candidates.length > 0 && (
+                  <>
+                    <SearchFilters userRole="recruiter" onSearch={handleSearch} />
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {filteredCandidates.length === 0 ? (
+                        <div className="col-span-2 text-center py-12">
+                          <p className="text-muted-foreground">
+                            {candidates.length === 0 
+                              ? "I candidati appariranno qui quando si registreranno"
+                              : "Nessun candidato trovato con questi filtri"}
+                          </p>
+                        </div>
+                      ) : (
+                        filteredCandidates.map((candidate) => (
+                          <CandidateCard
+                            key={candidate.id}
+                            candidate={candidate}
+                            onToggleFavorite={handleToggleFavorite}
+                            isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
+                          />
+                        ))
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-lg font-semibold text-foreground">Nessun candidato trovato</p>
-                      <p className="text-sm text-muted-foreground">
-                        {candidates.length === 0 
-                          ? "I candidati appariranno qui quando si registreranno"
-                          : "Prova a modificare i filtri di ricerca"}
-                      </p>
-                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="favorites">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  I Tuoi Preferiti
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-2">
+                {favorites.length === 0 ? (
+                  <div className="col-span-2 text-center py-12">
+                    <p className="text-muted-foreground">
+                      Nessun preferito salvato. Clicca sulla stella per salvare i candidati.
+                    </p>
                   </div>
                 ) : (
-                  filteredCandidates.map((candidate) => (
+                  favorites.map((fav) => (
                     <CandidateCard
-                      key={candidate.id}
-                      candidate={candidate}
+                      key={fav.id}
+                      candidate={fav.candidate}
                       onToggleFavorite={handleToggleFavorite}
-                      isFavorite={favorites.some((f) => f.candidate_id === candidate.id)}
+                      isFavorite={true}
                     />
                   ))
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {showFavorites && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5" />
-                I Tuoi Preferiti
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              {favorites.length === 0 ? (
-                <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Star className="h-10 w-10 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold text-foreground">Nessun preferito salvato</p>
-                    <p className="text-sm text-muted-foreground">Clicca sulla stella per salvare i candidati che ti interessano</p>
-                  </div>
-                </div>
-              ) : (
-                favorites.map((fav) => (
-                  <CandidateCard
-                    key={fav.id}
-                    candidate={fav.candidate}
-                    onToggleFavorite={handleToggleFavorite}
-                    isFavorite={true}
-                  />
-                ))
-              )}
-            </CardContent>
-          </Card>
-        )}
+          <TabsContent value="analytics">
+            <AnalyticsChart data={analyticsData} userRole="recruiter" />
+          </TabsContent>
+
+          <TabsContent value="matches">
+            <Card>
+              <CardHeader>
+                <CardTitle>Match AI Intelligenti</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Candidati suggeriti automaticamente in base alle tue offerte
+                </p>
+              </CardHeader>
+              <CardContent>
+                <MatchesList userId={profile.id} userRole="recruiter" />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {profile.referral_code && (
-          <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
+          <AmbassadorSection
+            referralCode={profile.referral_code}
+            userId={profile.id}
+          />
         )}
 
         <LinkedInIntegration />
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5" />
-              Le Tue Offerte
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            {jobOffers.length === 0 ? (
-              <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Briefcase className="h-10 w-10 text-primary" />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-lg font-semibold text-foreground">Nessuna offerta pubblicata</p>
-                  <p className="text-sm text-muted-foreground">Clicca su "Nuova Offerta" per iniziare a trovare candidati!</p>
-                </div>
-                <Button onClick={() => setShowCreateJob(true)} size="lg" className="mt-4">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Crea la tua prima offerta
-                </Button>
-              </div>
-            ) : (
-              jobOffers.map((job) => (
-                <JobOfferCard key={job.id} job={job} onUpdate={loadJobOffers} />
-              ))
-            )}
-          </CardContent>
-        </Card>
       </main>
 
-      <CreateJobDialog
-        open={showCreateJob}
-        onOpenChange={setShowCreateJob}
-        recruiterId={profile.id}
-        onSuccess={loadJobOffers}
-      />
+      {showCreateJob && (
+        <CreateJobDialog
+          open={showCreateJob}
+          onOpenChange={setShowCreateJob}
+          recruiterId={profile.id}
+          onSuccess={loadJobOffers}
+        />
+      )}
     </div>
   );
 };
