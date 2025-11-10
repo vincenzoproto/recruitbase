@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2, Edit, Trash2, Power, Users } from "lucide-react";
-import { CVCopilot } from "@/components/candidate/CVCopilot";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditJobDialog from "./EditJobDialog";
@@ -150,22 +149,16 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
           </div>
 
           {isCandidate && onApply && (
-            <div className="flex gap-2">
-              <Button onClick={onApply} disabled={hasApplied} size="sm" className="flex-1">
-                {hasApplied ? (
-                  <>
-                    <CheckCircle2 className="mr-1 h-4 w-4" />
-                    Candidato
-                  </>
-                ) : (
-                  "Candidati Ora"
-                )}
-              </Button>
-              <CVCopilot
-                jobTitle={job.title}
-                jobDescription={job.description}
-              />
-            </div>
+            <Button onClick={onApply} disabled={hasApplied} size="sm" className="w-full">
+              {hasApplied ? (
+                <>
+                  <CheckCircle2 className="mr-1 h-4 w-4" />
+                  Candidato
+                </>
+              ) : (
+                "Candidati Ora"
+              )}
+            </Button>
           )}
 
           {isRecruiter && (

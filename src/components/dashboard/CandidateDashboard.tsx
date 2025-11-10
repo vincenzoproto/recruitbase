@@ -21,6 +21,10 @@ import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
+import { PremiumCandidateDashboard } from "./PremiumCandidateDashboard";
+import { CVCopilot } from "@/components/candidate/CVCopilot";
+import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
+import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -42,11 +46,10 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
-    { id: 1, name: "Match", icon: "💼" },
-    { id: 2, name: "Offerte", icon: "📋" },
-    { id: 3, name: "Recruiter", icon: "👔" },
+    { id: 1, name: "Offerte", icon: "📋" },
+    { id: 2, name: "Feed", icon: "📱" },
+    { id: 3, name: "Messaggi", icon: "💬" },
     { id: 4, name: "Profilo", icon: "👤" },
-    { id: 5, name: "Gruppi", icon: "💬" },
   ];
 
   useEffect(() => {
@@ -281,58 +284,86 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
           {/* Vista 0: Home */}
           {(!isMobile || currentView === 0) && (
             <div className="space-y-6 animate-fade-in">
-              <Card className="border-none shadow-md bg-gradient-to-r from-card to-accent/20">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <div>
-                      <CardTitle className="text-2xl flex items-center gap-2">
-                        👋 Benvenuto, {profile.full_name}
-                        {profile.is_premium && (
-                          <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-none">
-                            <Crown className="h-3 w-3 mr-1" />
-                            Premium
-                          </Badge>
-                        )}
-                      </CardTitle>
-                      <CardDescription className="text-base">Trova il lavoro perfetto per te</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    👋 Benvenuto, {profile.full_name}
+                    {profile.is_premium && (
+                      <Badge className="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-none">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Premium
+                      </Badge>
+                    )}
+                  </h2>
+                  <p className="text-muted-foreground">Pannello Carriera</p>
+                </div>
+                <CVCopilot profile={profile} />
+              </div>
+
+              <PremiumCandidateDashboard profile={profile} onNavigate={setCurrentView} />
 
               {profile.referral_code && (
                 <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
               )}
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Benvenuto, {profile.full_name}</CardTitle>
-                    {!profile.city || !profile.job_title || !profile.skills?.length ? (
-                      <Badge variant="outline" className="text-amber-600 border-amber-600">
-                        Profilo incompleto
-                      </Badge>
-                    ) : (
-                      <Badge variant="default" className="bg-green-600">
-                        Profilo completo ✓
-                      </Badge>
-                    )}
-                  </div>
-                  <CardDescription>
-                    {!profile.city || !profile.job_title || !profile.skills?.length
-                      ? "Completa il tuo profilo per aumentare le tue possibilità!"
-                      : "Trova le migliori opportunità di lavoro per te"}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
             </div>
           )}
 
-          {/* Vista 1: Match */}
+          {/* Vista 1: Offerte */}
           {(!isMobile || currentView === 1) && (
-            <div className="space-y-6 animate-fade-in">
-              <TinderMatch userId={profile.id} userRole="candidate" />
-              <MatchesList userId={profile.id} userRole="candidate" />
+            <Card className="animate-fade-in">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <div className="space-y-1">
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="h-5 w-5" />
+                    Offerte Disponibili
+                  </CardTitle>
+                  <CardDescription>
+                    {jobOffers.length === 0
+                      ? "Nessuna offerta disponibile al momento"
+                      : `${jobOffers.length} offerte disponibili`}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <SearchFilters userRole="candidate" onSearch={handleSearch} />
+                <div className="grid gap-4 md:grid-cols-2">
+                  {filteredJobs.length === 0 ? (
+                    <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
+                      <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                        <Briefcase className="h-10 w-10 text-primary" />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-lg font-semibold text-foreground">Nessuna offerta trovata</p>
+                        <p className="text-sm text-muted-foreground">
+                          {jobOffers.length === 0
+                            ? "Torna più tardi per scoprire nuove opportunità"
+                            : "Prova a modificare i filtri di ricerca"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    filteredJobs.map((job) => {
+                      const hasApplied = applications.some((app) => app.job_offer_id === job.id);
+                      return (
+                        <JobOfferCard
+                          key={job.id}
+                          job={job}
+                          onApply={() => handleApply(job.id)}
+                          hasApplied={hasApplied}
+                          isCandidate
+                        />
+                      );
+                    })
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vista 2: Feed */}
+          {(!isMobile || currentView === 2) && (
+            <div className="animate-fade-in">
+              <FeedWithTabs />
             </div>
           )}
 
@@ -388,34 +419,44 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 3: Recruiter */}
+          {/* Vista 3: Messaggi */}
           {(!isMobile || currentView === 3) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Recruiter Disponibili
+                  💬 Messaggi
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-2">
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </CardTitle>
                 <CardDescription>
-                  {recruiters.length} recruiter attivi · Contattali per opportunità
+                  Contatta i recruiter per opportunità
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {recruiters.map((recruiter) => (
-                    <RecruiterCard
-                      key={recruiter.id}
-                      recruiter={recruiter}
-                      currentUserId={profile.id}
-                    />
-                  ))}
-                  {recruiters.length === 0 && (
-                    <div className="col-span-full text-center py-12 bg-card rounded-lg border">
-                      <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground mb-2">
-                        Nessun recruiter disponibile al momento
-                      </p>
-                    </div>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Clicca su "Contatta" nelle card dei recruiter per iniziare una conversazione
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {recruiters.slice(0, 4).map((recruiter) => (
+                      <RecruiterCard
+                        key={recruiter.id}
+                        recruiter={recruiter}
+                        currentUserId={profile.id}
+                      />
+                    ))}
+                  </div>
+                  {recruiters.length > 4 && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate('/search')}
+                    >
+                      Vedi tutti i recruiter →
+                    </Button>
                   )}
                 </div>
               </CardContent>
@@ -499,15 +540,29 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
               </CardContent>
             </Card>
           )}
-          
-          {/* Vista 5: Gruppi Chat */}
-          {(!isMobile || currentView === 5) && (
-            <div className="animate-fade-in">
-              <GroupChatSection />
-            </div>
-          )}
         </div>
       </main>
+
+      {isMobile && (
+        <MobileBottomNav
+          activeTab={
+            currentView === 0 ? "home" :
+            currentView === 1 ? "offers" :
+            currentView === 2 ? "feed" :
+            currentView === 3 ? "messages" :
+            "profile"
+          }
+          onTabChange={(tab) => {
+            if (tab === "home") setCurrentView(0);
+            else if (tab === "offers") setCurrentView(1);
+            else if (tab === "feed") setCurrentView(2);
+            else if (tab === "messages") setCurrentView(3);
+            else if (tab === "profile") setCurrentView(4);
+          }}
+          userRole="candidate"
+          unreadCount={unreadCount}
+        />
+      )}
 
       <EditProfileDialog
         open={showEditProfile}

@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, LayoutDashboard, User } from "lucide-react";
+import { Heart, MessageCircle, LayoutDashboard, User, Briefcase } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { hapticFeedback } from "@/lib/haptics";
 
@@ -28,8 +28,9 @@ export const MobileBottomNav = ({
 
   const candidateTabs = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
+    { id: "offers", icon: Briefcase, label: "Offerte" },
     { id: "feed", icon: Heart, label: "Feed" },
-    { id: "offers", icon: MessageCircle, label: "Offerte" },
+    { id: "messages", icon: MessageCircle, label: "Messaggi" },
     { id: "profile", icon: User, label: "Profilo" },
   ];
 
