@@ -35,6 +35,11 @@ import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import EditProfileDialog from "./EditProfileDialog";
 import { PremiumHomeDashboard } from "./PremiumHomeDashboard";
 import { FeedWithTabs } from "@/components/social/FeedWithTabs";
+import { UnifiedHeader } from "./UnifiedHeader";
+import { UnifiedLevelCard } from "./UnifiedLevelCard";
+import { TopOfTheDay } from "./TopOfTheDay";
+import { MiniNavbar } from "./MiniNavbar";
+import { QuickActionFAB } from "@/components/ui/quick-action-fab";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -45,7 +50,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Candidati, 2: Pipeline, 3: Offerte, 4: Insights
+  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Feed, 2: Match, 3: Candidati, 4: Pipeline, 5: Offerte, 6: Insights, 7: Gruppi Chat
+  const [miniNavSection, setMiniNavSection] = useState<"dashboard" | "chat" | "trm">("dashboard");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
