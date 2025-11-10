@@ -16,7 +16,7 @@
 
 @layer base {
   :root {
-    /* Apple Premium Palette */
+    /* Recruit Match Premium Palette */
     --background: 0 0% 100%;
     --foreground: 240 6% 10%;
 
@@ -26,10 +26,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 6% 10%;
 
-    --primary: 211 100% 50%;
+    --primary: 211 100% 50%; /* #007AFF */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 9% 96%;
+    --secondary: 240 9% 96%; /* #F2F2F7 */
     --secondary-foreground: 240 6% 10%;
 
     --muted: 240 9% 96%;
@@ -38,6 +38,9 @@
     --accent: 211 100% 97%;
     --accent-foreground: 211 100% 50%;
 
+    --success: 152 76% 60%; /* #3ED598 */
+    --success-foreground: 0 0% 100%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
@@ -45,18 +48,21 @@
     --input: 240 6% 90%;
     --ring: 211 100% 50%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
     
-    /* Apple Gradients */
+    /* Recruit Match Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(211 100% 50%) 0%, hsl(211 100% 60%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(152 76% 60%) 0%, hsl(152 76% 70%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(240 9% 98%) 100%);
-    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+    --gradient-card-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
     
-    /* Apple Shadows */
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-    --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-strong: 0 4px 16px rgba(0, 0, 0, 0.12), 0 16px 48px rgba(0, 0, 0, 0.18);
-    --shadow-glow: 0 0 32px rgba(0, 122, 255, 0.2);
+    /* Recruit Match Shadows */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12), 0 16px 56px rgba(0, 0, 0, 0.16);
+    --shadow-glow-blue: 0 0 40px rgba(0, 122, 255, 0.3);
+    --shadow-glow-green: 0 0 40px rgba(62, 213, 152, 0.3);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
