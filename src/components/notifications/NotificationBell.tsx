@@ -168,6 +168,9 @@ export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessage
                     if (notification.type === 'new_application' && onApplicationNotificationClick && notification.link) {
                       onApplicationNotificationClick(notification.link);
                     }
+                    if ((notification.type === 'post_reaction' || notification.type === 'post_comment') && notification.link) {
+                      window.location.href = notification.link;
+                    }
                     setOpen(false);
                   }}
                   className={`w-full p-4 text-left hover:bg-accent transition-colors ${

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send, User, Rss } from "lucide-react";
+import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send, User, Rss, Search, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
@@ -30,6 +30,7 @@ import CandidateDetailDialog from "@/components/trm/CandidateDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
 import EditProfileDialog from "./EditProfileDialog";
+import { TinderMatch } from "@/components/match/TinderMatch";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -59,11 +60,12 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
-    { id: 1, name: "Candidati", icon: "👥" },
-    { id: 2, name: "Pipeline", icon: "📋" },
-    { id: 3, name: "Offerte", icon: "💼" },
-    { id: 4, name: "Insights", icon: "📈" },
-    { id: 5, name: "Gruppi Chat", icon: "💬" }
+    { id: 1, name: "Match", icon: "💼" },
+    { id: 2, name: "Candidati", icon: "👥" },
+    { id: 3, name: "Pipeline", icon: "📋" },
+    { id: 4, name: "Offerte", icon: "💼" },
+    { id: 5, name: "Insights", icon: "📈" },
+    { id: 6, name: "Gruppi Chat", icon: "💬" }
   ];
 
   useEffect(() => {
@@ -324,6 +326,15 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => navigate('/search')}
+              className="gap-1"
+            >
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">Cerca</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate('/profile')}
               className="gap-1"
             >
@@ -459,8 +470,15 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 1: Candidati */}
+          {/* Vista 1: Match */}
           {(!isMobile || currentView === 1) && (
+            <div className="animate-fade-in">
+              <TinderMatch userId={profile.id} userRole="recruiter" />
+            </div>
+          )}
+
+          {/* Vista 2: Candidati */}
+          {(!isMobile || currentView === 2) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -495,8 +513,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 2: Pipeline */}
-          {(!isMobile || currentView === 2) && (
+          {/* Vista 3: Pipeline */}
+          {(!isMobile || currentView === 3) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -513,8 +531,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 3: Offerte */}
-          {(!isMobile || currentView === 3) && (
+          {/* Vista 4: Offerte */}
+          {(!isMobile || currentView === 4) && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex justify-end">
                 <Button onClick={() => setShowCreateJob(true)}>
@@ -550,8 +568,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 4: Insights */}
-          {(!isMobile || currentView === 4) && (
+          {/* Vista 5: Insights */}
+          {(!isMobile || currentView === 5) && (
             <div className="space-y-4 animate-fade-in">
               {profile?.id && (
                 <>
@@ -562,8 +580,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 5: Gruppi Chat */}
-          {(!isMobile || currentView === 5) && (
+          {/* Vista 6: Gruppi Chat */}
+          {(!isMobile || currentView === 6) && (
             <div className="space-y-4 animate-fade-in">
               <Card>
                 <CardHeader>

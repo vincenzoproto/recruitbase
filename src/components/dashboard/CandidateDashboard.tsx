@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss } from "lucide-react";
+import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss, Search, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
@@ -20,6 +20,7 @@ import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
+import { TinderMatch } from "@/components/match/TinderMatch";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -41,10 +42,11 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
-    { id: 1, name: "Offerte", icon: "💼" },
-    { id: 2, name: "Recruiter", icon: "👔" },
-    { id: 3, name: "Profilo", icon: "👤" },
-    { id: 4, name: "Gruppi", icon: "💬" },
+    { id: 1, name: "Match", icon: "💼" },
+    { id: 2, name: "Offerte", icon: "💼" },
+    { id: 3, name: "Recruiter", icon: "👔" },
+    { id: 4, name: "Profilo", icon: "👤" },
+    { id: 5, name: "Gruppi", icon: "💬" },
   ];
 
   useEffect(() => {
@@ -206,6 +208,10 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             <p className="text-sm text-muted-foreground">Dashboard Candidato</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/search')}>
+              <Search className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Cerca</span>
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
               <User className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Profilo</span>
@@ -324,8 +330,15 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 1: Offerte */}
+          {/* Vista 1: Match */}
           {(!isMobile || currentView === 1) && (
+            <div className="animate-fade-in">
+              <TinderMatch userId={profile.id} userRole="candidate" />
+            </div>
+          )}
+
+          {/* Vista 2: Offerte */}
+          {(!isMobile || currentView === 2) && (
             <Card className="animate-fade-in">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                 <div className="space-y-1">
@@ -376,8 +389,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 2: Recruiter */}
-          {(!isMobile || currentView === 2) && (
+          {/* Vista 3: Recruiter */}
+          {(!isMobile || currentView === 3) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -410,8 +423,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 3: Profilo */}
-          {(!isMobile || currentView === 3) && (
+          {/* Vista 4: Profilo */}
+          {(!isMobile || currentView === 4) && (
             <Card className="animate-fade-in">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                 <div className="space-y-1">
@@ -488,8 +501,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
           
-          {/* Vista 4: Gruppi Chat */}
-          {(!isMobile || currentView === 4) && (
+          {/* Vista 5: Gruppi Chat */}
+          {(!isMobile || currentView === 5) && (
             <div className="animate-fade-in">
               <GroupChatSection />
             </div>

@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Social from "./pages/Social";
+import SearchProfiles from "./pages/SearchProfiles";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/social" element={<Social />} />
+          <Route path="/search" element={<SearchProfiles />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

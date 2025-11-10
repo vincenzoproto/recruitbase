@@ -108,21 +108,62 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
 
     try {
       if (hasReposted) {
+        // Remove repost
         await supabase
           .from('post_reposts')
           .delete()
           .eq('post_id', postId)
           .eq('user_id', userId);
+        
+        // Also delete the reposted post if exists
+        const { data: originalPost } = await supabase
+          .from('posts')
+          .select('content')
+          .eq('id', postId)
+          .single();
+        
+        if (originalPost) {
+          await supabase
+            .from('posts')
+            .delete()
+            .eq('user_id', userId)
+            .like('content', `🔄 Repost: ${originalPost.content || ''}%`);
+        }
+        
         setHasReposted(false);
         setReposts(reposts - 1);
         toast.success("Repost rimosso");
       } else {
+        // Get original post data
+        const { data: originalPost, error: fetchError } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', postId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        // Create new post (repost) - appears at top of feed
+        const { error: insertError } = await supabase
+          .from('posts')
+          .insert({
+            user_id: userId,
+            content: `🔄 Repost: ${originalPost.content || ''}`,
+            media_url: originalPost.media_url,
+            media_type: originalPost.media_type,
+            hashtags: originalPost.hashtags
+          });
+
+        if (insertError) throw insertError;
+
+        // Track repost
         await supabase
           .from('post_reposts')
           .insert({ post_id: postId, user_id: userId });
+        
         setHasReposted(true);
         setReposts(reposts + 1);
-        toast.success("Post repostato!");
+        toast.success("Post repostato! Apparirà in cima al feed");
       }
     } catch (error) {
       console.error('Error toggling repost:', error);
