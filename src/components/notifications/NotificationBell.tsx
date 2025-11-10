@@ -26,9 +26,16 @@ interface NotificationBellProps {
   onMeetingNotificationClick?: () => void;
   onMessageNotificationClick?: (senderId: string) => void;
   onApplicationNotificationClick?: (candidateId: string) => void;
+  onMatchNotificationClick?: (matchId: string) => void;
 }
 
-export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessageNotificationClick, onApplicationNotificationClick }: NotificationBellProps) => {
+export const NotificationBell = ({ 
+  userId, 
+  onMeetingNotificationClick, 
+  onMessageNotificationClick, 
+  onApplicationNotificationClick,
+  onMatchNotificationClick 
+}: NotificationBellProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -157,21 +164,27 @@ export const NotificationBell = ({ userId, onMeetingNotificationClick, onMessage
               {notifications.map((notification) => (
                 <button
                   key={notification.id}
-                  onClick={() => {
-                    markAsRead(notification.id);
+                  onClick={async () => {
+                    await markAsRead(notification.id);
+                    
+                    // Handle different notification types with deep-linking
                     if (notification.type === 'meeting' && onMeetingNotificationClick) {
                       onMeetingNotificationClick();
-                    }
-                    if (notification.type === 'message' && onMessageNotificationClick && notification.link) {
+                    } else if (notification.type === 'message' && onMessageNotificationClick && notification.link) {
+                      // Deep-link to specific chat
                       onMessageNotificationClick(notification.link);
-                    }
-                    if (notification.type === 'new_application' && onApplicationNotificationClick && notification.link) {
+                    } else if (notification.type === 'new_application' && onApplicationNotificationClick && notification.link) {
+                      // Deep-link to candidate profile
                       onApplicationNotificationClick(notification.link);
-                    }
-                    if ((notification.type === 'post_reaction' || notification.type === 'post_comment') && notification.link) {
+                    } else if (notification.type === 'match' && onMatchNotificationClick && notification.link) {
+                      // Deep-link to match profile
+                      onMatchNotificationClick(notification.link);
+                    } else if ((notification.type === 'post_reaction' || notification.type === 'post_comment') && notification.link) {
                       window.location.href = notification.link;
                     }
+                    
                     setOpen(false);
+                    toast.success("✔️ Notifica letta");
                   }}
                   className={`w-full p-4 text-left hover:bg-accent transition-colors ${
                     !notification.read ? 'bg-accent/50' : ''

@@ -1057,6 +1057,63 @@ export type Database = {
           },
         ]
       }
+      recruiter_actions: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string | null
+          id: string
+          points: number
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points: number
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recruiter_points: {
+        Row: {
+          created_at: string
+          id: string
+          level: string
+          level_progress: number
+          points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level?: string
+          level_progress?: number
+          points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: string
+          level_progress?: number
+          points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       recruiter_stats: {
         Row: {
           avg_response_time_hours: number | null
@@ -1204,6 +1261,15 @@ export type Database = {
     Functions: {
       award_achievement: {
         Args: { p_badge_type: string; p_user_id: string }
+        Returns: undefined
+      }
+      award_recruiter_points: {
+        Args: {
+          p_action_type: string
+          p_description?: string
+          p_points: number
+          p_user_id: string
+        }
         Returns: undefined
       }
       calculate_match_score: {

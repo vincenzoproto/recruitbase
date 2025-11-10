@@ -59,7 +59,7 @@ export const MobileBottomNav = ({
             >
               <div className={`relative transition-transform ${isActive ? "scale-110" : ""}`}>
                 <Icon className="h-6 w-6" />
-                {item.id === "pipeline" && unreadCount > 0 && (
+                {(item.id === "pipeline" || item.label === "TRM") && unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>

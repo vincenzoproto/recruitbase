@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import { MessageCircle, Send, X, Smile, Image, Mic, Phone, Check, CheckCheck } from "lucide-react";
+import { MessageCircle, Send, X, Smile, Image, Mic, Phone, Check, CheckCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AISuggestDialog } from "./AISuggestDialog";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ export const ChatDialog = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [showAISuggest, setShowAISuggest] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -353,6 +355,16 @@ export const ChatDialog = ({
         </ScrollArea>
 
         <div className="p-4 border-t space-y-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAISuggest(true)}
+            className="w-full mb-2"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Suggerisci messaggio AI
+          </Button>
+
           {showEmojiPicker && (
             <div className="flex flex-wrap gap-2 p-2 bg-muted rounded-lg">
               {emojis.map((emoji) => (
@@ -419,6 +431,14 @@ export const ChatDialog = ({
             </Button>
           </form>
         </div>
+
+        <AISuggestDialog
+          open={showAISuggest}
+          onOpenChange={setShowAISuggest}
+          candidateName={otherUserName}
+          context={messages.length > 0 ? "Conversazione già iniziata" : undefined}
+          onSelectMessage={(message) => setNewMessage(message)}
+        />
       </DialogContent>
     </Dialog>
   );

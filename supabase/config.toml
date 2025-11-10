@@ -1,1 +1,4 @@
 project_id = "uaqgkyvacumtnftnuody"
+
+[functions.ai-message-suggest]
+verify_jwt = false
