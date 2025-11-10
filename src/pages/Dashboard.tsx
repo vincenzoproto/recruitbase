@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthCache } from "@/hooks/useAuthCache";
 import { toast } from "sonner";
-import { SplashScreen } from "@/components/splash/SplashScreen";
 import { EnhancedSplashScreen } from "@/components/splash/EnhancedSplashScreen";
-import RoleSetup from "@/components/dashboard/RoleSetup";
-import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import UnifiedOnboarding from "@/components/onboarding/UnifiedOnboarding";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Lazy load dashboard components
@@ -19,7 +17,6 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [showRoleSetup, setShowRoleSetup] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const hasShownWelcome = useRef(false);
 
@@ -55,10 +52,10 @@ const Dashboard = () => {
         setIsLoadingProfile(false);
       }
 
-      // Carica i dati freschi in background (solo campi essenziali)
+      // Carica i dati freschi in background (tutti i campi necessari)
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, role, full_name, is_premium, referral_code, city, onboarding_completed")
+        .select("*")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -72,11 +69,10 @@ const Dashboard = () => {
         cacheProfile(data);
         setProfile(data);
 
-        // Se role è null/undefined, mostra setup
-        if (!data.role) {
-          setShowRoleSetup(true);
+        // Controlla se serve onboarding
+        if (!data.onboarding_completed) {
+          setShowOnboarding(true);
         }
-        // Onboarding disabilitato temporaneamente
       } else {
         // Profilo non esiste, crealo automaticamente
         await createProfile();
@@ -143,13 +139,20 @@ const Dashboard = () => {
     }
   };
 
-  const handleRoleSetupComplete = (role: string) => {
-    setShowRoleSetup(false);
-    if (profile) {
-      const updatedProfile = { ...profile, role };
+  const handleOnboardingComplete = async () => {
+    const { data: updatedProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", profile?.id)
+      .single();
+
+    if (updatedProfile) {
       setProfile(updatedProfile);
       cacheProfile(updatedProfile);
     }
+
+    setShowOnboarding(false);
+    window.location.reload();
   };
 
   // Mostra splash screen solo brevemente
@@ -187,17 +190,6 @@ const Dashboard = () => {
     );
   }
 
-  // Mostra setup ruolo se necessario
-  if (showRoleSetup && profile) {
-    return <RoleSetup userId={profile.id} onComplete={handleRoleSetupComplete} />;
-  }
-
-  // Mostra onboarding se necessario
-  const handleOnboardingComplete = (data: any) => {
-    setShowOnboarding(false);
-    setProfile({ ...profile, ...data });
-    cacheProfile({ ...profile, ...data });
-  };
 
   if (!profile) {
     return (
@@ -218,12 +210,10 @@ const Dashboard = () => {
       
       {!showSplash && (
         <>
-          <OnboardingFlow
+          <UnifiedOnboarding
             open={showOnboarding}
-            onComplete={() => {
-              setShowOnboarding(false);
-              localStorage.setItem("rb_onboarding_completed", "true");
-            }}
+            userId={profile?.id || ""}
+            onComplete={handleOnboardingComplete}
           />
           
           <ErrorBoundary 
