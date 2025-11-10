@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
 import { toast } from "sonner";
+import { hapticFeedback } from "@/lib/haptics";
 
 interface PostActionsProps {
   postId: string;
@@ -78,6 +79,8 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
       return;
     }
 
+    await hapticFeedback.light();
+
     try {
       if (hasLiked) {
         await supabase
@@ -93,6 +96,7 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
           .insert({ post_id: postId, user_id: userId, reaction_type: 'like' });
         setHasLiked(true);
         setLikes(likes + 1);
+        toast.success("❤️ Like aggiunto", { duration: 1500 });
       }
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -105,6 +109,8 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
       toast.error("Devi effettuare l'accesso per repostare");
       return;
     }
+
+    await hapticFeedback.medium();
 
     try {
       if (hasReposted) {
@@ -132,7 +138,7 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
         
         setHasReposted(false);
         setReposts(reposts - 1);
-        toast.success("Repost rimosso");
+        toast.success("✔️ Repost rimosso");
       } else {
         // Get original post data
         const { data: originalPost, error: fetchError } = await supabase
@@ -163,7 +169,7 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
         
         setHasReposted(true);
         setReposts(reposts + 1);
-        toast.success("Post repostato! Apparirà in cima al feed");
+        toast.success("🔄 Post repostato!");
       }
     } catch (error) {
       console.error('Error toggling repost:', error);

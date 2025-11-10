@@ -25,6 +25,9 @@ interface PostCardProps {
       full_name: string;
       avatar_url: string | null;
       job_title: string | null;
+      role?: string | null;
+      talent_relationship_score?: number | null;
+      core_values?: string[] | null;
     };
   };
 }
@@ -94,12 +97,24 @@ export const PostCard = ({ post }: PostCardProps) => {
             <AvatarFallback>{getInitials(post.profiles.full_name)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h4 
-              className="font-semibold cursor-pointer hover:underline"
-              onClick={() => navigate(`/profile/${post.profiles.id}`)}
-            >
-              {post.profiles.full_name}
-            </h4>
+            <div className="flex items-center gap-2">
+              <h4 
+                className="font-semibold cursor-pointer hover:underline"
+                onClick={() => navigate(`/profile/${post.profiles.id}`)}
+              >
+                {post.profiles.full_name}
+              </h4>
+              {post.profiles.role && (
+                <Badge variant="secondary" className="text-xs">
+                  {post.profiles.role === 'recruiter' ? '👔 Recruiter' : '👤 Candidato'}
+                </Badge>
+              )}
+              {post.profiles.talent_relationship_score && post.profiles.talent_relationship_score > 70 && (
+                <Badge variant="outline" className="text-xs text-primary border-primary">
+                  TRS {post.profiles.talent_relationship_score}
+                </Badge>
+              )}
+            </div>
             {post.profiles.job_title && (
               <p className="text-sm text-muted-foreground">{post.profiles.job_title}</p>
             )}
@@ -133,11 +148,24 @@ export const PostCard = ({ post }: PostCardProps) => {
           />
         )}
 
-        {post.media_url && post.media_type === 'audio' && (
-          <audio controls className="w-full">
+        {post.media_url && post.media_type === 'video' && (
+          <video 
+            controls 
+            className="rounded-lg max-h-96 w-full"
+            preload="metadata"
+          >
             <source src={post.media_url} />
-            Il tuo browser non supporta l'elemento audio.
-          </audio>
+            Il tuo browser non supporta l'elemento video.
+          </video>
+        )}
+
+        {post.media_url && post.media_type === 'audio' && (
+          <div className="bg-accent/50 rounded-lg p-4">
+            <audio controls className="w-full">
+              <source src={post.media_url} />
+              Il tuo browser non supporta l'elemento audio.
+            </audio>
+          </div>
         )}
 
         {post.hashtags && post.hashtags.length > 0 && (

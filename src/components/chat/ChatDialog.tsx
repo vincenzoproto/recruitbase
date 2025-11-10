@@ -198,7 +198,7 @@ export const ChatDialog = ({
     }
 
     console.log('Message sent successfully:', data);
-    toast.success("Messaggio inviato");
+    toast.success("💬 Messaggio inviato");
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

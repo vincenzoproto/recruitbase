@@ -31,6 +31,7 @@ import { ChatDialog } from "@/components/chat/ChatDialog";
 import CandidateDetailDialog from "@/components/trm/CandidateDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
+import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import EditProfileDialog from "./EditProfileDialog";
 import { PremiumHomeDashboard } from "./PremiumHomeDashboard";
 import { FeedWithTabs } from "@/components/social/FeedWithTabs";
@@ -377,6 +378,9 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
               onMessageNotificationClick={handleOpenChat}
               onApplicationNotificationClick={handleOpenCandidateDetail}
+              onMatchNotificationClick={(matchId) => {
+                setCurrentView(2); // Go to match view
+              }}
             />
             <Button
               variant="outline"
@@ -598,6 +602,25 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
         <LinkedInIntegration />
       </main>
+
+      <MobileBottomNav 
+        activeTab={
+          currentView === 0 ? "home" :
+          currentView === 1 ? "feed" :
+          currentView === 4 ? "pipeline" :
+          currentView === 7 ? "profile" :
+          "home"
+        }
+        onTabChange={(tab) => {
+          if (tab === "home") setCurrentView(0);
+          else if (tab === "feed") setCurrentView(1);
+          else if (tab === "pipeline") setCurrentView(4);
+          else if (tab === "profile") setEditProfileOpen(true);
+          hapticFeedback.light();
+        }}
+        userRole="recruiter"
+        unreadCount={unreadCount}
+      />
 
       {showCreateJob && (
         <CreateJobDialog
