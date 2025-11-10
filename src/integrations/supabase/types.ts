@@ -163,23 +163,32 @@ export type Database = {
         Row: {
           applied_at: string | null
           candidate_id: string
+          feedback_notes: string | null
+          feedback_type: string | null
           id: string
           job_offer_id: string
-          status: string | null
+          status: Database["public"]["Enums"]["application_status"] | null
+          updated_at: string | null
         }
         Insert: {
           applied_at?: string | null
           candidate_id: string
+          feedback_notes?: string | null
+          feedback_type?: string | null
           id?: string
           job_offer_id: string
-          status?: string | null
+          status?: Database["public"]["Enums"]["application_status"] | null
+          updated_at?: string | null
         }
         Update: {
           applied_at?: string | null
           candidate_id?: string
+          feedback_notes?: string | null
+          feedback_type?: string | null
           id?: string
           job_offer_id?: string
-          status?: string | null
+          status?: Database["public"]["Enums"]["application_status"] | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -230,6 +239,64 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      candidate_history: {
+        Row: {
+          action_type: string
+          application_id: string | null
+          candidate_id: string
+          created_at: string | null
+          id: string
+          new_status: string | null
+          notes: string | null
+          old_status: string | null
+          recruiter_id: string
+        }
+        Insert: {
+          action_type: string
+          application_id?: string | null
+          candidate_id: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          old_status?: string | null
+          recruiter_id: string
+        }
+        Update: {
+          action_type?: string
+          application_id?: string | null
+          candidate_id?: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          old_status?: string | null
+          recruiter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_history_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_history_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_history_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       candidate_notes: {
         Row: {
@@ -462,6 +529,60 @@ export type Database = {
           },
           {
             foreignKeyName: "favorites_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follow_ups: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          followup_due: string | null
+          followup_message: string | null
+          followup_sent: boolean | null
+          id: string
+          last_contact: string | null
+          recruiter_id: string
+          response_received: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          followup_due?: string | null
+          followup_message?: string | null
+          followup_sent?: boolean | null
+          id?: string
+          last_contact?: string | null
+          recruiter_id: string
+          response_received?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          followup_due?: string | null
+          followup_message?: string | null
+          followup_sent?: boolean | null
+          id?: string
+          last_contact?: string | null
+          recruiter_id?: string
+          response_received?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_ups_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follow_ups_recruiter_id_fkey"
             columns: ["recruiter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1276,6 +1397,10 @@ export type Database = {
         Args: { p_candidate_id: string; p_job_offer_id: string }
         Returns: number
       }
+      calculate_priority_score: {
+        Args: { p_candidate_id: string; p_recruiter_id: string }
+        Returns: number
+      }
       calculate_trs: {
         Args: { candidate_uuid: string; recruiter_uuid: string }
         Returns: number
@@ -1298,6 +1423,11 @@ export type Database = {
       update_recruiter_rankings: { Args: never; Returns: undefined }
     }
     Enums: {
+      application_status:
+        | "in_valutazione"
+        | "colloquio_programmato"
+        | "assunto"
+        | "non_idoneo"
       experience_level: "entry" | "junior" | "mid" | "senior" | "lead"
       user_role: "recruiter" | "candidate" | "admin"
     }
@@ -1427,6 +1557,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_status: [
+        "in_valutazione",
+        "colloquio_programmato",
+        "assunto",
+        "non_idoneo",
+      ],
       experience_level: ["entry", "junior", "mid", "senior", "lead"],
       user_role: ["recruiter", "candidate", "admin"],
     },

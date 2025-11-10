@@ -48,7 +48,7 @@ export const PremiumCandidateDashboard = ({ profile, onNavigate }: PremiumCandid
         cultureFit,
         feedbackAvg: 4.5, // Da implementare con recensioni reali
         highFitOffers: 0, // Da implementare con match >80%
-        pendingApplications: apps?.filter(a => a.status === 'pending').length || 0
+        pendingApplications: apps?.filter(a => a.status === 'in_valutazione').length || 0
       });
       setTrsChange(change);
     } catch (error) {

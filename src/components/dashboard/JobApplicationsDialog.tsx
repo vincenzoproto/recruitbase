@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { ApplicationStatusManager } from "./ApplicationStatusManager";
 
 interface JobApplicationsDialogProps {
   open: boolean;
@@ -134,6 +135,15 @@ export const JobApplicationsDialog = ({
                           ))}
                         </div>
                       )}
+                      
+                      <div className="py-3">
+                        <ApplicationStatusManager
+                          applicationId={app.id}
+                          currentStatus={app.status || 'in_valutazione'}
+                          candidateName={app.candidate?.full_name || 'Candidato'}
+                          onStatusUpdated={loadApplications}
+                        />
+                      </div>
                       
                       <div className="flex gap-2 pt-2">
                         <Button

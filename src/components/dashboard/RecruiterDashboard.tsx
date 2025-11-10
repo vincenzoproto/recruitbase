@@ -46,6 +46,10 @@ import { RecruiterCalendar } from "./RecruiterCalendar";
 import { TeamManagement } from "./TeamManagement";
 import { PricingPlans } from "./PricingPlans";
 import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
+import { PriorityCard } from "./PriorityCard";
+import { FollowUpManager } from "./FollowUpManager";
+import { UpcomingMeetingsCard } from "./UpcomingMeetingsCard";
+import { PositiveFeedbackCard } from "./PositiveFeedbackCard";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -475,10 +479,42 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         >
           {/* Vista 0: Home Premium */}
           {(!isMobile || currentView === 0) && (
-            <PremiumHomeDashboard 
-              userId={profile.id} 
-              onNavigate={(view) => handleNavigateFromHome(view)}
-            />
+            <div className="space-y-6 animate-fade-in">
+              {/* Dynamic Dashboard Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FollowUpManager 
+                  recruiterId={profile.id} 
+                  onOpenChat={(candidateId, candidateName) => {
+                    setChatUserId(candidateId);
+                    setChatUserName(candidateName);
+                  }}
+                />
+                <UpcomingMeetingsCard userId={profile.id} userRole="recruiter" />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <PriorityCard 
+                  recruiterId={profile.id}
+                  onOpenChat={(candidateId, candidateName) => {
+                    setChatUserId(candidateId);
+                    setChatUserName(candidateName);
+                  }}
+                />
+                <PositiveFeedbackCard 
+                  recruiterId={profile.id}
+                  onOpenChat={(candidateId, candidateName) => {
+                    setChatUserId(candidateId);
+                    setChatUserName(candidateName);
+                  }}
+                />
+              </div>
+
+              {/* Original Premium Dashboard */}
+              <PremiumHomeDashboard 
+                userId={profile.id} 
+                onNavigate={(view) => handleNavigateFromHome(view)}
+              />
+            </div>
           )}
 
           {/* Vista 1: Feed */}
