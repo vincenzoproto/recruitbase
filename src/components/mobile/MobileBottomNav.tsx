@@ -23,7 +23,7 @@ export const MobileBottomNav = ({
   const recruiterItems = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
     { id: "match", icon: Heart, label: "Match" },
-    { id: "feed", icon: Heart, label: "Feed" },
+    { id: "feed", icon: MessageCircle, label: "Feed" },
     { id: "trm", icon: Kanban, label: "TRM" },
     { id: "profile", icon: User, label: "Profilo" },
   ];

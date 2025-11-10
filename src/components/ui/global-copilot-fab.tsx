@@ -76,10 +76,10 @@ export const GlobalCopilotFAB = ({ userRole }: GlobalCopilotFABProps) => {
           setOpen(true);
           hapticFeedback.light();
         }}
-        className="fixed bottom-20 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all"
+        className="fixed bottom-24 right-4 z-40 h-12 w-12 rounded-full shadow-apple-lg hover:shadow-xl transition-all apple-button"
         size="icon"
       >
-        <Sparkles className="h-6 w-6" />
+        <Sparkles className="h-5 w-5" />
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

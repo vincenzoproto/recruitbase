@@ -230,7 +230,14 @@ const CandidateDetailDialog = ({ candidate, open, onOpenChange, onUpdate }: Cand
               <CardHeader>
                 <CardTitle className="text-lg">Informazioni</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-4">
+                {candidate.bio && (
+                  <div className="pb-4 border-b">
+                    <p className="text-sm font-medium mb-2">Bio / Esperienze</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{candidate.bio}</p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Città</p>

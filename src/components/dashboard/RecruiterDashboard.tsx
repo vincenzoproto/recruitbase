@@ -443,7 +443,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                     👈 Swipe per navigare 👉
                   </p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1 overflow-x-auto max-w-[200px] scrollbar-hide">
                   {views.map((view) => (
                     <Button
                       key={view.id}
@@ -453,7 +453,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                       }}
                       variant={currentView === view.id ? "default" : "ghost"}
                       size="sm"
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 flex-shrink-0"
                     >
                       {view.icon}
                     </Button>
