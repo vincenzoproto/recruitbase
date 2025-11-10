@@ -3,10 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, User } from "lucide-react";
+import { Star, User, MessageCircle, Calendar, Brain } from "lucide-react";
 import { toast } from "sonner";
 import CandidateDetailDialog from "./CandidateDetailDialog";
 import TRSBadge from "./TRSBadge";
+import { useKanbanActions, KanbanStatus } from "@/hooks/useKanbanActions";
+import { KanbanKPIs } from "./KanbanKPIs";
 
 interface PipelineStage {
   id: string;
@@ -28,12 +30,18 @@ interface Candidate {
   talent_relationship_score: number;
 }
 
-const KanbanBoard = () => {
+interface KanbanBoardProps {
+  onOpenChat?: (userId: string, userName: string) => void;
+}
+
+const KanbanBoard = ({ onOpenChat }: KanbanBoardProps) => {
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const [draggedCandidate, setDraggedCandidate] = useState<string | null>(null);
+  const [recruiterId, setRecruiterId] = useState<string>("");
+  const { executeKanbanAction } = useKanbanActions();
 
   useEffect(() => {
     loadData();
@@ -43,6 +51,8 @@ const KanbanBoard = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      
+      setRecruiterId(user.id);
 
       // Load pipeline stages
       const { data: stagesData } = await supabase
@@ -90,6 +100,12 @@ const KanbanBoard = () => {
     if (!draggedCandidate) return;
 
     try {
+      const candidate = candidates.find(c => c.id === draggedCandidate);
+      if (!candidate) return;
+
+      const stage = stages.find(s => s.id === stageId);
+      if (!stage) return;
+
       const { error } = await supabase
         .from('profiles')
         .update({ pipeline_stage_id: stageId })
@@ -104,7 +120,26 @@ const KanbanBoard = () => {
           candidate_id: draggedCandidate,
           recruiter_id: user.id,
           type: 'status_change',
-          content: `Spostato in ${stages.find(s => s.id === stageId)?.name}`
+          content: `Spostato in ${stage.name}`
+        });
+
+        // Execute AI actions based on new status
+        const statusMapping: Record<string, KanbanStatus> = {
+          'Nuovi candidati': 'nuova',
+          'In contatto': 'in_valutazione',
+          'In valutazione': 'colloquio',
+          'Assunti': 'assunto',
+        };
+
+        const mappedStatus = statusMapping[stage.name] || 'in_valutazione';
+        
+        await executeKanbanAction({
+          candidateId: draggedCandidate,
+          candidateName: candidate.full_name,
+          newStatus: mappedStatus,
+          jobTitle: candidate.job_title,
+          recruiterId: user.id,
+          onOpenChat,
         });
       }
 
@@ -112,7 +147,7 @@ const KanbanBoard = () => {
         prev.map(c => c.id === draggedCandidate ? { ...c, pipeline_stage_id: stageId } : c)
       );
 
-      toast.success("Candidato spostato con successo");
+      toast.success("✅ Stato aggiornato");
     } catch (error) {
       console.error('Error updating stage:', error);
       toast.error("Errore nello spostamento");
@@ -151,6 +186,8 @@ const KanbanBoard = () => {
 
   return (
     <>
+      {recruiterId && <KanbanKPIs recruiterId={recruiterId} />}
+      
       <div className="flex gap-4 overflow-x-auto pb-4">
         {stages.map(stage => (
           <div
@@ -215,14 +252,46 @@ const KanbanBoard = () => {
                     </div>
                   )}
 
-                  <div className="mt-3 pt-2 border-t">
+                  <div className="mt-3 pt-2 border-t space-y-2">
                     <TRSBadge score={candidate.talent_relationship_score || 0} size="sm" />
+                    
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenChat?.(candidate.id, candidate.full_name);
+                        }}
+                        title="Apri Chat"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        title="Programma Call"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        title="AI Copilot"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Brain className="h-3.5 w-3.5 text-primary" />
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
-                    <span>Engagement: {candidate.engagement_score || 0}</span>
                     {candidate.last_contact_date && (
-                      <span>{new Date(candidate.last_contact_date).toLocaleDateString()}</span>
+                      <span>Ultimo: {new Date(candidate.last_contact_date).toLocaleDateString()}</span>
                     )}
                   </div>
                 </Card>

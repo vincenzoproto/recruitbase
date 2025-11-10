@@ -64,6 +64,14 @@ const Index = () => {
               Inizia ora (gratis 30 giorni)
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => navigate("/demo")}
+              className="text-base px-8 h-14 rounded-xl font-semibold"
+            >
+              Prova la Demo Live
+            </Button>
           </div>
           
           {/* Trust Indicators */}

@@ -577,11 +577,16 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                   Pipeline Kanban
                 </CardTitle>
                 <CardDescription>
-                  Trascina i candidati per aggiornare lo stato
+                  Trascina i candidati per aggiornare lo stato — AI automatico attivo
                 </CardDescription>
               </CardHeader>
               <CardContent className="overflow-x-auto">
-                <KanbanBoard />
+                <KanbanBoard 
+                  onOpenChat={(userId, userName) => {
+                    setChatUserId(userId);
+                    setChatUserName(userName);
+                  }}
+                />
               </CardContent>
             </Card>
           )}
