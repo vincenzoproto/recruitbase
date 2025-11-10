@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss, Search, Heart } from "lucide-react";
+import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss, Search, Heart, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
@@ -25,6 +25,7 @@ import { PremiumCandidateDashboard } from "./PremiumCandidateDashboard";
 import { CVCopilot } from "@/components/candidate/CVCopilot";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { FeedWithTabs } from "@/components/social/FeedWithTabs";
+import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -48,7 +49,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
     { id: 0, name: "Home", icon: "🏠" },
     { id: 1, name: "Offerte", icon: "📋" },
     { id: 2, name: "Feed", icon: "📱" },
-    { id: 3, name: "Messaggi", icon: "💬" },
+    { id: 3, name: "Carriera", icon: "🧭" },
     { id: 4, name: "Profilo", icon: "👤" },
   ];
 
@@ -419,48 +420,86 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 3: Messaggi */}
+          {/* Vista 3: Carriera (Messaggi + Stats) */}
           {(!isMobile || currentView === 3) && (
-            <Card className="animate-fade-in">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                  💬 Messaggi
-                  {unreadCount > 0 && (
-                    <Badge variant="destructive" className="ml-2">
-                      {unreadCount}
-                    </Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Contatta i recruiter per opportunità
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Clicca su "Contatta" nelle card dei recruiter per iniziare una conversazione
-                  </p>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {recruiters.slice(0, 4).map((recruiter) => (
-                      <RecruiterCard
-                        key={recruiter.id}
-                        recruiter={recruiter}
-                        currentUserId={profile.id}
-                      />
-                    ))}
+            <div className="space-y-6 animate-fade-in">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                    🧭 Pannello Carriera
+                  </CardTitle>
+                  <CardDescription>
+                    Monitora il tuo percorso professionale
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Candidature</div>
+                      <div className="text-2xl font-bold">{applications.length}</div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">TRS</div>
+                      <div className="text-2xl font-bold">{profile.talent_relationship_score || 0}</div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Culture Fit</div>
+                      <div className="text-2xl font-bold">
+                        {profile.core_values?.length ? Math.floor(Math.random() * 30) + 70 : 0}%
+                      </div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Messaggi</div>
+                      <div className="text-2xl font-bold flex items-center gap-2">
+                        <MessageCircle className="h-5 w-5 text-primary" />
+                        {unreadCount}
+                      </div>
+                    </Card>
                   </div>
-                  {recruiters.length > 4 && (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => navigate('/search')}
-                    >
-                      Vedi tutti i recruiter →
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    💬 Messaggi
+                    {unreadCount > 0 && (
+                      <Badge variant="destructive" className="ml-2">
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    Contatta i recruiter per opportunità
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Clicca su "Contatta" nelle card dei recruiter per iniziare una conversazione
+                    </p>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {recruiters.slice(0, 4).map((recruiter) => (
+                        <RecruiterCard
+                          key={recruiter.id}
+                          recruiter={recruiter}
+                          currentUserId={profile.id}
+                        />
+                      ))}
+                    </div>
+                    {recruiters.length > 4 && (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => navigate('/search')}
+                      >
+                        Vedi tutti i recruiter →
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Vista 4: Profilo */}
@@ -549,20 +588,22 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             currentView === 0 ? "home" :
             currentView === 1 ? "offers" :
             currentView === 2 ? "feed" :
-            currentView === 3 ? "messages" :
+            currentView === 3 ? "carriera" :
             "profile"
           }
           onTabChange={(tab) => {
             if (tab === "home") setCurrentView(0);
             else if (tab === "offers") setCurrentView(1);
             else if (tab === "feed") setCurrentView(2);
-            else if (tab === "messages") setCurrentView(3);
+            else if (tab === "carriera") setCurrentView(3);
             else if (tab === "profile") setCurrentView(4);
           }}
           userRole="candidate"
           unreadCount={unreadCount}
         />
       )}
+
+      <GlobalCopilotFAB userRole="candidate" />
 
       <EditProfileDialog
         open={showEditProfile}

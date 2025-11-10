@@ -51,6 +51,7 @@ export const ChatDialog = ({
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [showAISuggest, setShowAISuggest] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -316,11 +317,11 @@ export const ChatDialog = ({
                   className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      isSender
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
+                  className={`max-w-[70%] rounded-lg p-3 ${
+                    isSender
+                      ? 'bg-primary text-primary-foreground rounded-br-sm'
+                      : 'bg-muted rounded-bl-sm'
+                  }`}
                   >
                     {message.message_type === 'image' && message.media_url && (
                       <img src={message.media_url} alt="Immagine" className="max-w-full rounded mb-2" />
@@ -350,6 +351,17 @@ export const ChatDialog = ({
                 </div>
               );
             })}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-muted rounded-lg p-3 max-w-[70%]">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={scrollRef} />
           </div>
         </ScrollArea>

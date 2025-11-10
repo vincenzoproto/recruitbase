@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthCache } from "@/hooks/useAuthCache";
 import { toast } from "sonner";
 import { SplashScreen } from "@/components/splash/SplashScreen";
+import { EnhancedSplashScreen } from "@/components/splash/EnhancedSplashScreen";
 import RoleSetup from "@/components/dashboard/RoleSetup";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -212,9 +213,7 @@ const Dashboard = () => {
   return (
     <>
       {showSplash && (
-        <SplashScreen 
-          onComplete={() => setShowSplash(false)} 
-        />
+        <EnhancedSplashScreen />
       )}
       
       {!showSplash && (

@@ -40,6 +40,11 @@ import { UnifiedLevelCard } from "./UnifiedLevelCard";
 import { TopOfTheDay } from "./TopOfTheDay";
 import { MiniNavbar } from "./MiniNavbar";
 import { QuickActionFAB } from "@/components/ui/quick-action-fab";
+import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
+import { RecruiterAnalytics } from "./RecruiterAnalytics";
+import { RecruiterCalendar } from "./RecruiterCalendar";
+import { TeamManagement } from "./TeamManagement";
+import { PricingPlans } from "./PricingPlans";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -75,8 +80,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     { id: 3, name: "Candidati", icon: "👥" },
     { id: 4, name: "Pipeline", icon: "📋" },
     { id: 5, name: "Offerte", icon: "💼" },
-    { id: 6, name: "Insights", icon: "📈" },
-    { id: 7, name: "Gruppi Chat", icon: "💬" }
+    { id: 6, name: "Analytics", icon: "📈" },
+    { id: 7, name: "Calendario", icon: "📅" },
+    { id: 8, name: "Team", icon: "👥" },
+    { id: 9, name: "Piani", icon: "💎" }
   ];
 
   const handleNavigateFromHome = (viewName: string) => {
@@ -576,32 +583,31 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 6: Insights */}
+          {/* Vista 6: Analytics */}
           {(!isMobile || currentView === 6) && (
-            <div className="space-y-4 animate-fade-in">
-              {profile?.id && (
-                <>
-                  <LiveMetrics userId={profile.id} />
-                  <TRSDashboardCard recruiterId={profile.id} />
-                </>
-              )}
+            <div className="animate-fade-in">
+              <RecruiterAnalytics userId={profile.id} />
             </div>
           )}
 
-          {/* Vista 7: Gruppi Chat */}
+          {/* Vista 7: Calendario */}
           {(!isMobile || currentView === 7) && (
-            <div className="space-y-4 animate-fade-in">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Profilo e Impostazioni</CardTitle>
-                    <Button onClick={() => setEditProfileOpen(true)} variant="outline">
-                      Modifica Profilo
-                    </Button>
-                  </div>
-                </CardHeader>
-              </Card>
-              <GroupChatSection />
+            <div className="animate-fade-in">
+              <RecruiterCalendar userId={profile.id} />
+            </div>
+          )}
+
+          {/* Vista 8: Team */}
+          {(!isMobile || currentView === 8) && (
+            <div className="animate-fade-in">
+              <TeamManagement userId={profile.id} />
+            </div>
+          )}
+
+          {/* Vista 9: Piani */}
+          {(!isMobile || currentView === 9) && (
+            <div className="animate-fade-in">
+              <PricingPlans />
             </div>
           )}
         </div>
@@ -613,20 +619,23 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         activeTab={
           currentView === 0 ? "home" :
           currentView === 1 ? "feed" :
-          currentView === 4 ? "pipeline" :
-          currentView === 7 ? "profile" :
+          currentView === 2 ? "match" :
+          currentView === 4 ? "trm" :
           "home"
         }
         onTabChange={(tab) => {
           if (tab === "home") setCurrentView(0);
           else if (tab === "feed") setCurrentView(1);
-          else if (tab === "pipeline") setCurrentView(4);
+          else if (tab === "match") setCurrentView(2);
+          else if (tab === "trm") setCurrentView(4);
           else if (tab === "profile") setEditProfileOpen(true);
           hapticFeedback.light();
         }}
         userRole="recruiter"
         unreadCount={unreadCount}
       />
+
+      <GlobalCopilotFAB userRole="recruiter" />
 
       {showCreateJob && (
         <CreateJobDialog

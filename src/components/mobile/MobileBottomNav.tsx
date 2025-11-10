@@ -19,23 +19,24 @@ export const MobileBottomNav = ({
 
   if (!isMobile) return null;
 
-  // Navbar unificata identica per entrambi i ruoli
-  const navItems = [
+  // Navbar specifica per ruolo
+  const recruiterItems = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
     { id: "match", icon: Heart, label: "Match" },
     { id: "feed", icon: Heart, label: "Feed" },
-    { id: "pipeline", icon: Kanban, label: "TRM" },
+    { id: "trm", icon: Kanban, label: "TRM" },
     { id: "profile", icon: User, label: "Profilo" },
   ];
 
-  // Adatta le label in base al ruolo
-  const adaptedItems = navItems.map((item) => {
-    if (userRole === "candidate") {
-      if (item.id === "match") return { ...item, id: "offers", icon: Briefcase, label: "Offerte" };
-      if (item.id === "pipeline") return { ...item, id: "messages", icon: MessageCircle, label: "Messaggi" };
-    }
-    return item;
-  });
+  const candidateItems = [
+    { id: "home", icon: LayoutDashboard, label: "Home" },
+    { id: "offers", icon: Briefcase, label: "Offerte" },
+    { id: "feed", icon: Heart, label: "Feed" },
+    { id: "carriera", icon: Kanban, label: "Carriera" },
+    { id: "profile", icon: User, label: "Profilo" },
+  ];
+
+  const navItems = userRole === "recruiter" ? recruiterItems : candidateItems;
 
   const handleTabChange = (tabId: string) => {
     hapticFeedback.light();
@@ -45,9 +46,10 @@ export const MobileBottomNav = ({
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50 safe-area-inset-bottom shadow-apple-md">
       <div className="flex items-center justify-around h-16 max-w-screen-lg mx-auto">
-        {adaptedItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const showBadge = (item.id === "trm" || item.id === "carriera" || item.id === "messages") && unreadCount > 0;
           
           return (
             <button
@@ -61,7 +63,7 @@ export const MobileBottomNav = ({
             >
               <div className={`relative smooth-transition ${isActive ? "scale-110 -translate-y-0.5" : ""}`}>
                 <Icon className="h-6 w-6" />
-                {(item.id === "pipeline" || item.id === "messages" || item.label === "TRM" || item.label === "Messaggi") && unreadCount > 0 && (
+                {showBadge && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce-soft">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
