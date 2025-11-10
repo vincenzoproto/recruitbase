@@ -202,14 +202,32 @@ export const ChatDialog = ({
     toast.success("💬 Messaggio inviato");
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error("Solo immagini supportate");
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File troppo grande (max 10MB)");
       return;
     }
+
+    // Determine file type
+    let messageType = 'file';
+    let displayMessage = file.name;
+    
+    if (file.type.startsWith('image/')) {
+      messageType = 'image';
+      displayMessage = 'Immagine';
+    } else if (file.type === 'application/pdf') {
+      messageType = 'document';
+      displayMessage = `📄 ${file.name}`;
+    } else if (file.type.includes('word') || file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+      messageType = 'document';
+      displayMessage = `📄 ${file.name}`;
+    }
+
+    toast.info("📤 Caricamento in corso...");
 
     const fileName = `${currentUserId}/${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage
@@ -217,13 +235,13 @@ export const ChatDialog = ({
       .upload(fileName, file);
 
     if (uploadError) {
-      toast.error("Errore caricamento immagine");
+      toast.error("Errore caricamento file");
       console.error(uploadError);
       return;
     }
 
     const { data } = supabase.storage.from('chat-media').getPublicUrl(fileName);
-    await sendMessage('image', 'Immagine', data.publicUrl);
+    await sendMessage(messageType, displayMessage, data.publicUrl);
   };
 
   const startRecording = async () => {
@@ -329,7 +347,17 @@ export const ChatDialog = ({
                     {message.message_type === 'audio' && message.media_url && (
                       <audio controls src={message.media_url} className="max-w-full" />
                     )}
-                    {message.message_type === 'text' && (
+                    {message.message_type === 'document' && message.media_url && (
+                      <a 
+                        href={message.media_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm underline hover:no-underline"
+                      >
+                        {message.content}
+                      </a>
+                    )}
+                    {(message.message_type === 'text' || message.message_type === 'file') && (
                       <p className="text-sm break-words">{message.content}</p>
                     )}
                     <div className="flex items-center gap-1 mt-1">
@@ -403,9 +431,9 @@ export const ChatDialog = ({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,application/pdf,.doc,.docx,.jpg,.jpeg,.png"
               className="hidden"
-              onChange={handleImageUpload}
+              onChange={handleFileUpload}
             />
             <Button
               type="button"
@@ -420,6 +448,7 @@ export const ChatDialog = ({
               variant="ghost"
               size="icon"
               onClick={() => fileInputRef.current?.click()}
+              title="Allega file (immagini, PDF, documenti)"
             >
               <Image className="h-4 w-4" />
             </Button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,7 @@ export const NotificationBell = ({
   onApplicationNotificationClick,
   onMatchNotificationClick 
 }: NotificationBellProps) => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -180,7 +182,8 @@ export const NotificationBell = ({
                       // Deep-link to match profile
                       onMatchNotificationClick(notification.link);
                     } else if ((notification.type === 'post_reaction' || notification.type === 'post_comment') && notification.link) {
-                      window.location.href = notification.link;
+                      // Navigate to social feed with post ID
+                      navigate(`/social?post=${notification.link}`);
                     }
                     
                     setOpen(false);

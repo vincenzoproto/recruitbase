@@ -39,7 +39,7 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
     try {
       const { data: user } = await supabase.auth.getUser();
 
-      const { error } = await supabase.from("meetings").insert({
+      const { error: meetingError } = await supabase.from("meetings").insert({
         candidate_id: candidateId,
         recruiter_id: user.user?.id,
         scheduled_date: date.toISOString(),
@@ -47,9 +47,19 @@ export const MeetingScheduler = ({ candidateId, candidateName }: MeetingSchedule
         status: "pending"
       });
 
-      if (error) throw error;
+      if (meetingError) throw meetingError;
 
-      toast.success(`Richiesta di call inviata a ${candidateName}. In attesa di conferma.`);
+      // Send notification to candidate
+      await supabase.from("notifications").insert({
+        user_id: candidateId,
+        type: "meeting",
+        title: "🗓️ Nuova richiesta di colloquio",
+        message: `Hai ricevuto una richiesta per un colloquio il ${date.toLocaleDateString('it-IT')} alle ${selectedTime}`,
+        link: "/dashboard",
+        read: false
+      });
+
+      toast.success(`✅ Richiesta di call inviata a ${candidateName}`);
       setOpen(false);
     } catch (error) {
       console.error("Error scheduling meeting:", error);

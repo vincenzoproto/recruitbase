@@ -164,7 +164,10 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
           {isRecruiter && (
             <div className="space-y-2 pt-2">
               <Button
-                onClick={() => setApplicationsOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setApplicationsOpen(true);
+                }}
                 size="sm"
                 variant="default"
                 className="w-full"
@@ -173,19 +176,37 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
                 Vedi Candidature ({applicationsCount})
               </Button>
               <div className="flex gap-2">
-                <Button onClick={() => setEditOpen(true)} size="sm" variant="outline" className="flex-1">
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditOpen(true);
+                  }} 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1"
+                >
                   <Edit className="h-4 w-4 mr-1" />
                   Modifica
                 </Button>
                 <Button
-                  onClick={toggleActive}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleActive();
+                  }}
                   size="sm"
                   variant={job.is_active ? "secondary" : "default"}
                 >
                   <Power className="h-4 w-4 mr-1" />
                   {job.is_active ? 'Disattiva' : 'Attiva'}
                 </Button>
-                <Button onClick={() => setDeleteOpen(true)} size="sm" variant="destructive">
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteOpen(true);
+                  }} 
+                  size="sm" 
+                  variant="destructive"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
