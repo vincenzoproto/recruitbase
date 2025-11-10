@@ -443,7 +443,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                     👈 Swipe per navigare 👉
                   </p>
                 </div>
-                <div className="flex gap-1 overflow-x-auto max-w-[200px] scrollbar-hide">
+                <div className="flex gap-1 overflow-x-auto scrollbar-hide" style={{ maxWidth: '200px' }}>
                   {views.map((view) => (
                     <Button
                       key={view.id}

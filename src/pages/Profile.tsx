@@ -164,6 +164,75 @@ const Profile = () => {
               </div>
             )}
 
+            {profile.core_values && profile.core_values.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Valori Professionali</h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.core_values.map((value: string, idx: number) => (
+                    <Badge key={idx} variant="secondary">{value}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2 pt-4 border-t">
+              {profile.years_experience && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Esperienza</h4>
+                  <p className="text-muted-foreground">{profile.years_experience}</p>
+                </div>
+              )}
+
+              {profile.education && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Formazione</h4>
+                  <p className="text-muted-foreground">{profile.education}</p>
+                </div>
+              )}
+
+              {profile.languages && profile.languages.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Lingue</h4>
+                  <p className="text-muted-foreground">{profile.languages.join(", ")}</p>
+                </div>
+              )}
+
+              {profile.availability && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Disponibilità</h4>
+                  <p className="text-muted-foreground">{profile.availability}</p>
+                </div>
+              )}
+
+              {profile.work_preference && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Preferenza Lavoro</h4>
+                  <p className="text-muted-foreground">{profile.work_preference}</p>
+                </div>
+              )}
+
+              {profile.expected_salary && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">RAL Attesa</h4>
+                  <p className="text-muted-foreground">{profile.expected_salary}</p>
+                </div>
+              )}
+
+              {profile.company_size && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Dimensione Azienda</h4>
+                  <p className="text-muted-foreground">{profile.company_size}</p>
+                </div>
+              )}
+
+              {profile.industry && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Settore</h4>
+                  <p className="text-muted-foreground">{profile.industry}</p>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-3 pt-4 border-t">
               <h3 className="text-lg font-semibold">Contatti</h3>
               

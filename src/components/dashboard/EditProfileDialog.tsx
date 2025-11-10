@@ -36,6 +36,14 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     skills: profile.skills?.join(", ") || "",
     linkedin_url: profile.linkedin_url || "",
     phone_number: profile.phone_number || "",
+    years_experience: profile.years_experience || "",
+    education: profile.education || "",
+    languages: profile.languages?.join(", ") || "",
+    availability: profile.availability || "",
+    work_preference: profile.work_preference || "",
+    expected_salary: profile.expected_salary || "",
+    company_size: profile.company_size || "",
+    industry: profile.industry || "",
   });
   const [coreValues, setCoreValues] = useState<string[]>(profile.core_values || []);
 
@@ -79,6 +87,11 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
         .map((s) => s.trim())
         .filter(Boolean);
 
+      const languagesArray = formData.languages
+        .split(",")
+        .map((l) => l.trim())
+        .filter(Boolean);
+
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -91,6 +104,14 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           phone_number: formData.phone_number,
           avatar_url: avatarUrl,
           core_values: coreValues,
+          years_experience: formData.years_experience || null,
+          education: formData.education || null,
+          languages: languagesArray.length > 0 ? languagesArray : null,
+          availability: formData.availability || null,
+          work_preference: formData.work_preference || null,
+          expected_salary: formData.expected_salary || null,
+          company_size: formData.company_size || null,
+          industry: formData.industry || null,
         })
         .eq("id", profile.id);
 
@@ -222,6 +243,100 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
               />
             </div>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="years_experience">Anni di Esperienza</Label>
+              <Input
+                id="years_experience"
+                value={formData.years_experience}
+                onChange={(e) => setFormData({ ...formData, years_experience: e.target.value })}
+                placeholder="es. 5 anni"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="education">Titolo di Studio</Label>
+              <Input
+                id="education"
+                value={formData.education}
+                onChange={(e) => setFormData({ ...formData, education: e.target.value })}
+                placeholder="es. Laurea in Informatica"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="languages">Lingue (separate da virgola)</Label>
+            <Input
+              id="languages"
+              value={formData.languages}
+              onChange={(e) => setFormData({ ...formData, languages: e.target.value })}
+              placeholder="es. Italiano, Inglese, Spagnolo"
+            />
+          </div>
+
+          {profile.role === 'candidate' && (
+            <>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="availability">Disponibilità</Label>
+                  <Input
+                    id="availability"
+                    value={formData.availability}
+                    onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+                    placeholder="es. Immediata, 1 mese"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="work_preference">Preferenza Lavoro</Label>
+                  <Input
+                    id="work_preference"
+                    value={formData.work_preference}
+                    onChange={(e) => setFormData({ ...formData, work_preference: e.target.value })}
+                    placeholder="es. Remote, Ibrido, In sede"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="expected_salary">Retribuzione Attesa (RAL annua)</Label>
+                <Input
+                  id="expected_salary"
+                  value={formData.expected_salary}
+                  onChange={(e) => setFormData({ ...formData, expected_salary: e.target.value })}
+                  placeholder="es. 35.000 - 45.000 €"
+                />
+              </div>
+            </>
+          )}
+
+          {profile.role === 'recruiter' && (
+            <>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="company_size">Dimensione Azienda</Label>
+                  <Input
+                    id="company_size"
+                    value={formData.company_size}
+                    onChange={(e) => setFormData({ ...formData, company_size: e.target.value })}
+                    placeholder="es. 50-100 dipendenti"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="industry">Settore / Industria</Label>
+                  <Input
+                    id="industry"
+                    value={formData.industry}
+                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                    placeholder="es. Tech, Finance, Healthcare"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, LayoutDashboard, User, Briefcase, Kanban } from "lucide-react";
+import { Heart, MessageCircle, LayoutDashboard, User, Briefcase, Kanban, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { hapticFeedback } from "@/lib/haptics";
 
@@ -23,7 +23,7 @@ export const MobileBottomNav = ({
   const recruiterItems = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
     { id: "match", icon: Heart, label: "Match" },
-    { id: "feed", icon: MessageCircle, label: "Feed" },
+    { id: "feed", icon: Users, label: "Feed" },
     { id: "trm", icon: Kanban, label: "TRM" },
     { id: "profile", icon: User, label: "Profilo" },
   ];
