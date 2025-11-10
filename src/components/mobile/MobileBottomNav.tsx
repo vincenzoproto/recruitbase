@@ -21,14 +21,14 @@ export const MobileBottomNav = ({
 
   const recruiterTabs = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
-    { id: "matches", icon: Heart, label: "Match" },
+    { id: "feed", icon: Heart, label: "Feed" },
     { id: "pipeline", icon: MessageCircle, label: "TRM" },
     { id: "profile", icon: User, label: "Profilo" },
   ];
 
   const candidateTabs = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
-    { id: "matches", icon: Heart, label: "Match" },
+    { id: "feed", icon: Heart, label: "Feed" },
     { id: "offers", icon: MessageCircle, label: "Offerte" },
     { id: "profile", icon: User, label: "Profilo" },
   ];

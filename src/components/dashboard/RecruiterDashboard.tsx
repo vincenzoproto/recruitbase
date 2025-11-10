@@ -32,6 +32,8 @@ import CandidateDetailDialog from "@/components/trm/CandidateDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
 import EditProfileDialog from "./EditProfileDialog";
+import { PremiumHomeDashboard } from "./PremiumHomeDashboard";
+import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -61,13 +63,28 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
-    { id: 1, name: "Match", icon: "💼" },
-    { id: 2, name: "Candidati", icon: "👥" },
-    { id: 3, name: "Pipeline", icon: "📋" },
-    { id: 4, name: "Offerte", icon: "💼" },
-    { id: 5, name: "Insights", icon: "📈" },
-    { id: 6, name: "Gruppi Chat", icon: "💬" }
+    { id: 1, name: "Feed", icon: "📱" },
+    { id: 2, name: "Match", icon: "💼" },
+    { id: 3, name: "Candidati", icon: "👥" },
+    { id: 4, name: "Pipeline", icon: "📋" },
+    { id: 5, name: "Offerte", icon: "💼" },
+    { id: 6, name: "Insights", icon: "📈" },
+    { id: 7, name: "Gruppi Chat", icon: "💬" }
   ];
+
+  const handleNavigateFromHome = (viewName: string) => {
+    const viewMap: Record<string, number> = {
+      "match": 2,
+      "pipeline": 4,
+      "offers": 5,
+      "candidates": 3,
+    };
+    const viewId = viewMap[viewName];
+    if (viewId !== undefined) {
+      setCurrentView(viewId);
+      hapticFeedback.light();
+    }
+  };
 
   useEffect(() => {
     loadJobOffers();
@@ -435,56 +452,31 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           className="min-h-[60vh] touch-pan-y mb-6"
           style={{ touchAction: 'pan-y' }}
         >
-          {/* Vista 0: Home */}
+          {/* Vista 0: Home Premium */}
           {(!isMobile || currentView === 0) && (
-            <div className="space-y-4 animate-fade-in">
-              {profile?.id && (
-                <RecruiterScore userId={profile.id} />
-              )}
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <StatsCard
-                  title="Offerte Attive"
-                  value={jobOffers.length}
-                  icon={Briefcase}
-                  subtitle="Offerte pubblicate"
-                  gradient="from-blue-500/10 to-blue-500/5"
-                />
-                <StatsCard
-                  title="TRS Medio"
-                  value={85}
-                  icon={UserCheck}
-                  subtitle="Score relazioni"
-                  gradient="from-green-500/10 to-green-500/5"
-                />
-                <StatsCard
-                  title="Contatti Mese"
-                  value={24}
-                  icon={Gift}
-                  subtitle="Follow-up attivi"
-                  gradient="from-purple-500/10 to-purple-500/5"
-                />
-              </div>
+            <PremiumHomeDashboard 
+              userId={profile.id} 
+              onNavigate={(view) => handleNavigateFromHome(view)}
+            />
+          )}
 
-              {profile.referral_code && (
-                <AmbassadorSection
-                  referralCode={profile.referral_code}
-                  userId={profile.id}
-                />
-              )}
+          {/* Vista 1: Feed */}
+          {(!isMobile || currentView === 1) && (
+            <div className="animate-fade-in">
+              <FeedWithTabs />
             </div>
           )}
 
-          {/* Vista 1: Match */}
-          {(!isMobile || currentView === 1) && (
+          {/* Vista 2: Match */}
+          {(!isMobile || currentView === 2) && (
             <div className="space-y-6 animate-fade-in">
               <TinderMatch userId={profile.id} userRole="recruiter" />
               <MatchesList userId={profile.id} userRole="recruiter" />
             </div>
           )}
 
-          {/* Vista 2: Candidati */}
-          {(!isMobile || currentView === 2) && (
+          {/* Vista 3: Candidati */}
+          {(!isMobile || currentView === 3) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -519,8 +511,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 3: Pipeline */}
-          {(!isMobile || currentView === 3) && (
+          {/* Vista 4: Pipeline */}
+          {(!isMobile || currentView === 4) && (
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
@@ -537,8 +529,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 4: Offerte */}
-          {(!isMobile || currentView === 4) && (
+          {/* Vista 5: Offerte */}
+          {(!isMobile || currentView === 5) && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex justify-end">
                 <Button onClick={() => setShowCreateJob(true)}>
@@ -574,8 +566,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 5: Insights */}
-          {(!isMobile || currentView === 5) && (
+          {/* Vista 6: Insights */}
+          {(!isMobile || currentView === 6) && (
             <div className="space-y-4 animate-fade-in">
               {profile?.id && (
                 <>
@@ -586,8 +578,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 6: Gruppi Chat */}
-          {(!isMobile || currentView === 6) && (
+          {/* Vista 7: Gruppi Chat */}
+          {(!isMobile || currentView === 7) && (
             <div className="space-y-4 animate-fade-in">
               <Card>
                 <CardHeader>
