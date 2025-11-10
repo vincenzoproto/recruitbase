@@ -7,6 +7,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { calculateCultureFit, getCultureFitLevel } from "@/lib/culture-fit";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface CandidateProfileModalProps {
   open: boolean;
@@ -21,6 +24,8 @@ export const CandidateProfileModal = ({
   candidate,
   recruiterValues = []
 }: CandidateProfileModalProps) => {
+  const navigate = useNavigate();
+  
   if (!candidate) return null;
 
   const cultureFitScore = recruiterValues.length > 0 && candidate.core_values?.length > 0
@@ -57,9 +62,25 @@ export const CandidateProfileModal = ({
                 <span>{candidate.city || "Località non specificata"}</span>
               </div>
 
-              <div className="flex justify-center mt-4">
+              <div className="flex items-center justify-center gap-2 mt-4">
                 <TRSBadge score={candidate.talent_relationship_score || 0} size="lg" />
+                <InfoTooltip 
+                  content="Talent Relationship Score: misura la qualità della relazione (0-100)"
+                  side="right"
+                />
               </div>
+              
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate('/score-info');
+                }}
+                className="mt-2 text-xs text-muted-foreground hover:text-primary"
+              >
+                Come funzionano i punteggi? →
+              </Button>
             </div>
 
             <Separator />
@@ -72,6 +93,10 @@ export const CandidateProfileModal = ({
                     <div className="flex items-center gap-2">
                       <Heart className={`h-5 w-5 ${cultureFitLevel.textColor}`} />
                       <span className="font-semibold">Culture Fit</span>
+                      <InfoTooltip 
+                        content={`${cultureFitScore}% di affinità = ${Math.round((cultureFitScore / 100) * recruiterValues.length)} su ${recruiterValues.length} valori in comune`}
+                        side="top"
+                      />
                     </div>
                     <span className={`text-2xl font-bold ${cultureFitLevel.textColor}`}>
                       {cultureFitScore}%

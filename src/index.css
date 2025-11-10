@@ -38,10 +38,10 @@
     --accent: 211 100% 97%;
     --accent-foreground: 211 100% 50%;
 
-    --success: 152 76% 60%; /* #3ED598 */
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92 50%; /* hsl(38, 92%, 50%) - Warning yellow */
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -100,6 +100,9 @@
 
     --accent: 240 6% 20%;
     --accent-foreground: 211 100% 60%;
+
+    --success: 142 71% 45%;
+    --warning: 38 92% 60%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;

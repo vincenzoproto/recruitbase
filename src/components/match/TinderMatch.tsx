@@ -15,6 +15,7 @@ import { MatchPopup } from "./MatchPopup";
 import { CandidateProfileModal } from "./CandidateProfileModal";
 import { DailyMatchSuggestion } from "./DailyMatchSuggestion";
 import { calculateCultureFit, getCultureFitLevel } from "@/lib/culture-fit";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface TinderMatchProps {
   userId: string;
