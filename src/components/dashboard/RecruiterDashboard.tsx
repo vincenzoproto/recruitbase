@@ -45,6 +45,7 @@ import { RecruiterAnalytics } from "./RecruiterAnalytics";
 import { RecruiterCalendar } from "./RecruiterCalendar";
 import { TeamManagement } from "./TeamManagement";
 import { PricingPlans } from "./PricingPlans";
+import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -409,6 +410,9 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
+        {/* Meeting Confirmation Banner */}
+        <MeetingConfirmationBanner userId={profile.id} userRole="recruiter" />
+
         {/* View Indicators - solo mobile */}
         {isMobile && (
           <div className="flex justify-center gap-2 mb-4">

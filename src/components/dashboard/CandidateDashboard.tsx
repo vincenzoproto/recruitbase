@@ -26,6 +26,7 @@ import { CVCopilot } from "@/components/candidate/CVCopilot";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
+import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -238,6 +239,9 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
+        {/* Meeting Confirmation Banner */}
+        <MeetingConfirmationBanner userId={profile.id} userRole="candidate" />
+
         {/* Indicatori vista - solo mobile */}
         {isMobile && (
           <div className="flex justify-center gap-2 -mt-2">

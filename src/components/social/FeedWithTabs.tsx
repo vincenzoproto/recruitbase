@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { CreatePost } from "./CreatePost";
 import { PostCard } from "./PostCard";
@@ -9,11 +10,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 
-export const FeedWithTabs = () => {
+interface FeedWithTabsProps {
+  highlightPostId?: string;
+}
+
+export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const postRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     loadPosts();
@@ -41,6 +47,20 @@ export const FeedWithTabs = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Scroll to highlighted post
+  useEffect(() => {
+    if (highlightPostId && posts.length > 0) {
+      const postRef = postRefs.current[highlightPostId];
+      if (postRef) {
+        setTimeout(() => {
+          postRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight effect
+          postRef.style.animation = 'pulse 1s ease-in-out 2';
+        }, 500);
+      }
+    }
+  }, [highlightPostId, posts]);
 
   const loadPosts = async () => {
     try {
@@ -174,7 +194,15 @@ export const FeedWithTabs = () => {
               
               <div className="space-y-4">
                 {filteredPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <div
+                    key={post.id}
+                    ref={(el) => {
+                      if (el) postRefs.current[post.id] = el;
+                    }}
+                    className={highlightPostId === post.id ? "ring-2 ring-primary rounded-lg" : ""}
+                  >
+                    <PostCard post={post} />
+                  </div>
                 ))}
               </div>
             </>

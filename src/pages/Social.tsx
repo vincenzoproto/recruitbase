@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -10,8 +10,12 @@ import { hapticFeedback } from "@/lib/haptics";
 
 const Social = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const [userRole, setUserRole] = useState<"recruiter" | "candidate">("recruiter");
+  
+  // Get post ID from query params for deep-linking
+  const highlightPostId = searchParams.get('post');
 
   useEffect(() => {
     loadUserRole();
@@ -54,7 +58,7 @@ const Social = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 max-w-3xl">
-        <FeedWithTabs />
+        <FeedWithTabs highlightPostId={highlightPostId || undefined} />
       </main>
 
       {isMobile && (
