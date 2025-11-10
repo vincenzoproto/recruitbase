@@ -1,4 +1,4 @@
-import { Home, Users, MessageCircle, TrendingUp, User } from "lucide-react";
+import { Home, Users, Briefcase, TrendingUp, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MobileBottomNavProps {
@@ -14,7 +14,7 @@ export const MobileBottomNav = ({ activeTab, onTabChange }: MobileBottomNavProps
   const navItems = [
     { id: "pipeline", icon: Home, label: "Home" },
     { id: "candidates", icon: Users, label: "Candidati" },
-    { id: "matches", icon: MessageCircle, label: "Match" },
+    { id: "matches", icon: Briefcase, label: "Match" },
     { id: "analytics", icon: TrendingUp, label: "Insights" },
     { id: "profile", icon: User, label: "Profilo" }
   ];

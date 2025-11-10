@@ -30,8 +30,6 @@ import CandidateDetailDialog from "@/components/trm/CandidateDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
 import EditProfileDialog from "./EditProfileDialog";
-import { TinderMatch } from "@/components/match/TinderMatch";
-import { MatchesList } from "@/components/match/MatchesList";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -468,14 +466,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                   userId={profile.id}
                 />
               )}
-            </div>
-          )}
-
-          {/* Vista 1: Match */}
-          {(!isMobile || currentView === 1) && (
-            <div className="animate-fade-in space-y-6">
-              <TinderMatch userId={profile.id} userRole="recruiter" />
-              <MatchesList userId={profile.id} userRole="recruiter" />
             </div>
           )}
 

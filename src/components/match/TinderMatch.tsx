@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, MapPin, Trophy, Heart, Sparkles } from "lucide-react";
+import { X, MapPin, Trophy, Briefcase, Sparkles, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useSwipe } from "@/hooks/use-swipe";
 import { hapticFeedback } from "@/lib/haptics";
@@ -184,7 +184,7 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
           {/* Image/Header */}
           <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
             {userRole === "candidate" ? (
-              <Sparkles className="h-20 w-20 text-primary/40" />
+              <FileText className="h-20 w-20 text-primary/40" />
             ) : (
               <div className="text-6xl">👤</div>
             )}
@@ -283,7 +283,7 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
           onClick={handleMatch}
           className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-primary/80"
         >
-          <Heart className="h-10 w-10 fill-current" />
+          <Briefcase className="h-10 w-10" />
         </Button>
       </div>
     </div>

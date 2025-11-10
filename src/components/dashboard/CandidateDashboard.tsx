@@ -10,7 +10,6 @@ import JobOfferCard from "./JobOfferCard";
 import { Badge } from "@/components/ui/badge";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { MatchesList } from "@/components/match/MatchesList";
 import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
@@ -20,7 +19,6 @@ import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
 import { GroupChatSection } from "@/components/chat/GroupChatSection";
-import { TinderMatch } from "@/components/match/TinderMatch";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -42,7 +40,6 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
-    { id: 1, name: "Match", icon: "💼" },
     { id: 2, name: "Offerte", icon: "💼" },
     { id: 3, name: "Recruiter", icon: "👔" },
     { id: 4, name: "Profilo", icon: "👤" },
@@ -304,8 +301,6 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                 <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
               )}
 
-              <MatchesList userId={profile.id} userRole="candidate" />
-
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -327,14 +322,6 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                   </CardDescription>
                 </CardHeader>
               </Card>
-            </div>
-          )}
-
-          {/* Vista 1: Match */}
-          {(!isMobile || currentView === 1) && (
-            <div className="animate-fade-in space-y-6">
-              <TinderMatch userId={profile.id} userRole="candidate" />
-              <MatchesList userId={profile.id} userRole="candidate" />
             </div>
           )}
 
