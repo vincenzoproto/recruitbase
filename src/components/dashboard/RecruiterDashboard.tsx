@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send, User, Rss, Search, Heart } from "lucide-react";
+import { Plus, Briefcase, LogOut, Gift, UserCheck, TrendingUp, Users, Send, User, Rss, Search, Heart, Menu, Bell } from "lucide-react";
+import { SidebarMenu } from "@/components/navigation/SidebarMenu";
+import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CreateJobDialog from "./CreateJobDialog";
@@ -76,7 +78,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [candidateDetailOpen, setCandidateDetailOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [sidebarMenuOpen, setSidebarMenuOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
+  const premiumFeatures = usePremiumFeatures(profile.id);
 
   const views = [
     { id: 0, name: "Home", icon: "📊" },
@@ -88,7 +93,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     { id: 6, name: "Analytics", icon: "📈" },
     { id: 7, name: "Calendario", icon: "📅" },
     { id: 8, name: "Team", icon: "👥" },
-    { id: 9, name: "Piani", icon: "💎" }
+    { id: 9, name: "Messaggi", icon: "💬" },
+    { id: 10, name: "Notifiche", icon: "🔔" }
   ];
 
   const handleNavigateFromHome = (viewName: string) => {
@@ -110,6 +116,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     loadKPIData();
     loadCandidates();
     loadFavorites();
+    loadNotificationCount();
+    requestNotificationPermission();
   }, []);
 
   useEffect(() => {
@@ -189,6 +197,44 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       setFavorites(favSet);
     } catch (error) {
       console.error("Error loading favorites:", error);
+    }
+  };
+
+  const loadNotificationCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", profile.id)
+        .eq("read", false);
+
+      if (!error && count !== null) {
+        setNotificationCount(count);
+      }
+
+      // Real-time subscription for notification count
+      const channel = supabase
+        .channel('notification-count-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${profile.id}`
+          },
+          () => {
+            // Reload count on any notification change
+            loadNotificationCount();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (error) {
+      console.error("Error loading notification count:", error);
     }
   };
 
@@ -352,9 +398,38 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         </>
       )}
       
+      <SidebarMenu
+        open={sidebarMenuOpen}
+        onOpenChange={setSidebarMenuOpen}
+        fullName={profile.full_name}
+        avatarUrl={profile.avatar_url}
+        role="recruiter"
+        planType={premiumFeatures.planType}
+        trsScore={profile.talent_relationship_score || 0}
+        onNavigate={(section) => {
+          // Handle navigation
+          if (section === "profile") setEditProfileOpen(true);
+          else if (section === "offers") setCurrentView(5);
+          else if (section === "analytics") setCurrentView(6);
+          else if (section === "team") setCurrentView(8);
+          else if (section === "billing") navigate("/plans");
+          else if (section === "settings") setEditProfileOpen(true);
+          else if (section === "notifications-archive") setCurrentView(10);
+        }}
+        onLogout={handleSignOut}
+      />
+
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarMenuOpen(true)}
+              className="flex-shrink-0 md:hidden"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
             <Briefcase className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
             <div className="min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">Recruit Base TRM</h1>
@@ -649,11 +724,46 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
             </div>
           )}
 
-          {/* Vista 9: Piani */}
+          {/* Vista 9: Messaggi */}
           {(!isMobile || currentView === 9) && (
-            <div className="animate-fade-in">
-              <PricingPlans />
-            </div>
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5" />
+                  Messaggi
+                </CardTitle>
+                <CardDescription>
+                  Le tue conversazioni con candidati e recruiter
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GroupChatSection />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vista 10: Notifiche */}
+          {(!isMobile || currentView === 10) && (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Centro Notifiche
+                </CardTitle>
+                <CardDescription>
+                  Tutte le tue notifiche in un unico posto
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <NotificationBell
+                  userId={profile.id}
+                  onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+                  onMessageNotificationClick={(senderId) => handleOpenChat(senderId)}
+                  onApplicationNotificationClick={(candidateId) => handleOpenCandidateDetail(candidateId)}
+                  onMatchNotificationClick={(matchId) => setCurrentView(2)}
+                />
+              </CardContent>
+            </Card>
           )}
         </div>
 
@@ -663,21 +773,23 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       <MobileBottomNav 
         activeTab={
           currentView === 0 ? "home" :
-          currentView === 1 ? "feed" :
           currentView === 2 ? "match" :
           currentView === 4 ? "trm" :
+          currentView === 9 ? "messages" :
+          currentView === 10 ? "notifications" :
           "home"
         }
         onTabChange={(tab) => {
           if (tab === "home") setCurrentView(0);
-          else if (tab === "feed") setCurrentView(1);
           else if (tab === "match") setCurrentView(2);
           else if (tab === "trm") setCurrentView(4);
-          else if (tab === "profile") setEditProfileOpen(true);
+          else if (tab === "messages") setCurrentView(9);
+          else if (tab === "notifications") setCurrentView(10);
           hapticFeedback.light();
         }}
         userRole="recruiter"
         unreadCount={unreadCount}
+        notificationCount={notificationCount}
       />
 
       <GlobalCopilotFAB userRole="recruiter" />
