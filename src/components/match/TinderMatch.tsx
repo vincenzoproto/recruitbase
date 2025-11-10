@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, X, MapPin, Trophy, Heart } from "lucide-react";
+import { X, MapPin, Trophy, Heart, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useSwipe } from "@/hooks/use-swipe";
 import { hapticFeedback } from "@/lib/haptics";
@@ -116,6 +116,22 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
     minSwipeDistance: 100
   });
 
+  // Stop propagation to prevent page swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    swipeHandlers.onTouchStart(e);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    swipeHandlers.onTouchMove(e);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    swipeHandlers.onTouchEnd();
+  };
+
   if (loading) {
     return (
       <Card>
@@ -159,14 +175,16 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
       </div>
 
       <Card 
-        {...swipeHandlers}
-        className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing transition-transform hover:scale-[1.02]"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="overflow-hidden touch-none cursor-grab active:cursor-grabbing transition-transform hover:scale-[1.02]"
       >
         <CardContent className="p-0">
           {/* Image/Header */}
           <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
             {userRole === "candidate" ? (
-              <Briefcase className="h-20 w-20 text-primary/40" />
+              <Sparkles className="h-20 w-20 text-primary/40" />
             ) : (
               <div className="text-6xl">👤</div>
             )}
@@ -265,7 +283,7 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
           onClick={handleMatch}
           className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-primary/80"
         >
-          <Briefcase className="h-10 w-10" />
+          <Heart className="h-10 w-10 fill-current" />
         </Button>
       </div>
     </div>

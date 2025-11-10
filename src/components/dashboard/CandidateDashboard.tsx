@@ -332,8 +332,9 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
           {/* Vista 1: Match */}
           {(!isMobile || currentView === 1) && (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in space-y-6">
               <TinderMatch userId={profile.id} userRole="candidate" />
+              <MatchesList userId={profile.id} userRole="candidate" />
             </div>
           )}
 

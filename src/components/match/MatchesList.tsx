@@ -1,265 +1,249 @@
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Sparkles, MapPin, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MessageCircle, Sparkles, MapPin, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface Match {
   id: string;
   match_score: number;
+  created_at: string;
   job_offer_id: string;
   candidate_id: string;
-  job_offer?: {
+  job_offers?: {
     title: string;
     city: string;
     sector: string;
-    experience_level: string;
+    profiles: {
+      full_name: string;
+      avatar_url: string;
+    };
   };
-  profile?: {
+  profiles?: {
     full_name: string;
+    avatar_url: string;
+    job_title: string;
     city: string;
-    skills: string[];
   };
 }
 
 interface MatchesListProps {
   userId: string;
-  userRole: 'recruiter' | 'candidate';
+  userRole: "candidate" | "recruiter";
 }
 
 export const MatchesList = ({ userId, userRole }: MatchesListProps) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadMatches();
-    calculateMatches();
-
-    // Real-time subscription
-    const channel = supabase
-      .channel('matches-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'matches',
-        },
-        () => {
-          loadMatches();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [userId, userRole]);
 
   const loadMatches = async () => {
+    setLoading(true);
     try {
-      if (userRole === 'candidate') {
+      if (userRole === "candidate") {
         const { data, error } = await supabase
-          .from('matches')
+          .from("matches")
           .select(`
             *,
-            job_offer:job_offers(title, city, sector, experience_level)
+            job_offers!inner (
+              title,
+              city,
+              sector,
+              profiles:recruiter_id (
+                full_name,
+                avatar_url
+              )
+            )
           `)
-          .eq('candidate_id', userId)
-          .order('match_score', { ascending: false })
-          .limit(5);
+          .eq("candidate_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(10);
 
         if (error) throw error;
         setMatches(data || []);
       } else {
-        // For recruiters, show best candidates for their jobs
+        // For recruiters, get matches for their job offers
         const { data: jobOffers } = await supabase
-          .from('job_offers')
-          .select('id')
-          .eq('recruiter_id', userId)
-          .eq('is_active', true);
+          .from("job_offers")
+          .select("id")
+          .eq("recruiter_id", userId);
+        
+        if (!jobOffers || jobOffers.length === 0) {
+          setMatches([]);
+          return;
+        }
 
-        if (jobOffers && jobOffers.length > 0) {
-          const jobIds = jobOffers.map(j => j.id);
+        const offerIds = jobOffers.map(o => o.id);
+        
+        const { data: matchesData, error } = await supabase
+          .from("matches")
+          .select("*")
+          .in("job_offer_id", offerIds)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+        
+        // Get candidate profiles separately
+        if (matchesData && matchesData.length > 0) {
+          const candidateIds = matchesData.map(m => m.candidate_id);
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url, job_title, city")
+            .in("id", candidateIds);
           
-          // Get matches with profile data manually
-          const { data: matchesData, error: matchesError } = await supabase
-            .from('matches')
-            .select('*')
-            .in('job_offer_id', jobIds)
-            .order('match_score', { ascending: false })
-            .limit(10);
-
-          if (matchesError) throw matchesError;
-
-          if (matchesData) {
-            // Fetch profiles for each match
-            const candidateIds = matchesData.map(m => m.candidate_id);
-            const { data: profilesData } = await supabase
-              .from('profiles')
-              .select('id, full_name, city, skills')
-              .in('id', candidateIds);
-
-            // Combine matches with profiles
-            const enrichedMatches = matchesData.map(match => ({
-              ...match,
-              profile: profilesData?.find(p => p.id === match.candidate_id),
-            }));
-
-            setMatches(enrichedMatches);
-          }
+          // Combine matches with profiles
+          const enrichedMatches = matchesData.map(match => ({
+            ...match,
+            profiles: profilesData?.find(p => p.id === match.candidate_id)
+          }));
+          
+          setMatches(enrichedMatches as any);
+        } else {
+          setMatches([]);
         }
       }
     } catch (error) {
-      console.error('Error loading matches:', error);
+      console.error("Error loading matches:", error);
+      toast.error("Errore nel caricamento dei match");
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateMatches = async () => {
-    try {
-      if (userRole === 'candidate') {
-        // Get all active job offers
-        const { data: jobs } = await supabase
-          .from('job_offers')
-          .select('id')
-          .eq('is_active', true);
-
-        if (jobs) {
-          for (const job of jobs) {
-            // Check if match already exists
-            const { data: existing } = await supabase
-              .from('matches')
-              .select('id')
-              .eq('candidate_id', userId)
-              .eq('job_offer_id', job.id)
-              .maybeSingle();
-
-            if (!existing) {
-              // Calculate and insert match
-              const { data: score } = await supabase.rpc('calculate_match_score', {
-                p_candidate_id: userId,
-                p_job_offer_id: job.id,
-              });
-
-              if (score && score >= 50) {
-                await supabase.from('matches').insert({
-                  candidate_id: userId,
-                  job_offer_id: job.id,
-                  match_score: score,
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error calculating matches:', error);
-    }
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 60) return 'bg-yellow-500';
-    return 'bg-orange-500';
+  const handleMessage = async (match: Match) => {
+    const otherUserId = userRole === "candidate" 
+      ? match.job_offers?.profiles?.full_name 
+      : match.profiles?.full_name;
+    
+    // Navigate to messages/chat (you may need to adjust this based on your routing)
+    navigate("/dashboard", { state: { openChat: match.candidate_id } });
   };
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-muted rounded w-1/3"></div>
-          <div className="h-20 bg-muted rounded"></div>
-        </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5" />
+            I Tuoi Match
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-20 bg-muted rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
   if (matches.length === 0) {
     return (
-      <Card className="p-6 text-center text-muted-foreground">
-        <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>Nessun match trovato al momento</p>
-        <p className="text-sm mt-2">
-          {userRole === 'candidate' 
-            ? 'Completa il tuo profilo per ricevere suggerimenti'
-            : 'Crea offerte per ricevere candidati suggeriti'}
-        </p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5" />
+            I Tuoi Match
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-8">
+            Nessun match ancora. Inizia a swipare! 💫
+          </p>
+        </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="font-semibold">
-          {userRole === 'candidate' ? 'Offerte Consigliate' : 'Candidati Suggeriti'}
-        </h3>
-      </div>
-
-      <div className="space-y-3">
-        {matches.map((match) => (
-          <div
-            key={match.id}
-            className="border rounded-lg p-4 hover:border-primary/50 transition-colors"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 space-y-2">
-                {userRole === 'candidate' && match.job_offer ? (
-                  <>
-                    <h4 className="font-medium">{match.job_offer.title}</h4>
-                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {match.job_offer.city}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="h-3 w-3" />
-                        {match.job_offer.sector}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          I Tuoi Match ({matches.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {matches.map((match) => (
+            <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center flex-shrink-0">
+                      {userRole === "candidate" ? (
+                        <Sparkles className="h-6 w-6 text-primary" />
+                      ) : (
+                        <span className="text-2xl">👤</span>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold truncate">
+                        {userRole === "candidate"
+                          ? match.job_offers?.title
+                          : match.profiles?.full_name}
+                      </h4>
+                      
+                      {userRole === "candidate" ? (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            {match.job_offers?.city}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {match.job_offers?.profiles?.full_name}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            {match.profiles?.job_title}
+                          </p>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            {match.profiles?.city}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {match.match_score}% Match
+                        </Badge>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(match.created_at).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
-                  </>
-                ) : match.profile ? (
-                  <>
-                    <h4 className="font-medium">{match.profile.full_name}</h4>
-                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {match.profile.city || 'Non specificato'}
-                      </div>
-                    </div>
-                    {match.profile.skills && match.profile.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {match.profile.skills.slice(0, 3).map((skill, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : null}
-              </div>
-
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Match</span>
-                  <Badge className={`${getScoreColor(match.match_score)} text-white`}>
-                    {match.match_score}%
-                  </Badge>
+                  </div>
+                  
+                  <Button
+                    size="sm"
+                    onClick={() => handleMessage(match)}
+                    className="flex-shrink-0"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button size="sm" variant="outline">
-                  Visualizza
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </CardContent>
     </Card>
   );
 };
