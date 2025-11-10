@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, Mail, Phone, Linkedin, ArrowLeft, MessageCircle, Edit } from "lucide-react";
+import { MapPin, Briefcase, Mail, Phone, Linkedin, ArrowLeft, MessageCircle, Edit, FileText, Upload } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import EditProfileDialog from "@/components/dashboard/EditProfileDialog";
 
@@ -81,6 +82,22 @@ const Profile = () => {
     );
   }
 
+  // Calculate profile completion
+  const completionFields = [
+    profile.full_name,
+    profile.job_title,
+    profile.city,
+    profile.bio,
+    profile.skills?.length > 0,
+    profile.core_values?.length >= 3,
+    profile.linkedin_url,
+    profile.phone_number,
+    profile.cv_url,
+    profile.avatar_url,
+  ];
+  const filledFields = completionFields.filter(Boolean).length;
+  const completionPercentage = Math.round((filledFields / completionFields.length) * 100);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-4xl mx-auto py-8 px-4">
@@ -92,6 +109,31 @@ const Profile = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Torna alla Dashboard
         </Button>
+
+        {/* Profile Completion Banner */}
+        {isOwnProfile && completionPercentage < 100 && (
+          <Card className="mb-6 border-primary/30 bg-primary/5 animate-fade-in">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-foreground">
+                    Profilo {completionPercentage}% completo
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {10 - filledFields} campi mancanti
+                  </span>
+                </div>
+                <Progress value={completionPercentage} className="h-2" />
+                <p className="text-xs text-muted-foreground">
+                  Completa il tuo profilo per aumentare la visibilità e ricevere più opportunità
+                </p>
+                <Button onClick={() => setEditOpen(true)} size="sm" className="w-full">
+                  Completa ora
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader className="pb-4">
@@ -232,6 +274,49 @@ const Profile = () => {
                 </div>
               )}
             </div>
+
+            {/* CV Section */}
+            {profile.role === 'candidate' && (
+              <div className="pt-4 border-t">
+                <h3 className="text-lg font-semibold mb-3">Curriculum Vitae</h3>
+                {profile.cv_url ? (
+                  <div className="flex items-center justify-between p-4 bg-accent/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium">CV caricato</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={profile.cv_url} target="_blank" rel="noopener noreferrer">
+                          Visualizza
+                        </a>
+                      </Button>
+                      {isOwnProfile && (
+                        <Button size="sm" variant="outline">
+                          <Upload className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ) : isOwnProfile ? (
+                  <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+                    <CardContent className="p-6 text-center">
+                      <FileText className="h-12 w-12 text-primary mx-auto mb-3" />
+                      <h4 className="font-semibold mb-2">Carica il tuo CV</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Aumenta la visibilità del tuo profilo del 70%
+                      </p>
+                      <Button size="sm" onClick={() => setEditOpen(true)}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Carica CV
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <p className="text-sm text-muted-foreground">CV non disponibile</p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-3 pt-4 border-t">
               <h3 className="text-lg font-semibold">Contatti</h3>

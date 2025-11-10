@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { Activity, TrendingUp, TrendingDown } from "lucide-react";
 import TRSBadge from "./TRSBadge";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface TRSDashboardCardProps {
   recruiterId: string;
@@ -81,6 +82,10 @@ const TRSDashboardCard = ({ recruiterId }: TRSDashboardCardProps) => {
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
               Talent Relationship Score™
+              <InfoTooltip 
+                content="Misura la qualità delle relazioni: frequenza contatti, tempo risposta, interazioni positive, profilo completo, note e tag"
+                side="top"
+              />
             </CardTitle>
             <CardDescription>La tua media di qualità relazionale</CardDescription>
           </div>

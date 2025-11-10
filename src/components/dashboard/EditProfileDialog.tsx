@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
+import { Upload, FileText } from "lucide-react";
 import { CoreValuesSelector } from "@/components/ui/core-values-selector";
 
 interface EditProfileDialogProps {
@@ -27,7 +27,10 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
+  const [cvUrl, setCvUrl] = useState(profile.cv_url || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile.full_name || "",
     city: profile.city || "",
@@ -77,6 +80,41 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     }
   };
 
+  const uploadCV = async (file: File) => {
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+      toast.error("Carica solo file PDF");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File troppo grande (max 10MB)");
+      return;
+    }
+
+    setUploadingCv(true);
+    try {
+      const fileExt = 'pdf';
+      const fileName = `${profile.id}/cv_${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('cvs')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('cvs')
+        .getPublicUrl(fileName);
+
+      setCvUrl(publicUrl);
+      toast.success("CV caricato! Ricordati di salvare le modifiche");
+    } catch (error: any) {
+      toast.error(error.message || "Errore nel caricamento");
+    } finally {
+      setUploadingCv(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -103,6 +141,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           linkedin_url: formData.linkedin_url,
           phone_number: formData.phone_number,
           avatar_url: avatarUrl,
+          cv_url: cvUrl || null,
           core_values: coreValues,
           years_experience: formData.years_experience || null,
           education: formData.education || null,
@@ -161,6 +200,66 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
               {uploading ? "Caricamento..." : "Carica Foto"}
             </Button>
           </div>
+
+          {/* CV Upload for Candidates */}
+          {profile.role === 'candidate' && (
+            <div className="space-y-2 p-4 bg-accent/30 rounded-lg">
+              <Label htmlFor="cv">Curriculum Vitae (PDF)</Label>
+              <input
+                ref={cvInputRef}
+                type="file"
+                accept="application/pdf,.pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadCV(file);
+                }}
+              />
+              {cvUrl ? (
+                <div className="flex items-center justify-between p-3 bg-background rounded border">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">CV caricato</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      asChild
+                    >
+                      <a href={cvUrl} target="_blank" rel="noopener noreferrer">
+                        Visualizza
+                      </a>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => cvInputRef.current?.click()}
+                      disabled={uploadingCv}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => cvInputRef.current?.click()}
+                  disabled={uploadingCv}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploadingCv ? "Caricamento..." : "Carica CV (PDF)"}
+                </Button>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Carica il tuo CV per aumentare la visibilità del profilo
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="full_name">Nome Completo *</Label>
