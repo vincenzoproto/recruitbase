@@ -14,6 +14,7 @@ import { SmartFilters, FilterState } from "./SmartFilters";
 import { MatchPopup } from "./MatchPopup";
 import { CandidateProfileModal } from "./CandidateProfileModal";
 import { DailyMatchSuggestion } from "./DailyMatchSuggestion";
+import { calculateCultureFit, getCultureFitLevel } from "@/lib/culture-fit";
 
 interface TinderMatchProps {
   userId: string;
@@ -35,12 +36,31 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
   const [showDailyMatch, setShowDailyMatch] = useState(true);
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'pass', message: string } | null>(null);
   const [skippedCount, setSkippedCount] = useState(0);
+  const [recruiterValues, setRecruiterValues] = useState<string[]>([]);
 
   useEffect(() => {
     loadCards();
     loadDailyMatch();
     loadViewedCount();
+    loadRecruiterValues();
   }, [userId, userRole, filters]);
+
+  const loadRecruiterValues = async () => {
+    if (userRole !== 'recruiter') return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('core_values')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      setRecruiterValues(data?.core_values || []);
+    } catch (error) {
+      console.error("Error loading recruiter values:", error);
+    }
+  };
 
   const loadViewedCount = () => {
     const today = new Date().toDateString();
@@ -202,7 +222,11 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
     minSwipeDistance: 100
   });
 
-  const cultureFitScore = Math.floor(Math.random() * 20) + 75; // Mock 75-95%
+  const cultureFitScore = userRole === 'recruiter' && currentCard?.core_values
+    ? calculateCultureFit(recruiterValues, currentCard.core_values)
+    : null;
+  
+  const cultureFitLevel = cultureFitScore !== null ? getCultureFitLevel(cultureFitScore) : null;
 
   if (loading) {
     return (
@@ -259,6 +283,7 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
         open={profileModalOpen}
         onOpenChange={setProfileModalOpen}
         candidate={selectedProfile}
+        recruiterValues={recruiterValues}
       />
 
       <div className="max-w-md mx-auto space-y-4">
@@ -425,10 +450,14 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 w-fit">
-                    <Sparkles className="h-4 w-4" />
-                    <span className="text-sm font-medium">Culture Fit: {cultureFitScore}%</span>
-                  </div>
+                  {cultureFitScore !== null && cultureFitLevel && (
+                    <div className={`flex items-center gap-2 backdrop-blur-sm rounded-full px-4 py-2 w-fit ${cultureFitLevel.bgColor} border border-white/20`}>
+                      <Sparkles className={`h-4 w-4 ${cultureFitLevel.textColor}`} />
+                      <span className={`text-sm font-medium ${cultureFitLevel.textColor}`}>
+                        Culture Fit: {cultureFitScore}%
+                      </span>
+                    </div>
+                  )}
                 </>
               )}
             </CardContent>

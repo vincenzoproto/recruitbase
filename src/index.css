@@ -41,12 +41,17 @@
     --success: 152 76% 60%; /* #3ED598 */
     --success-foreground: 0 0% 100%;
 
+    --warning: 38 92 50%; /* hsl(38, 92%, 50%) - Warning yellow */
+    --warning-foreground: 0 0% 100%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 240 6% 90%;
     --input: 240 6% 90%;
     --ring: 211 100% 50%;
+    
+    --progress-background: hsl(var(--primary));
 
     --radius: 1.25rem;
     

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Copy, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Share2, Copy, CheckCircle, Heart } from "lucide-react";
 import TRSBadge from "@/components/trm/TRSBadge";
 import { hapticFeedback } from "@/lib/haptics";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ interface PersonalBrandCardProps {
     talent_relationship_score?: number;
     avatar_url?: string;
     id: string;
+    core_values?: string[];
   };
 }
 
@@ -82,6 +84,22 @@ export const PersonalBrandCard = ({ profile }: PersonalBrandCardProps) => {
           <p className="text-xs text-muted-foreground mb-1">Link profilo</p>
           <p className="text-sm font-mono text-primary truncate">{profileUrl}</p>
         </div>
+
+        {profile.core_values && profile.core_values.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Heart className="h-4 w-4 text-primary" />
+              <p className="text-xs font-medium text-muted-foreground">I miei valori</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {profile.core_values.map((value, index) => (
+                <Badge key={index} variant="outline" className="text-xs border-primary/30">
+                  {value}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex gap-2">

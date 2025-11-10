@@ -1,19 +1,33 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, Award, Calendar } from "lucide-react";
+import { MapPin, Briefcase, Award, Calendar, Heart } from "lucide-react";
 import TRSBadge from "@/components/trm/TRSBadge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { calculateCultureFit, getCultureFitLevel } from "@/lib/culture-fit";
 
 interface CandidateProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   candidate: any;
+  recruiterValues?: string[];
 }
 
-export const CandidateProfileModal = ({ open, onOpenChange, candidate }: CandidateProfileModalProps) => {
+export const CandidateProfileModal = ({ 
+  open, 
+  onOpenChange, 
+  candidate,
+  recruiterValues = []
+}: CandidateProfileModalProps) => {
   if (!candidate) return null;
+
+  const cultureFitScore = recruiterValues.length > 0 && candidate.core_values?.length > 0
+    ? calculateCultureFit(recruiterValues, candidate.core_values)
+    : null;
+  
+  const cultureFitLevel = cultureFitScore !== null ? getCultureFitLevel(cultureFitScore) : null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -49,6 +63,37 @@ export const CandidateProfileModal = ({ open, onOpenChange, candidate }: Candida
             </div>
 
             <Separator />
+
+            {/* Culture Fit Score */}
+            {cultureFitScore !== null && cultureFitLevel && (
+              <>
+                <div className={`p-4 rounded-xl ${cultureFitLevel.bgColor} border`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Heart className={`h-5 w-5 ${cultureFitLevel.textColor}`} />
+                      <span className="font-semibold">Culture Fit</span>
+                    </div>
+                    <span className={`text-2xl font-bold ${cultureFitLevel.textColor}`}>
+                      {cultureFitScore}%
+                    </span>
+                  </div>
+                  <Progress 
+                    value={cultureFitScore} 
+                    className="h-2 mb-3"
+                    style={{
+                      ['--progress-background' as any]: cultureFitLevel.color
+                    }}
+                  />
+                  <div className={`text-sm font-medium ${cultureFitLevel.textColor} mb-1`}>
+                    {cultureFitLevel.label}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Affinità basata sui valori condivisi tra te e il candidato
+                  </p>
+                </div>
+                <Separator />
+              </>
+            )}
 
             {/* Bio */}
             {candidate.bio && (
@@ -101,17 +146,22 @@ export const CandidateProfileModal = ({ open, onOpenChange, candidate }: Candida
               </div>
             </div>
 
-            {/* Valori culturali (placeholder) */}
-            <div>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-                VALORI CULTURALI
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline">Teamwork</Badge>
-                <Badge variant="outline">Innovation</Badge>
-                <Badge variant="outline">Growth Mindset</Badge>
+            {/* Valori culturali */}
+            {candidate.core_values && candidate.core_values.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  VALORI AZIENDALI
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {candidate.core_values.map((value: string, idx: number) => (
+                    <Badge key={idx} variant="outline" className="border-primary/30">
+                      {value}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ScrollArea>
       </SheetContent>

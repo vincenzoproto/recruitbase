@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
+import { CoreValuesSelector } from "@/components/ui/core-values-selector";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -36,6 +37,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     linkedin_url: profile.linkedin_url || "",
     phone_number: profile.phone_number || "",
   });
+  const [coreValues, setCoreValues] = useState<string[]>(profile.core_values || []);
 
   const uploadAvatar = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -88,6 +90,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           linkedin_url: formData.linkedin_url,
           phone_number: formData.phone_number,
           avatar_url: avatarUrl,
+          core_values: coreValues,
         })
         .eq("id", profile.id);
 
@@ -190,6 +193,11 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
               placeholder="es. JavaScript, React, Node.js"
             />
           </div>
+
+          <CoreValuesSelector
+            selectedValues={coreValues}
+            onChange={setCoreValues}
+          />
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">

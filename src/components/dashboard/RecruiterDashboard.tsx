@@ -269,7 +269,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
+      <OnboardingFlow 
+        open={showOnboarding} 
+        onComplete={handleOnboardingComplete}
+        userId={profile.id}
+      />
       <MeetingRequestDialog 
         userId={profile.id}
         open={meetingDialogOpen}
