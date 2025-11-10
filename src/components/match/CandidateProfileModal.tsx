@@ -36,7 +36,11 @@ export const CandidateProfileModal = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
+      <SheetContent 
+        side="bottom" 
+        className="h-[90vh] rounded-t-3xl"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>Profilo Candidato</SheetTitle>
         </SheetHeader>

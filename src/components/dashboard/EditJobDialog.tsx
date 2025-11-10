@@ -72,7 +72,10 @@ const EditJobDialog = ({ open, onOpenChange, job, onSuccess }: EditJobDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="max-w-2xl"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Modifica Offerta di Lavoro</DialogTitle>
           <DialogDescription>

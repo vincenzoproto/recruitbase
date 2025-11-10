@@ -76,7 +76,10 @@ export const JobApplicationsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent 
+        className="max-w-3xl max-h-[90vh]"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Candidature per: {jobTitle}</DialogTitle>
           <DialogDescription>
@@ -136,14 +139,22 @@ export const JobApplicationsDialog = ({
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => onOpenCandidateDetail(app.candidate.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onOpenCandidateDetail(app.candidate.id);
+                          }}
                         >
                           <User className="h-4 w-4 mr-1" />
                           Vedi Profilo
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => onOpenChat(app.candidate.id, app.candidate.full_name)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onOpenChat(app.candidate.id, app.candidate.full_name);
+                          }}
                         >
                           <MessageCircle className="h-4 w-4 mr-1" />
                           Contatta

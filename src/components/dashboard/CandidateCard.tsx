@@ -30,7 +30,11 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
           <Button
             variant={isFavorite ? "default" : "outline"}
             size="icon"
-            onClick={() => onToggleFavorite(candidate.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onToggleFavorite(candidate.id);
+            }}
           >
             <Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
           </Button>
@@ -62,7 +66,9 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
                   const path = candidate.cv_url.includes("/cvs/")
                     ? candidate.cv_url.split("/cvs/")[1]
                     : candidate.cv_url;
@@ -78,7 +84,11 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(candidate.linkedin_url, "_blank")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  window.open(candidate.linkedin_url, "_blank");
+                }}
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 LinkedIn
