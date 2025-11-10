@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, MapPin, Trophy, Briefcase, Sparkles, FileText } from "lucide-react";
+import { X, MapPin, Trophy, Heart, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useSwipe } from "@/hooks/use-swipe";
 import { hapticFeedback } from "@/lib/haptics";
@@ -116,22 +116,6 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
     minSwipeDistance: 100
   });
 
-  // Stop propagation to prevent page swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    swipeHandlers.onTouchStart(e);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    swipeHandlers.onTouchMove(e);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    swipeHandlers.onTouchEnd();
-  };
-
   if (loading) {
     return (
       <Card>
@@ -175,10 +159,8 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
       </div>
 
       <Card 
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="overflow-hidden touch-none cursor-grab active:cursor-grabbing transition-transform hover:scale-[1.02]"
+        {...swipeHandlers}
+        className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing transition-transform hover:scale-[1.02]"
       >
         <CardContent className="p-0">
           {/* Image/Header */}
@@ -283,7 +265,7 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
           onClick={handleMatch}
           className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-primary/80"
         >
-          <Briefcase className="h-10 w-10" />
+          <Heart className="h-10 w-10" />
         </Button>
       </div>
     </div>

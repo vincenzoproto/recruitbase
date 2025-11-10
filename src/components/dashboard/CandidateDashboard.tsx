@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
+import { TinderMatch } from "@/components/match/TinderMatch";
+import { MatchesList } from "@/components/match/MatchesList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipe } from "@/hooks/use-swipe";
 import { CVUploader } from "@/components/candidate/CVUploader";
@@ -40,7 +42,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
 
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
-    { id: 2, name: "Offerte", icon: "💼" },
+    { id: 1, name: "Match", icon: "💼" },
+    { id: 2, name: "Offerte", icon: "📋" },
     { id: 3, name: "Recruiter", icon: "👔" },
     { id: 4, name: "Profilo", icon: "👤" },
     { id: 5, name: "Gruppi", icon: "💬" },
@@ -322,6 +325,14 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                   </CardDescription>
                 </CardHeader>
               </Card>
+            </div>
+          )}
+
+          {/* Vista 1: Match */}
+          {(!isMobile || currentView === 1) && (
+            <div className="space-y-6 animate-fade-in">
+              <TinderMatch userId={profile.id} userRole="candidate" />
+              <MatchesList userId={profile.id} userRole="candidate" />
             </div>
           )}
 

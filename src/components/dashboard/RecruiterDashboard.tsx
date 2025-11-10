@@ -12,12 +12,14 @@ import StatsCard from "./StatsCard";
 import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
+import { TinderMatch } from "@/components/match/TinderMatch";
+import { MatchesList } from "@/components/match/MatchesList";
 import KanbanBoard from "../trm/KanbanBoard";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useSwipe } from "@/hooks/use-swipe";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useSwipe } from "@/hooks/use-swipe";
 import { LiveMetrics } from "@/components/premium/LiveMetrics";
 import { hapticFeedback } from "@/lib/haptics";
 import { KPIWidget } from "./KPIWidget";
@@ -466,6 +468,14 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                   userId={profile.id}
                 />
               )}
+            </div>
+          )}
+
+          {/* Vista 1: Match */}
+          {(!isMobile || currentView === 1) && (
+            <div className="space-y-6 animate-fade-in">
+              <TinderMatch userId={profile.id} userRole="recruiter" />
+              <MatchesList userId={profile.id} userRole="recruiter" />
             </div>
           )}
 
