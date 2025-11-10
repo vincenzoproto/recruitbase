@@ -1,7 +1,6 @@
 import { Heart, MessageCircle, LayoutDashboard, User, Briefcase, Kanban, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { hapticFeedback } from "@/lib/haptics";
-import { useSwipe } from "@/hooks/use-swipe";
 
 interface MobileBottomNavProps {
   activeTab: string;
@@ -44,27 +43,8 @@ export const MobileBottomNav = ({
     onTabChange(tabId);
   };
 
-  const currentIndex = navItems.findIndex(item => item.id === activeTab);
-
-  const swipeHandlers = useSwipe({
-    onSwipedLeft: () => {
-      if (currentIndex < navItems.length - 1) {
-        handleTabChange(navItems[currentIndex + 1].id);
-      }
-    },
-    onSwipedRight: () => {
-      if (currentIndex > 0) {
-        handleTabChange(navItems[currentIndex - 1].id);
-      }
-    },
-    minSwipeDistance: 50
-  });
-
   return (
-    <nav 
-      {...swipeHandlers}
-      className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50 safe-area-inset-bottom shadow-apple-md"
-    >
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50 safe-area-inset-bottom shadow-apple-md">
       <div className="flex items-center justify-around h-16 max-w-screen-lg mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;

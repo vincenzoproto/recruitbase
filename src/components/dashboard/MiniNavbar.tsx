@@ -2,50 +2,43 @@ import { BarChart3, MessageCircle, Kanban } from "lucide-react";
 import { hapticFeedback } from "@/lib/haptics";
 
 interface MiniNavbarProps {
-  onNavigate: (section: "home" | "match" | "feed" | "trm" | "profile") => void;
+  onNavigate: (section: "dashboard" | "chat" | "trm") => void;
   activeSection?: string;
 }
 
-export const MiniNavbar = ({ onNavigate, activeSection = "home" }: MiniNavbarProps) => {
+export const MiniNavbar = ({ onNavigate, activeSection = "dashboard" }: MiniNavbarProps) => {
   const items = [
-    { id: "home", icon: BarChart3, label: "Dashboard" },
-    { id: "match", icon: MessageCircle, label: "Chat" },
+    { id: "dashboard", icon: BarChart3, label: "Dashboard" },
+    { id: "chat", icon: MessageCircle, label: "Chat" },
     { id: "trm", icon: Kanban, label: "TRM" },
   ];
 
   const handleClick = (id: string) => {
     hapticFeedback.light();
-    onNavigate(id as "home" | "match" | "feed" | "trm" | "profile");
+    onNavigate(id as "dashboard" | "chat" | "trm");
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border safe-area-inset-top shadow-apple-sm">
-      <div className="flex items-center justify-around h-14 max-w-screen-lg mx-auto px-4">
-        {items.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeSection === item.id;
+    <div className="flex items-center justify-center gap-2 my-6 animate-fade-in">
+      {items.map((item) => {
+        const Icon = item.icon;
+        const isActive = activeSection === item.id;
 
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleClick(item.id)}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full gap-1 smooth-transition active:scale-95 ${
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Icon className={`h-6 w-6 smooth-transition ${isActive ? "scale-110" : ""}`} />
-              <span className={`text-[10px] font-medium smooth-transition ${isActive ? "font-bold" : ""}`}>
-                {item.label}
-              </span>
-              {isActive && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-t-full animate-scale-in" />
-              )}
-            </button>
-          );
-        })}
-      </div>
+        return (
+          <button
+            key={item.id}
+            onClick={() => handleClick(item.id)}
+            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl smooth-transition apple-button ${
+              isActive
+                ? "bg-primary text-primary-foreground shadow-apple-sm"
+                : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+            }`}
+          >
+            <Icon className={`h-5 w-5 ${isActive ? "scale-110" : ""} smooth-transition`} />
+            <span className="text-[10px] font-semibold">{item.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 };
