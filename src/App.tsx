@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Social from "./pages/Social";
 import SearchProfiles from "./pages/SearchProfiles";
 import ScoreInfo from "./pages/ScoreInfo";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Auth />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/landing" element={<Index />} />
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/index" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/invite/:code" element={<Invite />} />
           <Route path="/invite" element={<InviteRef />} />

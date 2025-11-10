@@ -52,11 +52,13 @@ interface RecruiterDashboardProps {
 
 const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Feed, 2: Match, 3: Candidati, 4: Pipeline, 5: Offerte, 6: Insights, 7: Gruppi Chat
-  const [miniNavSection, setMiniNavSection] = useState<"dashboard" | "chat" | "trm">("dashboard");
+  const [activeView, setActiveView] = useState("home");
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [showMiniNav, setShowMiniNav] = useState(true);
+  const isMobile = useIsMobile();
+  const { unreadCount } = useMessageNotifications(profile.id);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
