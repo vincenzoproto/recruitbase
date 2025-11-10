@@ -12,6 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Upload, FileText } from "lucide-react";
 import { CoreValuesSelector } from "@/components/ui/core-values-selector";
@@ -39,14 +46,15 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     skills: profile.skills?.join(", ") || "",
     linkedin_url: profile.linkedin_url || "",
     phone_number: profile.phone_number || "",
-    years_experience: profile.years_experience || "",
+    years_experience: profile.years_experience || 0,
     education: profile.education || "",
-    languages: profile.languages?.join(", ") || "",
+    languages: profile.languages || "",
     availability: profile.availability || "",
     work_preference: profile.work_preference || "",
     expected_salary: profile.expected_salary || "",
     company_size: profile.company_size || "",
     industry: profile.industry || "",
+    degree_title: profile.degree_title || "",
   });
   const [coreValues, setCoreValues] = useState<string[]>(profile.core_values || []);
 
@@ -143,14 +151,15 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           avatar_url: avatarUrl,
           cv_url: cvUrl || null,
           core_values: coreValues,
-          years_experience: formData.years_experience || null,
-          education: formData.education || null,
-          languages: languagesArray.length > 0 ? languagesArray : null,
+          years_experience: formData.years_experience || 0,
+          education: formData.education || "",
+          languages: formData.languages || "",
           availability: formData.availability || null,
           work_preference: formData.work_preference || null,
           expected_salary: formData.expected_salary || null,
-          company_size: formData.company_size || null,
-          industry: formData.industry || null,
+          company_size: formData.company_size || "",
+          industry: formData.industry || "",
+          degree_title: formData.degree_title || "",
         })
         .eq("id", profile.id);
 
@@ -348,9 +357,11 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
               <Label htmlFor="years_experience">Anni di Esperienza</Label>
               <Input
                 id="years_experience"
+                type="number"
+                min="0"
                 value={formData.years_experience}
-                onChange={(e) => setFormData({ ...formData, years_experience: e.target.value })}
-                placeholder="es. 5 anni"
+                onChange={(e) => setFormData({ ...formData, years_experience: parseInt(e.target.value) || 0 })}
+                placeholder="es. 5"
               />
             </div>
 
@@ -363,6 +374,16 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
                 placeholder="es. Laurea in Informatica"
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="degree_title">Titolo Accademico Completo</Label>
+            <Input
+              id="degree_title"
+              value={formData.degree_title}
+              onChange={(e) => setFormData({ ...formData, degree_title: e.target.value })}
+              placeholder="es. Laurea Magistrale in Ingegneria Informatica"
+            />
           </div>
 
           <div className="space-y-2">
@@ -416,12 +437,22 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="company_size">Dimensione Azienda</Label>
-                  <Input
-                    id="company_size"
+                  <Select
                     value={formData.company_size}
-                    onChange={(e) => setFormData({ ...formData, company_size: e.target.value })}
-                    placeholder="es. 50-100 dipendenti"
-                  />
+                    onValueChange={(value) => setFormData({ ...formData, company_size: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleziona dimensione" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      <SelectItem value="1-10">1-10 dipendenti</SelectItem>
+                      <SelectItem value="11-50">11-50 dipendenti</SelectItem>
+                      <SelectItem value="51-200">51-200 dipendenti</SelectItem>
+                      <SelectItem value="201-500">201-500 dipendenti</SelectItem>
+                      <SelectItem value="501-1000">501-1000 dipendenti</SelectItem>
+                      <SelectItem value="1001+">1001+ dipendenti</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">

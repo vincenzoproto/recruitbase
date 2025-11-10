@@ -91,7 +91,7 @@ export const SidebarMenu = ({
     premium: MenuItem[];
     enterprise: MenuItem[];
     settings: MenuItem[];
-  } = {
+  } = role === "recruiter" ? {
     main: [
       { 
         id: "profile", 
@@ -107,9 +107,9 @@ export const SidebarMenu = ({
         requiredPlan: "Pro"
       },
       { 
-        id: role === "recruiter" ? "offers" : "applications", 
+        id: "offers", 
         icon: Briefcase, 
-        label: role === "recruiter" ? "Gestione offerte" : "Le mie candidature", 
+        label: "Gestione offerte", 
         locked: false 
       },
       { 
@@ -135,7 +135,7 @@ export const SidebarMenu = ({
         requiredPlan: "Business"
       },
     ],
-    enterprise: role === "recruiter" ? [
+    enterprise: [
       { 
         id: "team", 
         icon: UserCog, 
@@ -143,7 +143,73 @@ export const SidebarMenu = ({
         locked: planType !== "enterprise",
         requiredPlan: "Enterprise"
       },
-    ] : [],
+    ],
+    settings: [
+      { 
+        id: "settings", 
+        icon: Settings, 
+        label: "Impostazioni account", 
+        locked: false 
+      },
+      { 
+        id: "billing", 
+        icon: CreditCard, 
+        label: "Abbonamenti e fatture", 
+        locked: false 
+      },
+      { 
+        id: "support", 
+        icon: HelpCircle, 
+        label: "Supporto & FAQ", 
+        locked: false 
+      },
+    ]
+  } : {
+    // Candidate menu
+    main: [
+      { 
+        id: "profile", 
+        icon: User, 
+        label: "Profilo personale", 
+        locked: false 
+      },
+      { 
+        id: "applications", 
+        icon: Briefcase, 
+        label: "Le mie candidature", 
+        locked: false 
+      },
+      { 
+        id: "copilot", 
+        icon: Brain, 
+        label: "Copilot CV & Lettera AI", 
+        locked: planType === "free",
+        requiredPlan: "Pro"
+      },
+      { 
+        id: "notifications-archive", 
+        icon: Bell, 
+        label: "Notifiche archiviate", 
+        locked: false 
+      },
+    ],
+    premium: [
+      { 
+        id: "feed", 
+        icon: Users, 
+        label: "Feed sociale", 
+        locked: planType === "free",
+        requiredPlan: "Pro"
+      },
+      { 
+        id: "analytics", 
+        icon: TrendingUp, 
+        label: "Statistiche carriera", 
+        locked: planType === "free" || planType === "pro",
+        requiredPlan: "Premium"
+      },
+    ],
+    enterprise: [],
     settings: [
       { 
         id: "settings", 

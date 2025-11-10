@@ -66,7 +66,7 @@ export const usePremiumFeatures = (userId: string | undefined): PremiumFeatures 
     };
   }, [userId]);
 
-  // Feature matrix based on plan
+  // Feature matrix based on plan (adjusted for candidates)
   const features: Record<PlanType, PremiumFeatures> = {
     free: {
       planType: "free",
@@ -82,7 +82,7 @@ export const usePremiumFeatures = (userId: string | undefined): PremiumFeatures 
     pro: {
       planType: "pro",
       canAccessCopilot: true,
-      canAccessFeed: false,
+      canAccessFeed: true, // Candidates get feed access at Pro
       canAccessAnalytics: false,
       canAccessTeamManagement: false,
       maxJobOffers: -1, // unlimited

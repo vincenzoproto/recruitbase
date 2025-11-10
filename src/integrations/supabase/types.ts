@@ -1093,13 +1093,17 @@ export type Database = {
           core_values: string[] | null
           created_at: string | null
           cv_url: string | null
+          degree_title: string | null
+          education: string | null
           email_verified: boolean | null
           engagement_score: number | null
           full_name: string
           id: string
+          industry: string | null
           is_favorite: boolean | null
           is_premium: boolean | null
           job_title: string | null
+          languages: string | null
           last_contact_date: string | null
           linkedin_url: string | null
           linkedin_verified: boolean | null
@@ -1112,6 +1116,7 @@ export type Database = {
           talent_relationship_score: number | null
           trs_last_updated: string | null
           updated_at: string | null
+          years_experience: number | null
         }
         Insert: {
           availability?: string | null
@@ -1122,13 +1127,17 @@ export type Database = {
           core_values?: string[] | null
           created_at?: string | null
           cv_url?: string | null
+          degree_title?: string | null
+          education?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
           full_name: string
           id: string
+          industry?: string | null
           is_favorite?: boolean | null
           is_premium?: boolean | null
           job_title?: string | null
+          languages?: string | null
           last_contact_date?: string | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
@@ -1141,6 +1150,7 @@ export type Database = {
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
           updated_at?: string | null
+          years_experience?: number | null
         }
         Update: {
           availability?: string | null
@@ -1151,13 +1161,17 @@ export type Database = {
           core_values?: string[] | null
           created_at?: string | null
           cv_url?: string | null
+          degree_title?: string | null
+          education?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
           full_name?: string
           id?: string
+          industry?: string | null
           is_favorite?: boolean | null
           is_premium?: boolean | null
           job_title?: string | null
+          languages?: string | null
           last_contact_date?: string | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
@@ -1170,6 +1184,7 @@ export type Database = {
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
           updated_at?: string | null
+          years_experience?: number | null
         }
         Relationships: [
           {
