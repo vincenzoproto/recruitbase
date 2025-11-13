@@ -1,60 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, CheckCircle2, Mail, Linkedin, Crown, Users } from "lucide-react";
+import { Award } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-type BadgeType = 
-  | 'profile_complete'
-  | 'first_application'
-  | 'email_verified'
-  | 'linkedin_verified'
-  | 'premium_user'
-  | 'ambassador';
-
-interface Achievement {
-  badge_type: BadgeType;
-  earned_at: string;
-}
-
-const badgeConfig: Record<BadgeType, { icon: any; label: string; color: string; description: string }> = {
-  profile_complete: {
-    icon: CheckCircle2,
-    label: "Profilo Completo",
-    color: "text-green-500",
-    description: "Hai completato il tuo profilo"
-  },
-  first_application: {
-    icon: Award,
-    label: "Prima Candidatura",
-    color: "text-blue-500",
-    description: "Hai inviato la tua prima candidatura"
-  },
-  email_verified: {
-    icon: Mail,
-    label: "Email Verificata",
-    color: "text-purple-500",
-    description: "Hai verificato il tuo indirizzo email"
-  },
-  linkedin_verified: {
-    icon: Linkedin,
-    label: "LinkedIn Connesso",
-    color: "text-blue-600",
-    description: "Hai collegato il tuo profilo LinkedIn"
-  },
-  premium_user: {
-    icon: Crown,
-    label: "Utente Premium",
-    color: "text-yellow-500",
-    description: "Sei un membro premium"
-  },
-  ambassador: {
-    icon: Users,
-    label: "Ambassador",
-    color: "text-primary",
-    description: "Sei un ambassador attivo"
-  }
-};
+import { BADGE_CONFIG } from "@/lib/constants/badges";
+import type { Achievement, BadgeType } from "@/types";
 
 export const BadgeDisplay = ({ userId }: { userId: string }) => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -66,12 +16,13 @@ export const BadgeDisplay = ({ userId }: { userId: string }) => {
 
   const loadAchievements = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("achievements")
         .select("*")
         .eq("user_id", userId)
         .order("earned_at", { ascending: false });
 
+      if (error) throw error;
       setAchievements((data || []) as Achievement[]);
     } catch (error) {
       console.error("Error loading achievements:", error);
@@ -97,7 +48,7 @@ export const BadgeDisplay = ({ userId }: { userId: string }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {achievements.map((achievement) => {
-          const config = badgeConfig[achievement.badge_type as BadgeType];
+          const config = BADGE_CONFIG[achievement.badge_type];
           if (!config) {
             console.warn(`Unknown badge type: ${achievement.badge_type}`);
             return null;

@@ -5,15 +5,51 @@ import { MapPin, Briefcase, ExternalLink, Star, FileText } from "lucide-react";
 import { ContactButtons } from "@/components/candidate/ContactButtons";
 import { MeetingScheduler } from "@/components/mobile/MeetingScheduler";
 import { supabase } from "@/integrations/supabase/client";
+import { memo, useCallback } from "react";
+import type { Profile } from "@/types";
 
 interface CandidateCardProps {
-  candidate: any;
+  candidate: Profile;
   currentUserId: string;
   onToggleFavorite: (candidateId: string) => void;
   isFavorite: boolean;
 }
 
-const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite }: CandidateCardProps) => {
+const CandidateCard = memo(({ candidate, currentUserId, onToggleFavorite, isFavorite }: CandidateCardProps) => {
+  const handleCVOpen = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    if (!candidate.cv_url) return;
+    
+    try {
+      // Handle both full URLs and storage paths
+      if (candidate.cv_url.startsWith('http')) {
+        window.open(candidate.cv_url, "_blank");
+        return;
+      }
+
+      const path = candidate.cv_url.includes("/cvs/")
+        ? candidate.cv_url.split("/cvs/")[1]
+        : candidate.cv_url;
+        
+      const { data, error } = await supabase.storage
+        .from("cvs")
+        .createSignedUrl(path, 60);
+        
+      if (!error && data) {
+        window.open(data.signedUrl, "_blank");
+      }
+    } catch (error) {
+      console.error('Error opening CV:', error);
+    }
+  }, [candidate.cv_url]);
+
+  const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onToggleFavorite(candidate.id);
+  }, [candidate.id, onToggleFavorite]);
   return (
     <Card className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50">
       <CardHeader className="pb-3">
@@ -30,11 +66,8 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
           <Button
             variant={isFavorite ? "default" : "outline"}
             size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onToggleFavorite(candidate.id);
-            }}
+            onClick={handleFavoriteToggle}
+            aria-label={isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
           >
             <Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
           </Button>
@@ -66,15 +99,8 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  const path = candidate.cv_url.includes("/cvs/")
-                    ? candidate.cv_url.split("/cvs/")[1]
-                    : candidate.cv_url;
-                  const { data, error } = await supabase.storage.from("cvs").createSignedUrl(path, 60);
-                  if (!error && data) window.open(data.signedUrl, "_blank");
-                }}
+                onClick={handleCVOpen}
+                aria-label="Visualizza CV"
               >
                 <FileText className="mr-2 h-4 w-4" />
                 CV
@@ -112,6 +138,8 @@ const CandidateCard = ({ candidate, currentUserId, onToggleFavorite, isFavorite 
       </CardContent>
     </Card>
   );
-};
+});
+
+CandidateCard.displayName = 'CandidateCard';
 
 export default CandidateCard;

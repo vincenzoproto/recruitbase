@@ -3,66 +3,38 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Euro, Users, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface AmbassadorStats {
-  referralCode: string;
-  totalReferrals: number;
-  activeReferrals: number;
-  totalEarnings: number;
-  pendingEarnings: number;
-}
+import { useCallback, useMemo } from "react";
+import { useAmbassadorStats } from "@/hooks/useAmbassadorStats";
 
 export const AmbassadorPanel = ({ userId }: { userId: string }) => {
-  const [stats, setStats] = useState<AmbassadorStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { stats, loading } = useAmbassadorStats(userId);
 
-  useEffect(() => {
-    loadStats();
-  }, [userId]);
-
-  const loadStats = async () => {
-    try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("referral_code")
-        .eq("id", userId)
-        .single();
-
-      const { data: referrals } = await supabase
-        .from("ambassador_referrals")
-        .select("*")
-        .eq("ambassador_id", userId);
-
-      const { data: earnings } = await supabase
-        .from("ambassador_earnings")
-        .select("*")
-        .eq("ambassador_id", userId);
-
-      setStats({
-        referralCode: profile?.referral_code || "",
-        totalReferrals: referrals?.length || 0,
-        activeReferrals: referrals?.filter(r => r.status === "active").length || 0,
-        totalEarnings: earnings?.filter(e => e.status === "paid").reduce((sum, e) => sum + e.amount, 0) || 0,
-        pendingEarnings: earnings?.filter(e => e.status === "pending").reduce((sum, e) => sum + e.amount, 0) || 0,
-      });
-    } catch (error) {
-      console.error("Error loading ambassador stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const copyReferralLink = () => {
+  const referralLink = useMemo(() => {
+    if (!stats?.referralCode) return '';
     const origin = window.location.origin || "https://recruitbase.lovable.app";
-    const link = `${origin}/invite/${stats?.referralCode}`;
-    navigator.clipboard.writeText(link);
+    return `${origin}/invite/${stats.referralCode}`;
+  }, [stats?.referralCode]);
+
+  const copyReferralLink = useCallback(() => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink);
     toast.success("Link copiato! Condividilo per guadagnare 10€ per ogni referral attivo");
-  };
+  }, [referralLink]);
 
   if (loading) {
-    return <div className="animate-pulse h-64 bg-muted rounded-lg" />;
+    return (
+      <Card className="p-6 glass-card border-primary/20">
+        <div className="space-y-4 animate-pulse">
+          <div className="h-6 bg-muted rounded w-1/3" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="h-24 bg-muted rounded" />
+            <div className="h-24 bg-muted rounded" />
+            <div className="h-24 bg-muted rounded" />
+          </div>
+          <div className="h-10 bg-muted rounded" />
+        </div>
+      </Card>
+    );
   }
 
   return (
@@ -115,11 +87,17 @@ export const AmbassadorPanel = ({ userId }: { userId: string }) => {
           <div className="flex gap-2">
             <input
               type="text"
-              value={`https://recruitbase.app/invite/${stats?.referralCode}`}
+              value={referralLink}
               readOnly
               className="flex-1 px-4 py-2 rounded-lg border bg-background/50 text-sm"
             />
-            <Button onClick={copyReferralLink} size="sm" className="apple-button">
+            <Button 
+              onClick={copyReferralLink} 
+              size="sm" 
+              className="apple-button"
+              disabled={!referralLink}
+              aria-label="Copia link referral"
+            >
               <Copy className="h-4 w-4" />
             </Button>
           </div>
