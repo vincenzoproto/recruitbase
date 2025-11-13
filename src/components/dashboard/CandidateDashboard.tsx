@@ -464,63 +464,11 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </Card>
           )}
 
-          {/* Vista 2: Feed */}
+          {/* Vista 2: Feed SOLO */}
           {(!isMobile || currentView === 2) && (
             <div className="animate-fade-in">
               <FeedWithTabs />
             </div>
-          )}
-
-          {/* Vista 2: Offerte */}
-          {(!isMobile || currentView === 2) && (
-            <Card className="animate-fade-in">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    Offerte Disponibili
-                  </CardTitle>
-                  <CardDescription>
-                    {jobOffers.length === 0
-                      ? "Nessuna offerta disponibile al momento"
-                      : `${jobOffers.length} offerte disponibili`}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <SearchFilters userRole="candidate" onSearch={handleSearch} />
-                <div className="grid gap-4 md:grid-cols-2">
-                  {filteredJobs.length === 0 ? (
-                    <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                      <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                        <Briefcase className="h-10 w-10 text-primary" />
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-lg font-semibold text-foreground">Nessuna offerta trovata</p>
-                        <p className="text-sm text-muted-foreground">
-                          {jobOffers.length === 0
-                            ? "Torna più tardi per scoprire nuove opportunità"
-                            : "Prova a modificare i filtri di ricerca"}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    filteredJobs.map((job) => {
-                      const hasApplied = applications.some((app) => app.job_offer_id === job.id);
-                      return (
-                        <JobOfferCard
-                          key={job.id}
-                          job={job}
-                          onApply={() => handleApply(job.id)}
-                          hasApplied={hasApplied}
-                          isCandidate
-                        />
-                      );
-                    })
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           )}
 
           {/* Vista 3: Carriera (Messaggi + Stats) */}

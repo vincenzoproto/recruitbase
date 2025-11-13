@@ -109,7 +109,7 @@ export const SidebarMenu = ({
         id: "copilot", 
         icon: Brain, 
         label: "Copilot AI", 
-        locked: planType === "free",
+        locked: !canAccessFeature(planType, 'pro'),
         requiredPlan: "Pro"
       },
       { 
@@ -121,7 +121,7 @@ export const SidebarMenu = ({
       { 
         id: "notifications-archive", 
         icon: Bell, 
-        label: "Notifiche archiviate", 
+        label: "Archivio notifiche", 
         locked: false 
       },
     ],
@@ -130,14 +130,14 @@ export const SidebarMenu = ({
         id: "feed", 
         icon: Users, 
         label: "Feed sociale", 
-        locked: planType === "free" || planType === "pro",
+        locked: !canAccessFeature(planType, 'business'),
         requiredPlan: "Business"
       },
       { 
         id: "analytics", 
         icon: TrendingUp, 
         label: "Analytics & Insight", 
-        locked: planType === "free" || planType === "pro",
+        locked: !canAccessFeature(planType, 'business'),
         requiredPlan: "Business"
       },
     ],
@@ -145,8 +145,8 @@ export const SidebarMenu = ({
       { 
         id: "team", 
         icon: UserCog, 
-        label: "Team HR / Gestione Recruiter", 
-        locked: planType !== "enterprise",
+        label: "Gestione Team", 
+        locked: !canAccessFeature(planType, 'enterprise'),
         requiredPlan: "Enterprise"
       },
     ],

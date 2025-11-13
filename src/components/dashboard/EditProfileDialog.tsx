@@ -22,11 +22,13 @@ import {
 import { toast } from "sonner";
 import { Upload, FileText } from "lucide-react";
 import { CoreValuesSelector } from "@/components/ui/core-values-selector";
+import { cvManager } from "@/lib/cvManager";
+import type { Profile } from "@/types";
 
 interface EditProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  profile: any;
+  profile: Profile;
   onSuccess: () => void;
 }
 
