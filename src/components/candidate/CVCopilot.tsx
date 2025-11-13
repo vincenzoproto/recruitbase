@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -8,19 +8,38 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Sparkles, Copy, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import type { Profile } from "@/types";
 
 interface CVCopilotProps {
-  profile: any;
+  profile: Profile;
 }
+
+type CopilotMode = "analyze" | "letter" | "suggestions";
+type ToneType = "professional" | "friendly" | "enthusiastic";
 
 export const CVCopilot = ({ profile }: CVCopilotProps) => {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"analyze" | "letter" | "suggestions">("analyze");
-  const [tone, setTone] = useState("professional");
+  const [mode, setMode] = useState<CopilotMode>("analyze");
+  const [tone, setTone] = useState<ToneType>("professional");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const analyzeProfile = async () => {
+  const canGenerateSuggestions = useMemo(() => {
+    return Boolean(profile.job_title && profile.skills && profile.skills.length > 0);
+  }, [profile.job_title, profile.skills]);
+
+  const handleAIError = useCallback((error: any) => {
+    console.error("AI Error:", error);
+    if (error.status === 429) {
+      toast.error("Troppi suggerimenti richiesti, riprova tra poco.");
+    } else if (error.status === 402) {
+      toast.error("Crediti AI esauriti, contatta il supporto.");
+    } else {
+      toast.error("Errore nella richiesta AI");
+    }
+  }, []);
+
+  const analyzeProfile = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("ai-insights", {
@@ -38,21 +57,20 @@ export const CVCopilot = ({ profile }: CVCopilotProps) => {
       });
 
       if (error) throw error;
-      setResult(data.insights || "Nessun suggerimento disponibile.");
+      
+      if (!data || !data.insights) {
+        setResult("Nessun suggerimento disponibile. Prova a completare il tuo profilo.");
+        return;
+      }
+      
+      setResult(data.insights);
       toast.success("✅ Analisi completata!");
     } catch (error: any) {
-      console.error("Error analyzing profile:", error);
-      if (error.status === 429) {
-        toast.error("Troppi suggerimenti richiesti, riprova tra poco.");
-      } else if (error.status === 402) {
-        toast.error("Crediti AI esauriti, contatta il supporto.");
-      } else {
-        toast.error("Errore nell'analisi del profilo");
-      }
+      handleAIError(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile, handleAIError]);
 
   const generateLetter = async () => {
     setLoading(true);
@@ -189,7 +207,7 @@ export const CVCopilot = ({ profile }: CVCopilotProps) => {
           {mode === "letter" && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Tono</label>
-              <Select value={tone} onValueChange={setTone}>
+              <Select value={tone} onValueChange={(value) => setTone(value as ToneType)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

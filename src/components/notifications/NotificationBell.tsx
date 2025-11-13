@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,19 +8,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-
-interface Notification {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  read: boolean;
-  created_at: string;
-  link?: string;
-}
+import { toast } from "sonner";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface NotificationBellProps {
   userId: string;
@@ -38,94 +28,16 @@ export const NotificationBell = ({
   onMatchNotificationClick 
 }: NotificationBellProps) => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    loadNotifications();
-
-    // Real-time subscription
-    const channel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
-          // Toast notification
-          toast.success(newNotification.title, {
-            description: newNotification.message,
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
-
-  const loadNotifications = async () => {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (error) {
-      console.error('Error loading notifications:', error);
-      return;
-    }
-
-    if (data) {
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
-    }
-  };
-
-  const markAsRead = async (notificationId: string) => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', notificationId);
-
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  };
-
-  const markAllAsRead = async () => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', userId)
-      .eq('read', false);
-
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    setUnreadCount(0);
-  };
-
-  const getTimeAgo = (timestamp: string) => {
-    const now = new Date();
-    const then = new Date(timestamp);
-    const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-    if (seconds < 60) return 'ora';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m fa`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h fa`;
-    return `${Math.floor(seconds / 86400)}g fa`;
-  };
+  
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    getTimeAgo
+  } = useNotifications(userId);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -180,7 +92,7 @@ export const NotificationBell = ({
                       if (notification.link) {
                         onApplicationNotificationClick?.(notification.link);
                       }
-                    } else if (notification.type === 'match_found') {
+                    } else if (notification.type === 'match' || notification.type === 'match_found') {
                       if (notification.link) {
                         onMatchNotificationClick?.(notification.link);
                       }

@@ -19,9 +19,11 @@ import {
   Crown,
   Heart
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
 import { hapticFeedback } from "@/lib/haptics";
+import { FEATURES, canAccessFeature, STRIPE_PRO_LINK } from "@/lib/constants/features";
+import type { PlanType } from "@/types";
 
 interface SidebarMenuProps {
   open: boolean;
@@ -29,14 +31,14 @@ interface SidebarMenuProps {
   fullName: string;
   avatarUrl?: string;
   role: "recruiter" | "candidate";
-  planType: "free" | "pro" | "business" | "enterprise";
+  planType: PlanType;
   trsScore?: number;
   cultureFit?: number;
   onNavigate: (section: string) => void;
   onLogout: () => void;
 }
 
-const planBadgeConfig = {
+const planBadgeConfig: Record<PlanType, { label: string; color: string }> = {
   free: { label: "Free", color: "bg-muted text-muted-foreground" },
   pro: { label: "Pro", color: "bg-gradient-to-r from-blue-500 to-blue-600 text-white" },
   business: { label: "Business", color: "bg-gradient-to-r from-purple-500 to-purple-600 text-white" },
@@ -58,26 +60,29 @@ export const SidebarMenu = ({
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const [lockedFeature, setLockedFeature] = useState<{ name: string; plan: string } | null>(null);
 
-  const initials = fullName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = useMemo(() => 
+    fullName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2),
+    [fullName]
+  );
 
   const planBadge = planBadgeConfig[planType];
 
-  const handleLockedFeatureClick = (featureName: string, requiredPlan: string) => {
+  const handleLockedFeatureClick = useCallback((featureName: string, requiredPlan: string) => {
     hapticFeedback.light();
     setLockedFeature({ name: featureName, plan: requiredPlan });
     setShowUpgradePopup(true);
-  };
+  }, []);
 
-  const handleUpgrade = () => {
+  const handleUpgrade = useCallback(() => {
     hapticFeedback.medium();
-    window.open("https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00", "_blank");
+    window.open(STRIPE_PRO_LINK, "_blank");
     setShowUpgradePopup(false);
-  };
+  }, []);
 
   interface MenuItem {
     id: string;
