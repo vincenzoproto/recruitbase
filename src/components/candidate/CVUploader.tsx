@@ -11,45 +11,19 @@ interface CVUploaderProps {
 }
 
 export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploaderProps) => {
-  const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const { uploadCV, openCV, deleteCV, uploading } = useCVManager(userId);
 
   const uploadFile = async (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File troppo grande. Max 5MB");
-      return;
-    }
-
-    if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-      toast.error("Solo file PDF sono supportati");
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const fileName = `${userId}/cv_${Date.now()}.pdf`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("cvs")
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { error: updateError } = await supabase
+    const cvPath = await uploadCV(file);
+    if (cvPath) {
+      await supabase
         .from("profiles")
-        .update({ cv_url: fileName })
+        .update({ cv_url: cvPath })
         .eq("id", userId);
-
-      if (updateError) throw updateError;
-
-      onUploadComplete(fileName);
-      toast.success("CV caricato con successo!");
-    } catch (error) {
-      console.error("Error uploading CV:", error);
-      toast.error("Errore nel caricamento del CV");
-    } finally {
-      setUploading(false);
+      
+      onUploadComplete();
     }
   };
 
@@ -99,20 +73,16 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
   };
 
   const handleDelete = async () => {
-    try {
-      const fileName = `${userId}/cv.pdf`;
-      await supabase.storage.from("cvs").remove([fileName]);
+    if (!currentCvUrl) return;
 
+    const success = await deleteCV(currentCvUrl);
+    if (success) {
       await supabase
         .from("profiles")
         .update({ cv_url: null })
         .eq("id", userId);
-
-      onUploadComplete("");
-      toast.success("CV eliminato");
-    } catch (error) {
-      console.error("Error deleting CV:", error);
-      toast.error("Errore nell'eliminazione");
+      
+      onUploadComplete();
     }
   };
 
