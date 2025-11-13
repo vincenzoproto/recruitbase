@@ -415,6 +415,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           else if (section === "billing") navigate("/plans");
           else if (section === "settings") setEditProfileOpen(true);
           else if (section === "notifications-archive") setCurrentView(10);
+          else if (section === "privacy") navigate("/privacy");
+          else if (section === "terms") navigate("/terms");
+          else if (section === "contact") navigate("/contact");
+          else if (section === "support") navigate("/contact");
         }}
         onLogout={handleSignOut}
       />

@@ -171,8 +171,33 @@ const KanbanBoard = ({ onOpenChat }: KanbanBoardProps) => {
       setCandidates(prev =>
         prev.map(c => c.id === candidateId ? { ...c, is_favorite: !c.is_favorite } : c)
       );
+      
+      toast.success(!candidate.is_favorite ? "⭐ Aggiunto ai preferiti" : "Rimosso dai preferiti");
     } catch (error) {
       console.error('Error toggling favorite:', error);
+    }
+  };
+
+  const handleQuickFeedback = async (candidateId: string, feedbackType: 'interesting' | 'review' | 'not_suitable') => {
+    try {
+      await supabase.from('interactions').insert({
+        candidate_id: candidateId,
+        recruiter_id: recruiterId,
+        type: 'feedback',
+        content: feedbackType,
+        metadata: { feedback_type: feedbackType, timestamp: new Date().toISOString() }
+      });
+
+      const messages = {
+        interesting: 'Candidato interessante 👍',
+        review: 'Da rivedere 📝',
+        not_suitable: 'Non idoneo ❌'
+      };
+
+      toast.success(messages[feedbackType]);
+    } catch (error) {
+      console.error('Error adding feedback:', error);
+      toast.error('Errore nel salvare il feedback');
     }
   };
 
@@ -221,17 +246,56 @@ const KanbanBoard = ({ onOpenChat }: KanbanBoardProps) => {
                       <User className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium text-sm">{candidate.full_name}</span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(candidate.id);
-                      }}
-                    >
-                      <Star className={`h-4 w-4 ${candidate.is_favorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        title="Interessante"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickFeedback(candidate.id, 'interesting');
+                        }}
+                      >
+                        👍
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        title="Da rivedere"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickFeedback(candidate.id, 'review');
+                        }}
+                      >
+                        📝
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        title="Non idoneo"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickFeedback(candidate.id, 'not_suitable');
+                        }}
+                      >
+                        ❌
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        title="Preferito"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(candidate.id);
+                        }}
+                      >
+                        <Star className={`h-4 w-4 ${candidate.is_favorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                      </Button>
+                    </div>
                   </div>
 
                   {candidate.job_title && (
