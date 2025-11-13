@@ -7,14 +7,26 @@ import { toast } from "sonner";
 import { Copy, Gift, Users, Euro, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+interface Referral {
+  id: string;
+  status: string;
+  signup_date: string;
+  referred_user_id: string;
+}
+
+interface Earning {
+  amount: number;
+  status: string;
+}
+
 interface AmbassadorSectionProps {
   userId: string;
   referralCode: string;
 }
 
 const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => {
-  const [referrals, setReferrals] = useState<any[]>([]);
-  const [earnings, setEarnings] = useState<any[]>([]);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [earnings, setEarnings] = useState<Earning[]>([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [pendingEarnings, setPendingEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -39,8 +51,12 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
         .order("created_at", { ascending: false })
         .limit(10);
 
-      if (refError) throw refError;
-      setReferrals(referralData || []);
+      if (refError) {
+        console.error("Error loading referrals:", refError);
+        toast.error("Errore nel caricamento dei referral");
+      } else {
+        setReferrals(referralData || []);
+      }
 
       // Carica earnings (solo campi essenziali)
       const { data: earningsData, error: earnError } = await supabase
@@ -48,17 +64,22 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
         .select("amount, status")
         .eq("ambassador_id", userId);
 
-      if (earnError) throw earnError;
-      setEarnings(earningsData || []);
-
-      // Calculate totals
-      const total = earningsData?.reduce((sum, e) => sum + parseFloat(e.amount.toString()), 0) || 0;
-      const pending = earningsData?.filter(e => e.status === "pending").reduce((sum, e) => sum + parseFloat(e.amount.toString()), 0) || 0;
-      
-      setTotalEarnings(total);
-      setPendingEarnings(pending);
+      if (earnError) {
+        console.error("Error loading earnings:", earnError);
+        toast.error("Errore nel caricamento dei guadagni");
+      } else {
+        setEarnings(earningsData || []);
+        
+        // Calculate totals
+        const total = earningsData?.reduce((sum, e) => sum + parseFloat(e.amount.toString()), 0) || 0;
+        const pending = earningsData?.filter(e => e.status === "pending").reduce((sum, e) => sum + parseFloat(e.amount.toString()), 0) || 0;
+        
+        setTotalEarnings(total);
+        setPendingEarnings(pending);
+      }
     } catch (error) {
       console.error("Error loading ambassador data:", error);
+      toast.error("Errore nel caricamento dei dati ambassador");
     } finally {
       setLoading(false);
     }
@@ -94,7 +115,9 @@ const AmbassadorSection = ({ userId, referralCode }: AmbassadorSectionProps) => 
     }
   };
 
-  const completedReferrals = referrals.filter(r => r.status === "completed" || r.status === "paid").length;
+  const completedReferrals = referrals.filter(r => 
+    r.status === "completed" || r.status === "paid" || r.status === "active"
+  ).length;
 
   return (
     <Card className="border-none shadow-lg bg-gradient-to-br from-card via-card to-accent/10">

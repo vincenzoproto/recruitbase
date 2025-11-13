@@ -27,13 +27,15 @@ interface EditJobDialogProps {
   onSuccess: () => void;
 }
 
+type ExperienceLevel = "entry" | "junior" | "mid" | "senior" | "lead";
+
 const EditJobDialog = ({ open, onOpenChange, job, onSuccess }: EditJobDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: job?.title || "",
     city: job?.city || "",
     sector: job?.sector || "",
-    experience_level: job?.experience_level || "junior",
+    experience_level: (job?.experience_level || "mid") as ExperienceLevel,
     description: job?.description || "",
   });
 
@@ -123,7 +125,7 @@ const EditJobDialog = ({ open, onOpenChange, job, onSuccess }: EditJobDialogProp
             <Select
               value={formData.experience_level}
               onValueChange={(value) =>
-                setFormData({ ...formData, experience_level: value })
+                setFormData({ ...formData, experience_level: value as ExperienceLevel })
               }
             >
               <SelectTrigger id="experience_level">

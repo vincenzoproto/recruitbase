@@ -16,21 +16,19 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
   const uploadFile = async (file: File) => {
-
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Il file è troppo grande. Max 5MB");
+      toast.error("File troppo grande. Max 5MB");
       return;
     }
 
-    if (!file.type.includes("pdf")) {
+    if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
       toast.error("Solo file PDF sono supportati");
       return;
     }
 
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${userId}/cv.${fileExt}`;
+      const fileName = `${userId}/cv_${Date.now()}.pdf`;
 
       const { error: uploadError } = await supabase.storage
         .from("cvs")
@@ -52,6 +50,30 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
       toast.error("Errore nel caricamento del CV");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const openCV = async () => {
+    if (!currentCvUrl) return;
+    
+    try {
+      // If it's already a full URL, open directly
+      if (currentCvUrl.startsWith('http')) {
+        window.open(currentCvUrl, '_blank');
+        return;
+      }
+
+      // Otherwise, create signed URL from path
+      const path = currentCvUrl.replace(/^cvs\//, '');
+      const { data, error } = await supabase.storage
+        .from('cvs')
+        .createSignedUrl(path, 60);
+
+      if (error) throw error;
+      if (data) window.open(data.signedUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening CV:', error);
+      toast.error('Errore nell\'apertura del CV');
     }
   };
 
@@ -109,11 +131,9 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
       >
         {currentCvUrl ? (
           <div className="flex items-center justify-between">
-            <Button variant="outline" size="sm" className="gap-2" asChild>
-              <a href={currentCvUrl} target="_blank" rel="noopener noreferrer">
-                <FileCheck className="h-4 w-4" />
-                Visualizza CV
-              </a>
+            <Button variant="outline" size="sm" className="gap-2" onClick={openCV}>
+              <FileCheck className="h-4 w-4" />
+              Visualizza CV
             </Button>
             <div className="flex gap-2">
               <Button
