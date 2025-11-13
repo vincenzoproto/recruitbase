@@ -2,37 +2,37 @@
 
 export interface Profile {
   id: string;
-  role: 'candidate' | 'recruiter';
-  full_name: string;
-  avatar_url?: string;
-  job_title?: string;
+  full_name?: string;
   city?: string;
+  job_title?: string;
   bio?: string;
   skills?: string[];
-  linkedin_url?: string;
+  avatar_url?: string;
   cv_url?: string;
-  phone_number?: string;
-  core_values?: string[];
-  talent_relationship_score?: number;
-  is_premium?: boolean;
-  company_size?: string;
-  industry?: string;
-  availability?: string;
+  role?: 'recruiter' | 'candidate';
   years_experience?: number;
   education?: string;
   languages?: string;
+  availability?: string;
+  company_size?: string;
+  industry?: string;
   degree_title?: string;
-  created_at?: string;
-  updated_at?: string;
+  core_values?: string[];
+  phone_number?: string;
+  linkedin_url?: string;
   referral_code?: string;
   email_verified?: boolean;
   linkedin_verified?: boolean;
   onboarding_completed?: boolean;
+  is_premium?: boolean;
+  talent_relationship_score?: number;
   is_favorite?: boolean;
   engagement_score?: number;
   last_contact_date?: string;
   pipeline_stage_id?: string;
   trs_last_updated?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface JobOffer {

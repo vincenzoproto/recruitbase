@@ -46,98 +46,88 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      // Usa i dati dalla cache se disponibili per rendering immediato
-      if (cachedProfile && cachedProfile.id === user.id) {
-        setProfile(cachedProfile);
-        setIsLoadingProfile(false);
-      }
+      setIsLoadingProfile(true);
 
-      // Carica i dati freschi in background (tutti i campi necessari)
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        // PGRST116 = no rows found, lo gestiamo sotto
-        throw error;
-      }
+      // Get authenticated user
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
       
-      if (data) {
-        // Profilo esiste
-        cacheProfile(data);
-        setProfile(data);
+      if (userError || !currentUser) {
+        console.error('User error:', userError);
+        navigate('/auth');
+        return;
+      }
 
-        // Controlla se serve onboarding
-        if (!data.onboarding_completed) {
+      // Try to fetch profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+
+      // If profile doesn't exist, create it
+      if (!profileData || profileError) {
+        console.log('Profile not found, creating new profile');
+        
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: currentUser.id,
+            full_name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Utente',
+            avatar_url: currentUser.user_metadata?.avatar_url || null,
+            role: 'candidate'
+          });
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          toast.error("Impossibile creare il profilo");
+          setIsLoadingProfile(false);
+          return;
+        }
+
+        // Reload the newly created profile
+        const { data: newProfile, error: reloadError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (reloadError || !newProfile) {
+          console.error('Error reloading profile:', reloadError);
+          toast.error("Impossibile caricare il profilo");
+          setIsLoadingProfile(false);
+          return;
+        }
+
+        setProfile(newProfile);
+        cacheProfile(newProfile);
+        
+        // Check if onboarding is needed
+        if (!newProfile.onboarding_completed) {
           setShowOnboarding(true);
         }
-      } else {
-        // Profilo non esiste, crealo automaticamente
-        await createProfile();
+        
+        setIsLoadingProfile(false);
+        return;
       }
+
+      // Profile exists
+      console.log('Profile loaded successfully');
+      setProfile(profileData);
+      cacheProfile(profileData);
+      
+      // Check if onboarding is needed
+      if (!profileData.onboarding_completed) {
+        setShowOnboarding(true);
+      }
+      
+      setIsLoadingProfile(false);
     } catch (error) {
-      console.error("Error loading profile:", error);
-    } finally {
+      console.error('Error loading profile:', error);
+      toast.error("Impossibile caricare il profilo");
       setIsLoadingProfile(false);
     }
   };
 
-  const createProfile = async () => {
-    if (!user) return;
-
-    try {
-      // Estrai nome dalla email se non disponibile
-      const nameFromEmail = user.email?.split('@')[0] || 'Utente';
-      
-      const { data: newProfile, error: insertError } = await supabase
-        .from("profiles")
-        .insert({
-          id: user.id,
-          full_name: user.user_metadata?.full_name || nameFromEmail,
-          role: "recruiter", // Default
-        })
-        .select("id, role, full_name, is_premium, referral_code, city")
-        .single();
-
-      if (insertError) throw insertError;
-
-      if (newProfile) {
-        cacheProfile(newProfile);
-        setProfile(newProfile);
-
-        // Invia email di benvenuto
-        try {
-          await supabase.functions.invoke("send-welcome-email", {
-            body: { 
-              name: newProfile.full_name, 
-              email: user.email 
-            },
-          });
-        } catch (emailError) {
-          console.error("Error sending welcome email:", emailError);
-        }
-
-        // Crea trial subscription
-        const trialStart = new Date();
-        const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 30);
-
-        await supabase.from("subscriptions").insert({
-          user_id: user.id,
-          status: "trial",
-          trial_start: trialStart.toISOString(),
-          trial_end: trialEnd.toISOString(),
-        });
-
-        toast.success("Profilo creato con successo!");
-      }
-    } catch (error: any) {
-      console.error("Error creating profile:", error);
-      toast.error("Errore nella creazione del profilo");
-    }
-  };
 
   const handleOnboardingComplete = async () => {
     const { data: updatedProfile } = await supabase
@@ -191,16 +181,6 @@ const Dashboard = () => {
   }
 
 
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Preparazione profilo...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
