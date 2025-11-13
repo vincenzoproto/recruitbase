@@ -19,6 +19,13 @@ export interface Profile {
   company_size?: string;
   industry?: string;
   availability?: string;
+  years_experience?: number;
+  education?: string;
+  languages?: string;
+  work_preference?: string;
+  expected_salary?: string;
+  degree_title?: string;
+  subscription_plan?: PlanType;
   created_at?: string;
   updated_at?: string;
 }
