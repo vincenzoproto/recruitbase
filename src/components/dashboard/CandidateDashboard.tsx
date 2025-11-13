@@ -27,6 +27,8 @@ import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
 import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
+import { SidebarMenu } from "@/components/navigation/SidebarMenu";
+import { Menu } from "lucide-react";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -39,11 +41,12 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const [applications, setApplications] = useState<any[]>([]);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const isMobile = useIsMobile();
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Offerte, 2: Recruiter, 3: Profilo
+  const [currentView, setCurrentView] = useState(0);
   const [recruiters, setRecruiters] = useState<any[]>([]);
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [chatUserName, setChatUserName] = useState<string>("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
   const views = [
@@ -156,6 +159,50 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
     navigate("/auth");
   };
 
+  const handleMenuNavigate = (section: string) => {
+    switch(section) {
+      case "profile":
+        setCurrentView(4);
+        break;
+      case "cv":
+        setCurrentView(4);
+        setShowEditProfile(true);
+        break;
+      case "saved-offers":
+        setCurrentView(1);
+        break;
+      case "feed":
+        setCurrentView(2);
+        break;
+      case "career":
+        setCurrentView(3);
+        break;
+      case "ai-suggestions":
+        if (profile.is_premium) {
+          toast.info("Funzionalità in arrivo");
+        }
+        break;
+      case "settings":
+        toast.info("Impostazioni in arrivo");
+        break;
+      case "billing":
+        window.open("https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00", "_blank");
+        break;
+      case "support":
+        navigate("/contact");
+        break;
+      case "privacy":
+        navigate("/privacy");
+        break;
+      case "terms":
+        navigate("/terms");
+        break;
+      case "contact":
+        navigate("/contact");
+        break;
+    }
+  };
+
   const handleApply = async (jobOfferId: string) => {
     const { error } = await supabase.from("applications").insert({
       job_offer_id: jobOfferId,
@@ -206,34 +253,46 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
         />
       )}
       
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Recruit Base</h1>
-            <p className="text-sm text-muted-foreground">Dashboard Candidato</p>
+      {/* Sidebar Menu */}
+      <SidebarMenu
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
+        fullName={profile.full_name || "Candidato"}
+        avatarUrl={profile.avatar_url}
+        role="candidate"
+        planType={profile.is_premium ? "business" : "free"}
+        trsScore={profile.talent_relationship_score}
+        cultureFit={0}
+        onNavigate={handleMenuNavigate}
+        onLogout={handleSignOut}
+      />
+
+      <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">RecruitBase</h1>
+              {profile.is_premium && (
+                <Badge variant="default" className="bg-gradient-to-r from-amber-500 to-yellow-500 text-xs">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Premium
+                </Badge>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/search')}>
-              <Search className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Cerca</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
-              <User className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Profilo</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/social')}>
-              <Rss className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Social</span>
-            </Button>
             <NotificationBell 
               userId={profile.id}
               onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
               onMessageNotificationClick={handleOpenChat}
             />
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Esci
-            </Button>
           </div>
         </div>
       </header>

@@ -16,7 +16,8 @@ import {
   HelpCircle, 
   LogOut,
   Lock,
-  Crown
+  Crown,
+  Heart
 } from "lucide-react";
 import { useState } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -183,88 +184,30 @@ export const SidebarMenu = ({
       },
     ]
   } : {
-    // Candidate menu
     main: [
-      { 
-        id: "profile", 
-        icon: User, 
-        label: "Profilo personale", 
-        locked: false 
-      },
-      { 
-        id: "applications", 
-        icon: Briefcase, 
-        label: "Le mie candidature", 
-        locked: false 
-      },
-      { 
-        id: "copilot", 
-        icon: Brain, 
-        label: "Copilot CV & Lettera AI", 
-        locked: planType === "free",
-        requiredPlan: "Pro"
-      },
-      { 
-        id: "notifications-archive", 
-        icon: Bell, 
-        label: "Notifiche archiviate", 
-        locked: false 
-      },
+      { id: "profile", icon: User, label: "Profilo personale", locked: false },
+      { id: "cv", icon: Briefcase, label: "CV & Portfolio", locked: false },
+      { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
+      { id: "feed", icon: Users, label: "Feed sociale", locked: false },
+      { id: "career", icon: TrendingUp, label: "Carriera", locked: false },
     ],
     premium: [
       { 
-        id: "feed", 
-        icon: Users, 
-        label: "Feed sociale", 
+        id: "ai-suggestions", 
+        icon: Brain, 
+        label: "Suggerimenti AI", 
         locked: planType === "free",
-        requiredPlan: "Pro"
-      },
-      { 
-        id: "analytics", 
-        icon: TrendingUp, 
-        label: "Statistiche carriera", 
-        locked: planType === "free" || planType === "pro",
-        requiredPlan: "Premium"
+        requiredPlan: "Business"
       },
     ],
     enterprise: [],
     settings: [
-      { 
-        id: "settings", 
-        icon: Settings, 
-        label: "Impostazioni account", 
-        locked: false 
-      },
-      { 
-        id: "billing", 
-        icon: CreditCard, 
-        label: "Abbonamenti e fatture", 
-        locked: false 
-      },
-      { 
-        id: "support", 
-        icon: HelpCircle, 
-        label: "Supporto & FAQ", 
-        locked: false 
-      },
-      { 
-        id: "privacy", 
-        icon: Settings, 
-        label: "Privacy Policy", 
-        locked: false 
-      },
-      { 
-        id: "terms", 
-        icon: Settings, 
-        label: "Termini e Condizioni", 
-        locked: false 
-      },
-      { 
-        id: "contact", 
-        icon: HelpCircle, 
-        label: "Contattaci", 
-        locked: false 
-      },
+      { id: "settings", icon: Settings, label: "Impostazioni", locked: false },
+      { id: "billing", icon: CreditCard, label: "Abbonamento & Fatture", locked: false },
+      { id: "support", icon: HelpCircle, label: "Supporto & FAQ", locked: false },
+      { id: "privacy", icon: Settings, label: "Privacy Policy", locked: false },
+      { id: "terms", icon: Settings, label: "Termini e Condizioni", locked: false },
+      { id: "contact", icon: HelpCircle, label: "Contattaci", locked: false },
     ]
   };
 
