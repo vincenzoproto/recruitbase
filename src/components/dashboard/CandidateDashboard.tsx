@@ -72,19 +72,29 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   }, []);
 
   const loadJobOffers = async () => {
-    const { data, error } = await supabase
-      .from("job_offers")
-      .select("id, title, city, sector, experience_level, description, created_at")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-      .limit(30);
+    try {
+      const { data, error } = await supabase
+        .from("job_offers")
+        .select("id, title, city, sector, experience_level, description, created_at")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(30);
 
-    if (error) {
-      toast.error("Errore nel caricamento delle offerte");
-      return;
+      if (error) {
+        console.error("RLS ERROR loading job offers:", error);
+        toast.error("Errore nel caricamento delle offerte");
+        setJobOffers([]);
+        setFilteredJobs([]);
+        return;
+      }
+      
+      setJobOffers(data || []);
+      setFilteredJobs(data || []);
+    } catch (error) {
+      console.error("Error loading job offers:", error);
+      setJobOffers([]);
+      setFilteredJobs([]);
     }
-    setJobOffers(data || []);
-    setFilteredJobs(data || []);
   };
 
   const handleSearch = (query: string, filters: SearchFilterValues) => {
@@ -118,34 +128,49 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   };
 
   const loadApplications = async () => {
-    const { data, error } = await supabase
-      .from("applications")
-      .select("job_offer_id")
-      .eq("candidate_id", profile.id);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    if (error) {
-      toast.error("Errore nel caricamento delle candidature");
-      return;
+      const { data, error } = await supabase
+        .from("applications")
+        .select("job_offer_id")
+        .eq("candidate_id", user.id);
+
+      if (error) {
+        console.error("RLS ERROR loading applications:", error);
+        toast.error("Errore nel caricamento delle candidature");
+        setApplications([]);
+        return;
+      }
+      
+      setApplications(data || []);
+    } catch (error) {
+      console.error("Error loading applications:", error);
+      setApplications([]);
     }
-    setApplications(data || []);
   };
 
   const loadRecruiters = async () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, full_name, avatar_url, job_title, city, bio")
         .eq("role", "recruiter")
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (error) {
+        console.error("RLS ERROR loading recruiters:", error);
         toast.error("Errore nel caricamento dei recruiter");
+        setRecruiters([]);
         return;
       }
+      
       setRecruiters(data || []);
     } catch (error) {
       console.error("Error loading recruiters:", error);
+      setRecruiters([]);
     }
   };
 
@@ -212,23 +237,35 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   };
 
   const handleApply = async (jobOfferId: string) => {
-    const { error } = await supabase.from("applications").insert({
-      job_offer_id: jobOfferId,
-      candidate_id: profile.id,
-    });
-
-    if (error) {
-      const code = (error as any).code;
-      if (code === "23505") {
-        toast.error("Ti sei già candidato per questa posizione");
-      } else {
-        toast.error("Errore nell'invio della candidatura");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Devi effettuare l'accesso");
+        return;
       }
-      return;
-    }
 
-    toast.success("Candidatura inviata con successo!");
-    loadApplications();
+      const { error } = await supabase.from("applications").insert({
+        job_offer_id: jobOfferId,
+        candidate_id: user.id,
+      });
+
+      if (error) {
+        console.error("RLS ERROR applying to job:", error);
+        const code = (error as any).code;
+        if (code === "23505") {
+          toast.error("Ti sei già candidato per questa posizione");
+        } else {
+          toast.error("Errore nell'invio della candidatura");
+        }
+        return;
+      }
+
+      toast.success("Candidatura inviata con successo!");
+      loadApplications();
+    } catch (error) {
+      console.error("Error applying to job:", error);
+      toast.error("Errore nell'invio della candidatura");
+    }
   };
 
   const swipeHandlers = useSwipe({
