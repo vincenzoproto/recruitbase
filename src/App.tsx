@@ -16,6 +16,9 @@ import Social from "./pages/Social";
 import SearchProfiles from "./pages/SearchProfiles";
 import ScoreInfo from "./pages/ScoreInfo";
 import Demo from "./pages/Demo";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +41,9 @@ const App = () => (
           <Route path="/search" element={<SearchProfiles />} />
           <Route path="/score-info" element={<ScoreInfo />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -163,6 +163,24 @@ export const SidebarMenu = ({
         label: "Supporto & FAQ", 
         locked: false 
       },
+      { 
+        id: "privacy", 
+        icon: Settings, 
+        label: "Privacy Policy", 
+        locked: false 
+      },
+      { 
+        id: "terms", 
+        icon: Settings, 
+        label: "Termini e Condizioni", 
+        locked: false 
+      },
+      { 
+        id: "contact", 
+        icon: HelpCircle, 
+        label: "Contattaci", 
+        locked: false 
+      },
     ]
   } : {
     // Candidate menu
@@ -227,6 +245,24 @@ export const SidebarMenu = ({
         id: "support", 
         icon: HelpCircle, 
         label: "Supporto & FAQ", 
+        locked: false 
+      },
+      { 
+        id: "privacy", 
+        icon: Settings, 
+        label: "Privacy Policy", 
+        locked: false 
+      },
+      { 
+        id: "terms", 
+        icon: Settings, 
+        label: "Termini e Condizioni", 
+        locked: false 
+      },
+      { 
+        id: "contact", 
+        icon: HelpCircle, 
+        label: "Contattaci", 
         locked: false 
       },
     ]

@@ -169,25 +169,39 @@ export const NotificationBell = ({
                   onClick={async () => {
                     await markAsRead(notification.id);
                     
-                    // Handle different notification types with deep-linking
-                    if (notification.type === 'meeting' && onMeetingNotificationClick) {
-                      onMeetingNotificationClick();
-                    } else if (notification.type === 'message' && onMessageNotificationClick && notification.link) {
-                      // Deep-link to specific chat
-                      onMessageNotificationClick(notification.link);
-                    } else if (notification.type === 'new_application' && onApplicationNotificationClick && notification.link) {
-                      // Deep-link to candidate profile
-                      onApplicationNotificationClick(notification.link);
-                    } else if (notification.type === 'match' && onMatchNotificationClick && notification.link) {
-                      // Deep-link to match profile
-                      onMatchNotificationClick(notification.link);
-                    } else if ((notification.type === 'post_reaction' || notification.type === 'post_comment') && notification.link) {
-                      // Navigate to social feed with post ID
-                      navigate(`/social?post=${notification.link}`);
+                    // Deep-linking completo basato sul tipo di notifica
+                    if (notification.type === 'meeting_request' || notification.type === 'meeting_confirmed') {
+                      onMeetingNotificationClick?.();
+                    } else if (notification.type === 'new_message') {
+                      if (notification.link) {
+                        onMessageNotificationClick?.(notification.link);
+                      }
+                    } else if (notification.type === 'new_application') {
+                      if (notification.link) {
+                        onApplicationNotificationClick?.(notification.link);
+                      }
+                    } else if (notification.type === 'match_found') {
+                      if (notification.link) {
+                        onMatchNotificationClick?.(notification.link);
+                      }
+                    } else if (notification.type === 'post_comment' || notification.type === 'post_reaction') {
+                      if (notification.link) {
+                        navigate(`/social?post=${notification.link}`);
+                      }
+                    } else if (notification.type === 'profile_view') {
+                      navigate('/dashboard');
+                    } else if (notification.type === 'application_status') {
+                      navigate('/dashboard');
+                    } else {
+                      // Fallback generico
+                      if (notification.link) {
+                        navigate(`/dashboard?ref=${notification.link}`);
+                      } else {
+                        toast.info("Contenuto non disponibile");
+                      }
                     }
                     
                     setOpen(false);
-                    toast.success("✔️ Notifica letta");
                   }}
                   className={`w-full p-4 text-left hover:bg-accent transition-colors ${
                     !notification.read ? 'bg-accent/50' : ''
