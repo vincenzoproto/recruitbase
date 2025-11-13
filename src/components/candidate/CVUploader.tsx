@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { FileUp, FileCheck, Trash2, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { cvManager } from "@/lib/cvManager";
 
 interface CVUploaderProps {
   userId: string;
@@ -16,59 +16,17 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
   const uploadFile = async (file: File) => {
-    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-      toast.error("Solo file PDF sono supportati");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File troppo grande. Max 5MB");
-      return;
-    }
-
     setUploading(true);
-    try {
-      const fileName = `${userId}/cv_${Date.now()}.pdf`;
-      const { error: uploadError } = await supabase.storage
-        .from('cvs')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
+    const cvPath = await cvManager.uploadCV(userId, file);
+    setUploading(false);
+    
+    if (cvPath) {
       await supabase
         .from("profiles")
-        .update({ cv_url: fileName })
+        .update({ cv_url: cvPath })
         .eq("id", userId);
       
-      toast.success("CV caricato con successo!");
-      onUploadComplete(fileName);
-    } catch (error: any) {
-      console.error('Error uploading CV:', error);
-      toast.error(error.message || "Errore nel caricamento");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const openCV = async () => {
-    if (!currentCvUrl) return;
-    
-    try {
-      if (currentCvUrl.startsWith('http')) {
-        window.open(currentCvUrl, '_blank');
-        return;
-      }
-
-      const path = currentCvUrl.replace(/^cvs\//, '');
-      const { data, error } = await supabase.storage
-        .from('cvs')
-        .createSignedUrl(path, 60);
-
-      if (error) throw error;
-      if (data) window.open(data.signedUrl, '_blank');
-    } catch (error) {
-      console.error('Error opening CV:', error);
-      toast.error('Errore nell\'apertura del CV');
+      onUploadComplete(cvPath);
     }
   };
 
@@ -96,24 +54,14 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
   const handleDelete = async () => {
     if (!currentCvUrl) return;
 
-    try {
-      const path = currentCvUrl.replace(/^cvs\//, '');
-      const { error } = await supabase.storage
-        .from('cvs')
-        .remove([path]);
-
-      if (error) throw error;
-
+    const success = await cvManager.deleteCV(currentCvUrl);
+    if (success) {
       await supabase
         .from("profiles")
         .update({ cv_url: null })
         .eq("id", userId);
       
-      toast.success("CV eliminato");
       onUploadComplete('');
-    } catch (error: any) {
-      console.error('Error deleting CV:', error);
-      toast.error(error.message || "Errore nell'eliminazione");
     }
   };
 
@@ -132,7 +80,7 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
       >
         {currentCvUrl ? (
           <div className="flex items-center justify-between">
-            <Button variant="outline" size="sm" className="gap-2" onClick={openCV}>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => cvManager.openCV(currentCvUrl)}>
               <FileCheck className="h-4 w-4" />
               Visualizza CV
             </Button>

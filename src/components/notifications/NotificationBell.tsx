@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useNotifications } from "@/hooks/useNotifications";
+import type { Notification } from "@/types";
 
 interface NotificationBellProps {
   userId: string;
@@ -38,6 +38,62 @@ export const NotificationBell = ({
     markAllAsRead,
     getTimeAgo
   } = useNotifications(userId);
+
+  const handleNotificationClick = async (notification: Notification) => {
+    await markAsRead(notification.id);
+    setOpen(false);
+    
+    // Deep-linking completo basato sul tipo di notifica
+    switch (notification.type) {
+      case 'meeting_request':
+      case 'meeting_confirmed':
+        onMeetingNotificationClick?.();
+        break;
+        
+      case 'new_message':
+        if (notification.link) {
+          onMessageNotificationClick?.(notification.link);
+        }
+        break;
+        
+      case 'new_application':
+        if (notification.link) {
+          onApplicationNotificationClick?.(notification.link);
+        }
+        break;
+        
+      case 'match':
+      case 'match_found':
+        if (notification.link) {
+          onMatchNotificationClick?.(notification.link);
+        } else {
+          navigate('/dashboard?view=match');
+        }
+        break;
+        
+      case 'post_comment':
+      case 'post_reaction':
+        if (notification.link) {
+          navigate(`/social?post=${notification.link}`);
+        } else {
+          navigate('/social');
+        }
+        break;
+        
+      case 'application_status':
+        navigate('/dashboard?view=career');
+        break;
+        
+      case 'profile_view':
+        navigate('/dashboard?view=insights');
+        break;
+        
+      default:
+        if (notification.link) {
+          navigate(`/dashboard?view=${notification.link}`);
+        }
+    }
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -69,7 +125,11 @@ export const NotificationBell = ({
           )}
         </div>
         <ScrollArea className="h-96">
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-muted-foreground">
+              Caricamento...
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               Nessuna notifica
             </div>
@@ -78,59 +138,23 @@ export const NotificationBell = ({
               {notifications.map((notification) => (
                 <button
                   key={notification.id}
-                  onClick={async () => {
-                    await markAsRead(notification.id);
-                    
-                    // Deep-linking completo basato sul tipo di notifica
-                    if (notification.type === 'meeting_request' || notification.type === 'meeting_confirmed') {
-                      onMeetingNotificationClick?.();
-                    } else if (notification.type === 'new_message') {
-                      if (notification.link) {
-                        onMessageNotificationClick?.(notification.link);
-                      }
-                    } else if (notification.type === 'new_application') {
-                      if (notification.link) {
-                        onApplicationNotificationClick?.(notification.link);
-                      }
-                    } else if (notification.type === 'match' || notification.type === 'match_found') {
-                      if (notification.link) {
-                        onMatchNotificationClick?.(notification.link);
-                      }
-                    } else if (notification.type === 'post_comment' || notification.type === 'post_reaction') {
-                      if (notification.link) {
-                        navigate(`/social?post=${notification.link}`);
-                      }
-                    } else if (notification.type === 'profile_view') {
-                      navigate('/dashboard');
-                    } else if (notification.type === 'application_status') {
-                      navigate('/dashboard');
-                    } else {
-                      // Fallback generico
-                      if (notification.link) {
-                        navigate(`/dashboard?ref=${notification.link}`);
-                      } else {
-                        toast.info("Contenuto non disponibile");
-                      }
-                    }
-                    
-                    setOpen(false);
-                  }}
-                  className={`w-full p-4 text-left hover:bg-accent transition-colors ${
-                    !notification.read ? 'bg-accent/50' : ''
+                  onClick={() => handleNotificationClick(notification)}
+                  className={`w-full text-left p-4 hover:bg-muted/50 transition-colors ${
+                    !notification.read ? 'bg-primary/5' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex-1 space-y-1">
-                      <p className="font-medium text-sm">{notification.title}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm mb-1">{notification.title}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground mt-1 block">
                         {getTimeAgo(notification.created_at)}
-                      </p>
+                      </span>
                     </div>
                     {!notification.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary mt-1" />
+                      <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-2" />
                     )}
                   </div>
                 </button>
