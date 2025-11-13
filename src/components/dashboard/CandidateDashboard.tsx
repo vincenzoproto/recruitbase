@@ -55,6 +55,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
     { id: 2, name: "Feed", icon: "📱" },
     { id: 3, name: "Carriera", icon: "🧭" },
     { id: 4, name: "Profilo", icon: "👤" },
+    { id: 5, name: "Messaggi", icon: "💬" },
+    { id: 6, name: "Notifiche", icon: "🔔" },
   ];
 
   useEffect(() => {
@@ -288,11 +290,15 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <NotificationBell 
-              userId={profile.id}
-              onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
-              onMessageNotificationClick={handleOpenChat}
-            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/search')}
+              className="gap-1"
+            >
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">Cerca</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -642,6 +648,46 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
               </CardContent>
             </Card>
           )}
+
+          {/* Vista 5: Messaggi */}
+          {(!isMobile || currentView === 5) && (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Messaggi
+                </CardTitle>
+                <CardDescription>
+                  Le tue conversazioni con recruiter
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GroupChatSection />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vista 6: Notifiche */}
+          {(!isMobile || currentView === 6) && (
+            <Card className="animate-fade-in">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  Centro Notifiche
+                </CardTitle>
+                <CardDescription>
+                  Tutte le tue notifiche in un unico posto
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <NotificationBell
+                  userId={profile.id}
+                  onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
+                  onMessageNotificationClick={(senderId) => handleOpenChat(senderId)}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
 
@@ -650,16 +696,17 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
           activeTab={
             currentView === 0 ? "home" :
             currentView === 1 ? "offers" :
-            currentView === 2 ? "feed" :
             currentView === 3 ? "carriera" :
-            "profile"
+            currentView === 5 ? "messages" :
+            currentView === 6 ? "notifications" :
+            "home"
           }
           onTabChange={(tab) => {
             if (tab === "home") setCurrentView(0);
             else if (tab === "offers") setCurrentView(1);
-            else if (tab === "feed") setCurrentView(2);
             else if (tab === "carriera") setCurrentView(3);
-            else if (tab === "profile") setCurrentView(4);
+            else if (tab === "messages") setCurrentView(5);
+            else if (tab === "notifications") setCurrentView(6);
           }}
           userRole="candidate"
           unreadCount={unreadCount}
