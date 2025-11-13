@@ -246,20 +246,6 @@ const Profile = () => {
                 </div>
               )}
 
-              {profile.work_preference && (
-                <div>
-                  <h4 className="text-sm font-semibold mb-1">Preferenza Lavoro</h4>
-                  <p className="text-muted-foreground">{profile.work_preference}</p>
-                </div>
-              )}
-
-              {profile.expected_salary && (
-                <div>
-                  <h4 className="text-sm font-semibold mb-1">RAL Attesa</h4>
-                  <p className="text-muted-foreground">{profile.expected_salary}</p>
-                </div>
-              )}
-
               {profile.company_size && (
                 <div>
                   <h4 className="text-sm font-semibold mb-1">Dimensione Azienda</h4>

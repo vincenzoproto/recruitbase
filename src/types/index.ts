@@ -2,6 +2,7 @@
 
 export interface Profile {
   id: string;
+  role: 'candidate' | 'recruiter';
   full_name: string;
   avatar_url?: string;
   job_title?: string;
@@ -12,9 +13,7 @@ export interface Profile {
   cv_url?: string;
   phone_number?: string;
   core_values?: string[];
-  role: 'candidate' | 'recruiter';
   talent_relationship_score?: number;
-  culture_fit_score?: number;
   is_premium?: boolean;
   company_size?: string;
   industry?: string;
@@ -22,12 +21,18 @@ export interface Profile {
   years_experience?: number;
   education?: string;
   languages?: string;
-  work_preference?: string;
-  expected_salary?: string;
   degree_title?: string;
-  subscription_plan?: PlanType;
   created_at?: string;
   updated_at?: string;
+  referral_code?: string;
+  email_verified?: boolean;
+  linkedin_verified?: boolean;
+  onboarding_completed?: boolean;
+  is_favorite?: boolean;
+  engagement_score?: number;
+  last_contact_date?: string;
+  pipeline_stage_id?: string;
+  trs_last_updated?: string;
 }
 
 export interface JobOffer {
