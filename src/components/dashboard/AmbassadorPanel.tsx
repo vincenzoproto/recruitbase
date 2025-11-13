@@ -55,7 +55,8 @@ export const AmbassadorPanel = ({ userId }: { userId: string }) => {
   };
 
   const copyReferralLink = () => {
-    const link = `https://recruitbase.app/invite/${stats?.referralCode}`;
+    const origin = window.location.origin || "https://recruitbase.lovable.app";
+    const link = `${origin}/invite/${stats?.referralCode}`;
     navigator.clipboard.writeText(link);
     toast.success("Link copiato! Condividilo per guadagnare 10€ per ogni referral attivo");
   };

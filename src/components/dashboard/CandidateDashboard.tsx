@@ -49,6 +49,13 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
+  // Calculate Culture Fit Score (stable, no random)
+  const cultureFitScore = profile.culture_fit_score 
+    ? Math.min(100, Math.max(0, profile.culture_fit_score))
+    : profile.core_values?.length 
+      ? Math.min(95, 60 + profile.core_values.length * 5)
+      : 0;
+
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
     { id: 1, name: "Offerte", icon: "📋" },
@@ -264,7 +271,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
         role="candidate"
         planType={profile.is_premium ? "business" : "free"}
         trsScore={profile.talent_relationship_score}
-        cultureFit={0}
+        cultureFit={cultureFitScore}
         onNavigate={handleMenuNavigate}
         onLogout={handleSignOut}
       />
@@ -365,10 +372,37 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                       </Badge>
                     )}
                   </h2>
-                  <p className="text-muted-foreground">Pannello Carriera</p>
+                  <p className="text-muted-foreground">Pannello Carriera · controlla CV, candidature e match consigliati</p>
                 </div>
                 <CVCopilot profile={profile} />
               </div>
+
+              {/* Azioni rapide */}
+              <Card className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg font-semibold">🚀 Azioni Rapide</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentView(4)}
+                    className="gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    Completa profilo
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setCurrentView(1)}
+                    className="gap-2"
+                  >
+                    <Briefcase className="h-4 w-4" />
+                    Vedi offerte
+                  </Button>
+                </div>
+              </Card>
 
               <PremiumCandidateDashboard profile={profile} onNavigate={setCurrentView} />
 
@@ -514,7 +548,7 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
                     <Card className="p-4">
                       <div className="text-sm text-muted-foreground mb-1">Culture Fit</div>
                       <div className="text-2xl font-bold">
-                        {profile.core_values?.length ? Math.floor(Math.random() * 30) + 70 : 0}%
+                        {cultureFitScore}%
                       </div>
                     </Card>
                     <Card className="p-4">

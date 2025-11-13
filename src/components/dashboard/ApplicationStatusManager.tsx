@@ -19,7 +19,15 @@ interface ApplicationStatusManagerProps {
   onStatusUpdated: () => void;
 }
 
-const STATUS_STEPS = [
+type ApplicationStatus = 'in_valutazione' | 'colloquio_programmato' | 'assunto' | 'non_idoneo';
+type FeedbackType = 'positivo' | 'neutro' | 'negativo';
+
+const STATUS_STEPS: Array<{
+  key: ApplicationStatus;
+  label: string;
+  icon: any;
+  color: string;
+}> = [
   { key: 'in_valutazione', label: 'In valutazione', icon: Clock, color: 'text-blue-500' },
   { key: 'colloquio_programmato', label: 'Colloquio programmato', icon: Calendar, color: 'text-purple-500' },
   { key: 'assunto', label: 'Assunto', icon: CheckCircle, color: 'text-green-500' },
@@ -33,13 +41,13 @@ export const ApplicationStatusManager = ({
   onStatusUpdated,
 }: ApplicationStatusManagerProps) => {
   const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackType, setFeedbackType] = useState<'positivo' | 'neutro' | 'negativo' | null>(null);
+  const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
   const [feedbackNotes, setFeedbackNotes] = useState("");
   const [updating, setUpdating] = useState(false);
 
   const currentIndex = STATUS_STEPS.findIndex(s => s.key === currentStatus);
 
-  const updateStatus = async (newStatus: string, feedback?: { type: string; notes: string }) => {
+  const updateStatus = async (newStatus: ApplicationStatus, feedback?: { type: FeedbackType; notes: string }) => {
     setUpdating(true);
     try {
       const updateData: any = { status: newStatus };
@@ -69,21 +77,29 @@ export const ApplicationStatusManager = ({
     }
   };
 
-  const handleStatusClick = (status: string) => {
+  const handleStatusClick = (status: ApplicationStatus) => {
     if (status === 'colloquio_programmato' || status === 'assunto' || status === 'non_idoneo') {
       setShowFeedback(true);
-      setFeedbackType(status === 'assunto' ? 'positivo' : status === 'non_idoneo' ? 'negativo' : null);
+      setFeedbackType(
+        status === 'assunto' ? 'positivo' : 
+        status === 'non_idoneo' ? 'negativo' : 
+        'neutro'
+      );
     } else {
       updateStatus(status);
     }
   };
 
   const handleFeedbackSubmit = () => {
-    const newStatus = STATUS_STEPS.find(s => 
-      (feedbackType === 'positivo' && s.key === 'assunto') ||
-      (feedbackType === 'negativo' && s.key === 'non_idoneo') ||
-      (feedbackType === 'neutro' && s.key === 'colloquio_programmato')
-    )?.key;
+    let newStatus: ApplicationStatus | undefined;
+    
+    if (feedbackType === 'positivo') {
+      newStatus = 'assunto';
+    } else if (feedbackType === 'negativo') {
+      newStatus = 'non_idoneo';
+    } else if (feedbackType === 'neutro') {
+      newStatus = 'colloquio_programmato';
+    }
 
     if (newStatus && feedbackType) {
       updateStatus(newStatus, {

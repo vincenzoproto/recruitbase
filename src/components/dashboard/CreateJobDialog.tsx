@@ -21,13 +21,15 @@ interface CreateJobDialogProps {
   onSuccess: () => void;
 }
 
+type ExperienceLevel = "entry" | "junior" | "mid" | "senior" | "lead";
+
 const CreateJobDialog = ({ open, onOpenChange, recruiterId, onSuccess }: CreateJobDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     city: "",
     sector: "",
-    experience_level: "mid" as "entry" | "junior" | "mid" | "senior" | "lead",
+    experience_level: "mid" as ExperienceLevel,
     description: "",
   });
 
@@ -112,10 +114,10 @@ const CreateJobDialog = ({ open, onOpenChange, recruiterId, onSuccess }: CreateJ
             <Label htmlFor="experience">Livello di Esperienza *</Label>
             <Select
               value={formData.experience_level}
-              onValueChange={(value: any) => setFormData({ ...formData, experience_level: value })}
+              onValueChange={(value: ExperienceLevel) => setFormData({ ...formData, experience_level: value })}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Seleziona livello" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="entry">Entry Level</SelectItem>

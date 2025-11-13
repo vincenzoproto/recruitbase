@@ -16,20 +16,28 @@ interface AnalyticsChartProps {
 }
 
 export const AnalyticsChart = ({ data, userRole }: AnalyticsChartProps) => {
+  if (!data || data.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-muted-foreground">Nessun dato disponibile</p>
+      </Card>
+    );
+  }
+
   const stats = [
     {
       label: userRole === 'recruiter' ? 'Candidature Ricevute' : 'Candidature Inviate',
-      value: data.reduce((sum, d) => sum + d.applications, 0),
+      value: data.reduce((sum, d) => sum + (d.applications || 0), 0),
       icon: Users,
       color: 'text-blue-500',
     },
     {
       label: 'Visualizzazioni Profilo',
-      value: data.reduce((sum, d) => sum + d.views, 0),
+      value: data.reduce((sum, d) => sum + (d.views || 0), 0),
       icon: Eye,
       color: 'text-green-500',
     },
-    ...(userRole === 'recruiter' ? [{
+    ...(userRole === 'recruiter' && data.length > 0 ? [{
       label: 'Offerte Attive',
       value: data[data.length - 1]?.jobs || 0,
       icon: Briefcase,

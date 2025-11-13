@@ -90,19 +90,18 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
 
   const uploadCV = async (file: File) => {
     if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-      toast.error("Carica solo file PDF");
+      toast.error("Solo file PDF sono supportati");
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File troppo grande (max 10MB)");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File troppo grande. Max 5MB");
       return;
     }
 
     setUploadingCv(true);
     try {
-      const fileExt = 'pdf';
-      const fileName = `${profile.id}/cv_${Date.now()}.${fileExt}`;
+      const fileName = `${profile.id}/cv_${Date.now()}.pdf`;
       
       const { error: uploadError } = await supabase.storage
         .from('cvs')
@@ -110,16 +109,37 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('cvs')
-        .getPublicUrl(fileName);
-
-      setCvUrl(publicUrl);
+      // Save only the path, not the full URL
+      setCvUrl(fileName);
       toast.success("CV caricato! Ricordati di salvare le modifiche");
     } catch (error: any) {
       toast.error(error.message || "Errore nel caricamento");
     } finally {
       setUploadingCv(false);
+    }
+  };
+
+  const openCV = async () => {
+    if (!cvUrl) return;
+    
+    try {
+      // If it's already a full URL, open directly
+      if (cvUrl.startsWith('http')) {
+        window.open(cvUrl, '_blank');
+        return;
+      }
+
+      // Otherwise, create signed URL from path
+      const path = cvUrl.replace(/^cvs\//, '');
+      const { data, error } = await supabase.storage
+        .from('cvs')
+        .createSignedUrl(path, 60);
+
+      if (error) throw error;
+      if (data) window.open(data.signedUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening CV:', error);
+      toast.error('Errore nell\'apertura del CV');
     }
   };
 
@@ -235,11 +255,9 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
                       type="button"
                       variant="outline"
                       size="sm"
-                      asChild
+                      onClick={openCV}
                     >
-                      <a href={cvUrl} target="_blank" rel="noopener noreferrer">
-                        Visualizza
-                      </a>
+                      Visualizza
                     </Button>
                     <Button
                       type="button"
@@ -265,7 +283,7 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
                 </Button>
               )}
               <p className="text-xs text-muted-foreground">
-                Carica il tuo CV per aumentare la visibilità del profilo
+                Carica il tuo CV (PDF, max 5MB) per aumentare la visibilità del profilo
               </p>
             </div>
           )}

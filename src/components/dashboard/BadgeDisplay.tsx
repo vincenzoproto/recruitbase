@@ -4,12 +4,20 @@ import { Award, CheckCircle2, Mail, Linkedin, Crown, Users } from "lucide-react"
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+type BadgeType = 
+  | 'profile_complete'
+  | 'first_application'
+  | 'email_verified'
+  | 'linkedin_verified'
+  | 'premium_user'
+  | 'ambassador';
+
 interface Achievement {
-  badge_type: string;
+  badge_type: BadgeType;
   earned_at: string;
 }
 
-const badgeConfig: Record<string, { icon: any; label: string; color: string; description: string }> = {
+const badgeConfig: Record<BadgeType, { icon: any; label: string; color: string; description: string }> = {
   profile_complete: {
     icon: CheckCircle2,
     label: "Profilo Completo",
@@ -64,7 +72,7 @@ export const BadgeDisplay = ({ userId }: { userId: string }) => {
         .eq("user_id", userId)
         .order("earned_at", { ascending: false });
 
-      setAchievements(data || []);
+      setAchievements((data || []) as Achievement[]);
     } catch (error) {
       console.error("Error loading achievements:", error);
     } finally {
@@ -89,8 +97,11 @@ export const BadgeDisplay = ({ userId }: { userId: string }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {achievements.map((achievement) => {
-          const config = badgeConfig[achievement.badge_type];
-          if (!config) return null;
+          const config = badgeConfig[achievement.badge_type as BadgeType];
+          if (!config) {
+            console.warn(`Unknown badge type: ${achievement.badge_type}`);
+            return null;
+          }
 
           const Icon = config.icon;
           
