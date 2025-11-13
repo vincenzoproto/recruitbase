@@ -52,8 +52,6 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
     education: profile.education || "",
     languages: profile.languages || "",
     availability: profile.availability || "",
-    work_preference: profile.work_preference || "",
-    expected_salary: profile.expected_salary || "",
     company_size: profile.company_size || "",
     industry: profile.industry || "",
     degree_title: profile.degree_title || "",
@@ -177,8 +175,6 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
           education: formData.education || "",
           languages: formData.languages || "",
           availability: formData.availability || null,
-          work_preference: formData.work_preference || null,
-          expected_salary: formData.expected_salary || null,
           company_size: formData.company_size || "",
           industry: formData.industry || "",
           degree_title: formData.degree_title || "",
@@ -428,26 +424,6 @@ const EditProfileDialog = ({ open, onOpenChange, profile, onSuccess }: EditProfi
                     placeholder="es. Immediata, 1 mese"
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="work_preference">Preferenza Lavoro</Label>
-                  <Input
-                    id="work_preference"
-                    value={formData.work_preference}
-                    onChange={(e) => setFormData({ ...formData, work_preference: e.target.value })}
-                    placeholder="es. Remote, Ibrido, In sede"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="expected_salary">Retribuzione Attesa (RAL annua)</Label>
-                <Input
-                  id="expected_salary"
-                  value={formData.expected_salary}
-                  onChange={(e) => setFormData({ ...formData, expected_salary: e.target.value })}
-                  placeholder="es. 35.000 - 45.000 €"
-                />
               </div>
             </>
           )}

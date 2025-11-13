@@ -6,12 +6,7 @@ import type { Profile, PlanType } from '@/types';
 export const getPlanType = (profile: Profile | null): PlanType => {
   if (!profile) return 'free';
   
-  // Check if there's an explicit subscription_plan field
-  if ('subscription_plan' in profile && profile.subscription_plan) {
-    return profile.subscription_plan as PlanType;
-  }
-  
-  // Fallback to is_premium
+  // Fallback to is_premium (subscription_plan doesn't exist in DB)
   if (profile.is_premium) {
     return 'pro';
   }
@@ -20,19 +15,15 @@ export const getPlanType = (profile: Profile | null): PlanType => {
 };
 
 /**
- * Calculate stable culture fit score
+ * Calculate stable culture fit score (based on core_values)
  */
 export const calculateCultureFit = (profile: Profile): number => {
-  if (profile.culture_fit_score !== undefined && profile.culture_fit_score !== null) {
-    return Math.min(100, Math.max(0, profile.culture_fit_score));
-  }
-  
   if (profile.core_values && profile.core_values.length > 0) {
     return Math.min(95, 60 + profile.core_values.length * 5);
   }
   
   return 0;
-};
+}
 
 /**
  * Get user initials from full name

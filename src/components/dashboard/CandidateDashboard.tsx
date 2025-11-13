@@ -30,11 +30,14 @@ import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmati
 import { SidebarMenu } from "@/components/navigation/SidebarMenu";
 import { Menu } from "lucide-react";
 
+import { calculateCultureFit } from "@/lib/utils/profileHelper";
+
 interface CandidateDashboardProps {
   profile: any;
+  onUpdateProfile?: () => void;
 }
 
-const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
+const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProps) => {
   const navigate = useNavigate();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
@@ -49,12 +52,8 @@ const CandidateDashboard = ({ profile }: CandidateDashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
 
-  // Calculate Culture Fit Score (stable, no random)
-  const cultureFitScore = profile.culture_fit_score 
-    ? Math.min(100, Math.max(0, profile.culture_fit_score))
-    : profile.core_values?.length 
-      ? Math.min(95, 60 + profile.core_values.length * 5)
-      : 0;
+  // Calculate Culture Fit Score using helper
+  const cultureFitScore = calculateCultureFit(profile);
 
   const views = [
     { id: 0, name: "Home", icon: "🏠" },
