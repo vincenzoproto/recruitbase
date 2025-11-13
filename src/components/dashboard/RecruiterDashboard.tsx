@@ -470,15 +470,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
               <Rss className="h-4 w-4" />
               <span className="hidden sm:inline">Social</span>
             </Button>
-            <NotificationBell 
-              userId={profile.id}
-              onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
-              onMessageNotificationClick={handleOpenChat}
-              onApplicationNotificationClick={handleOpenCandidateDetail}
-              onMatchNotificationClick={(matchId) => {
-                setCurrentView(2); // Go to match view
-              }}
-            />
             <Button
               variant="outline"
               size="sm"
