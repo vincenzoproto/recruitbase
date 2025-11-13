@@ -12,18 +12,41 @@ interface CVUploaderProps {
 
 export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const dropZoneRef = useRef<HTMLDivElement>(null);
-  const { uploadCV, openCV, deleteCV, uploading } = useCVManager(userId);
 
   const uploadFile = async (file: File) => {
-    const cvPath = await uploadCV(file);
-    if (cvPath) {
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+      toast.error("Solo file PDF sono supportati");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File troppo grande. Max 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileName = `${userId}/cv_${Date.now()}.pdf`;
+      const { error: uploadError } = await supabase.storage
+        .from('cvs')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
       await supabase
         .from("profiles")
-        .update({ cv_url: cvPath })
+        .update({ cv_url: fileName })
         .eq("id", userId);
       
-      onUploadComplete();
+      toast.success("CV caricato con successo!");
+      onUploadComplete(fileName);
+    } catch (error: any) {
+      console.error('Error uploading CV:', error);
+      toast.error(error.message || "Errore nel caricamento");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -31,13 +54,11 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
     if (!currentCvUrl) return;
     
     try {
-      // If it's already a full URL, open directly
       if (currentCvUrl.startsWith('http')) {
         window.open(currentCvUrl, '_blank');
         return;
       }
 
-      // Otherwise, create signed URL from path
       const path = currentCvUrl.replace(/^cvs\//, '');
       const { data, error } = await supabase.storage
         .from('cvs')
@@ -75,14 +96,24 @@ export const CVUploader = ({ userId, currentCvUrl, onUploadComplete }: CVUploade
   const handleDelete = async () => {
     if (!currentCvUrl) return;
 
-    const success = await deleteCV(currentCvUrl);
-    if (success) {
+    try {
+      const path = currentCvUrl.replace(/^cvs\//, '');
+      const { error } = await supabase.storage
+        .from('cvs')
+        .remove([path]);
+
+      if (error) throw error;
+
       await supabase
         .from("profiles")
         .update({ cv_url: null })
         .eq("id", userId);
       
-      onUploadComplete();
+      toast.success("CV eliminato");
+      onUploadComplete('');
+    } catch (error: any) {
+      console.error('Error deleting CV:', error);
+      toast.error(error.message || "Errore nell'eliminazione");
     }
   };
 
