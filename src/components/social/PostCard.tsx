@@ -27,7 +27,6 @@ interface PostCardProps {
       job_title: string | null;
       role?: string | null;
       talent_relationship_score?: number | null;
-      core_values?: string[] | null;
     };
   };
 }
@@ -71,7 +70,6 @@ export const PostCard = ({ post }: PostCardProps) => {
   const formatContent = (content: string | null) => {
     if (!content) return null;
     
-    // Replace hashtags with clickable badges (for visual only)
     const parts = content.split(/(#[\w\u00C0-\u017F]+)/g);
     return parts.map((part, idx) => {
       if (part.startsWith('#')) {
@@ -90,7 +88,7 @@ export const PostCard = ({ post }: PostCardProps) => {
       <CardHeader className="pb-2 md:pb-3">
         <div className="flex items-start gap-2 md:gap-3">
           <Avatar 
-            className="cursor-pointer h-8 w-8 md:h-10 md:w-10" 
+            className="cursor-pointer h-8 w-8 md:h-10 md:w-10 shrink-0" 
             onClick={() => navigate(`/profile/${post.profiles.id}`)}
           >
             <AvatarImage src={post.profiles.avatar_url || undefined} />

@@ -17,6 +17,7 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasReposted, setHasReposted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -32,42 +33,37 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Load likes
       const { data: likesData, error: likesError } = await supabase
         .from('post_reactions')
-        .select('*')
+        .select('user_id')
         .eq('post_id', postId);
       
       if (likesError) throw likesError;
       setLikes(likesData?.length || 0);
       
       if (user) {
-        const userLiked = likesData?.some(r => r.user_id === user.id);
-        setHasLiked(userLiked || false);
+        setHasLiked(likesData?.some(r => r.user_id === user.id) || false);
       }
 
-      // Load reposts
       const { data: repostsData, error: repostsError } = await supabase
         .from('post_reposts')
-        .select('*')
+        .select('user_id')
         .eq('post_id', postId);
       
       if (repostsError) throw repostsError;
       setReposts(repostsData?.length || 0);
       
       if (user) {
-        const userReposted = repostsData?.some(r => r.user_id === user.id);
-        setHasReposted(userReposted || false);
+        setHasReposted(repostsData?.some(r => r.user_id === user.id) || false);
       }
 
-      // Load comments count
-      const { data: commentsData, error: commentsError } = await supabase
+      const { count, error: commentsError } = await supabase
         .from('post_comments')
-        .select('*')
+        .select('id', { count: 'exact', head: true })
         .eq('post_id', postId);
       
       if (commentsError) throw commentsError;
-      setComments(commentsData?.length || 0);
+      setComments(count || 0);
     } catch (error) {
       console.error('Error loading stats:', error);
     }
@@ -79,28 +75,47 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
       return;
     }
 
+    if (loading) return;
+    setLoading(true);
+
     await hapticFeedback.light();
+
+    const previousLikes = likes;
+    const previousHasLiked = hasLiked;
+    
+    setHasLiked(!hasLiked);
+    setLikes(hasLiked ? likes - 1 : likes + 1);
 
     try {
       if (hasLiked) {
-        await supabase
+        const { error } = await supabase
           .from('post_reactions')
           .delete()
           .eq('post_id', postId)
           .eq('user_id', userId);
-        setHasLiked(false);
-        setLikes(likes - 1);
+        
+        if (error) throw error;
       } else {
-        await supabase
+        const { error } = await supabase
           .from('post_reactions')
           .insert({ post_id: postId, user_id: userId, reaction_type: 'like' });
-        setHasLiked(true);
-        setLikes(likes + 1);
+        
+        if (error) throw error;
         toast.success("❤️ Like aggiunto", { duration: 1500 });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling like:', error);
-      toast.error("Errore nell'aggiornare la reazione");
+      
+      setHasLiked(previousHasLiked);
+      setLikes(previousLikes);
+      
+      if (error?.message?.includes('unique')) {
+        toast.error("Hai già messo like a questo post");
+      } else {
+        toast.error("Errore nell'aggiornare la reazione");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,102 +125,83 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
       return;
     }
 
+    if (loading) return;
+    setLoading(true);
+
     await hapticFeedback.medium();
+
+    const previousReposts = reposts;
+    const previousHasReposted = hasReposted;
+    
+    setHasReposted(!hasReposted);
+    setReposts(hasReposted ? reposts - 1 : reposts + 1);
 
     try {
       if (hasReposted) {
-        // Remove repost
-        await supabase
+        const { error } = await supabase
           .from('post_reposts')
           .delete()
           .eq('post_id', postId)
           .eq('user_id', userId);
         
-        // Also delete the reposted post if exists
-        const { data: originalPost } = await supabase
-          .from('posts')
-          .select('content')
-          .eq('id', postId)
-          .single();
-        
-        if (originalPost) {
-          await supabase
-            .from('posts')
-            .delete()
-            .eq('user_id', userId)
-            .like('content', `🔄 Repost: ${originalPost.content || ''}%`);
-        }
-        
-        setHasReposted(false);
-        setReposts(reposts - 1);
-        toast.success("✔️ Repost rimosso");
+        if (error) throw error;
+        toast.success("Repost rimosso");
       } else {
-        // Get original post data
-        const { data: originalPost, error: fetchError } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('id', postId)
-          .single();
-
-        if (fetchError) throw fetchError;
-
-        // Create new post (repost) - appears at top of feed
-        const { error: insertError } = await supabase
-          .from('posts')
-          .insert({
-            user_id: userId,
-            content: `🔄 Repost: ${originalPost.content || ''}`,
-            media_url: originalPost.media_url,
-            media_type: originalPost.media_type,
-            hashtags: originalPost.hashtags
-          });
-
-        if (insertError) throw insertError;
-
-        // Track repost
-        await supabase
+        const { error } = await supabase
           .from('post_reposts')
           .insert({ post_id: postId, user_id: userId });
         
-        setHasReposted(true);
-        setReposts(reposts + 1);
-        toast.success("🔄 Post repostato!");
+        if (error) throw error;
+        toast.success("🔄 Post condiviso!", { duration: 1500 });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling repost:', error);
-      toast.error("Errore nel repost");
+      
+      setHasReposted(previousHasReposted);
+      setReposts(previousReposts);
+      
+      toast.error("Errore nel repostare");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-4 pt-2">
+    <div className="flex items-center gap-4 md:gap-6 pt-2 md:pt-3 border-t">
       <Button
         variant="ghost"
         size="sm"
         onClick={toggleLike}
-        className={hasLiked ? "text-red-500" : ""}
+        disabled={loading}
+        className={`gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3 ${
+          hasLiked ? 'text-red-500 hover:text-red-600' : ''
+        }`}
       >
-        <Heart className={`h-4 w-4 mr-1 ${hasLiked ? "fill-current" : ""}`} />
-        {likes}
+        <Heart className={`h-4 w-4 ${hasLiked ? 'fill-current' : ''}`} />
+        <span className="text-xs md:text-sm font-medium">{likes}</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         onClick={onCommentClick}
+        className="gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3"
       >
-        <MessageCircle className="h-4 w-4 mr-1" />
-        {comments}
+        <MessageCircle className="h-4 w-4" />
+        <span className="text-xs md:text-sm font-medium">{comments}</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         onClick={toggleRepost}
-        className={hasReposted ? "text-green-500" : ""}
+        disabled={loading}
+        className={`gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3 ${
+          hasReposted ? 'text-green-500 hover:text-green-600' : ''
+        }`}
       >
-        <Repeat2 className="h-4 w-4 mr-1" />
-        {reposts}
+        <Repeat2 className="h-4 w-4" />
+        <span className="text-xs md:text-sm font-medium">{reposts}</span>
       </Button>
     </div>
   );
