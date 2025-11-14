@@ -1,12 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Home, Briefcase, Heart, MessageCircle, User } from "lucide-react";
+import { Home, Briefcase, Rss, MessageCircle, Sparkles } from "lucide-react";
 
 const TABS = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: Briefcase, label: "Offerte", path: "/offers" },
-  { icon: Heart, label: "Feed", path: "/feed" },
+  { icon: Rss, label: "Feed", path: "/feed" },
   { icon: MessageCircle, label: "Messaggi", path: "/messages" },
-  { icon: User, label: "Profilo", path: "/profile" },
+  { icon: Sparkles, label: "Copilot", path: "/copilot" },
 ];
 
 const MobileBottomTabs = () => {

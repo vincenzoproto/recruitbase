@@ -20,6 +20,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Messages = lazy(() => import("./pages/Messages"));
+const Conversation = lazy(() => import("./pages/Conversation"));
 const Copilot = lazy(() => import("./pages/Copilot"));
 const Offers = lazy(() => import("./pages/Offers"));
 const Notifications = lazy(() => import("./pages/Notifications"));
@@ -51,6 +52,7 @@ const App = () => (
       <Route path="/terms" element={<Terms />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/messages" element={<Messages />} />
+      <Route path="/messages/:userId" element={<Conversation />} />
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/offers" element={<Offers />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
