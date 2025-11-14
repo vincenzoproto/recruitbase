@@ -25,7 +25,7 @@ interface UseSocialFeedProps {
 }
 
 export const useSocialFeed = ({ 
-  pageSize = 20, 
+  pageSize = 10, 
   filterRole = null 
 }: UseSocialFeedProps = {}) => {
   const [posts, setPosts] = useState<Post[]>([]);

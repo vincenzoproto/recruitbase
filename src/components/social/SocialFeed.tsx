@@ -48,7 +48,8 @@ export const SocialFeed = () => {
             job_title
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (error) throw error;
       setPosts(data || []);
