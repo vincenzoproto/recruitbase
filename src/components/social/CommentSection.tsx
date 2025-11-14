@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,10 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       const { data, error } = await supabase
         .from('post_comments')
         .select(`
-          *,
+          id,
+          content,
+          created_at,
+          user_id,
           profiles:user_id (
             id,
             full_name,
@@ -58,9 +61,8 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
           table: 'post_comments',
           filter: `post_id=eq.${postId}`
         },
-        (payload) => {
-          const newCommentData = payload.new as Comment;
-          setComments(prev => [...prev, newCommentData]);
+        () => {
+          loadComments();
         }
       )
       .subscribe();
@@ -104,7 +106,6 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
     } catch (error: any) {
       console.error('Error adding comment:', error);
       
-      // Handle specific errors
       if (error?.message?.includes('troppo velocemente')) {
         toast.error("⚠️ Stai commentando troppo velocemente. Attendi qualche minuto.");
       } else if (error?.message?.includes('800 caratteri')) {
@@ -192,21 +193,6 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
           ) : (
             <span className="text-base md:text-lg">💬</span>
           )}
-        </Button>
-      </div>
-    </div>
-  );
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="resize-none"
-          rows={2}
-          disabled={sending}
-        />
-        <Button 
-          onClick={handleSubmitComment}
-          disabled={sending || !newComment.trim()}
-        >
-          {sending ? 'Invio...' : 'Invia'}
         </Button>
       </div>
     </div>

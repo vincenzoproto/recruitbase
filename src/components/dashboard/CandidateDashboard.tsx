@@ -28,6 +28,7 @@ import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
 import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 import { SidebarMenu } from "@/components/navigation/SidebarMenu";
+import { QuickActionsFAB, candidateActions } from "@/components/ui/quick-actions-fab";
 import { Menu } from "lucide-react";
 
 import { calculateCultureFit } from "@/lib/utils/profileHelper";
@@ -51,6 +52,22 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   const [chatUserName, setChatUserName] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
+  const [showCVUploader, setShowCVUploader] = useState(false);
+  const [showAISuggest, setShowAISuggest] = useState(false);
+
+  // Listen for custom events from Quick Actions
+  useEffect(() => {
+    const handleCVUpload = () => setShowCVUploader(true);
+    const handleAISuggest = () => setShowAISuggest(true);
+    
+    window.addEventListener('openCVUpload', handleCVUpload);
+    window.addEventListener('openAISuggest', handleAISuggest);
+    
+    return () => {
+      window.removeEventListener('openCVUpload', handleCVUpload);
+      window.removeEventListener('openAISuggest', handleAISuggest);
+    };
+  }, []);
 
   // Calculate Culture Fit Score using helper
   const cultureFitScore = calculateCultureFit(profile);
@@ -731,7 +748,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         />
       )}
 
-      <GlobalCopilotFAB userRole="candidate" />
+      <QuickActionsFAB actions={candidateActions} userRole="candidate" />
 
       <EditProfileDialog
         open={showEditProfile}

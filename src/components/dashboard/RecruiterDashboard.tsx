@@ -42,6 +42,7 @@ import { UnifiedLevelCard } from "./UnifiedLevelCard";
 import { TopOfTheDay } from "./TopOfTheDay";
 import { MiniNavbar } from "./MiniNavbar";
 import { QuickActionFAB } from "@/components/ui/quick-action-fab";
+import { QuickActionsFAB, recruiterActions } from "@/components/ui/quick-actions-fab";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
 import { RecruiterAnalytics } from "./RecruiterAnalytics";
 import { RecruiterCalendar } from "./RecruiterCalendar";
@@ -787,7 +788,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         notificationCount={notificationCount}
       />
 
-      <GlobalCopilotFAB userRole="recruiter" />
+      <QuickActionsFAB actions={recruiterActions} userRole="recruiter" />
 
       {showCreateJob && (
         <CreateJobDialog

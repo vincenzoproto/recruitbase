@@ -31,7 +31,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const handleMediaSelect = (file: File, type: "image" | "audio" | "video") => {
     if (!file) return;
 
-    // Validate file size
     const maxSize = type === "image" ? 10 : 50;
     if (file.size > maxSize * 1024 * 1024) {
       toast.error(`File troppo grande. Massimo ${maxSize}MB`);
@@ -41,7 +40,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
     setMediaFile(file);
     setMediaType(type);
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setMediaPreview(e.target?.result as string);
@@ -79,7 +77,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
       let mediaUrl = null;
 
-      // Upload media if present
       if (mediaFile && mediaType) {
         const fileExt = mediaFile.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
@@ -106,10 +103,8 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
       setUploadProgress(80);
 
-      // Extract hashtags
       const hashtags = extractHashtags(content);
 
-      // Create post
       const { error: postError } = await supabase
         .from('posts')
         .insert({
@@ -124,7 +119,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
       setUploadProgress(100);
 
-      // Clear form
       setContent("");
       clearMedia();
       
@@ -136,7 +130,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
     } catch (error: any) {
       console.error('Error creating post:', error);
       
-      // Handle specific errors
       if (error?.message?.includes('troppo velocemente')) {
         toast.error("⚠️ Stai pubblicando troppo velocemente. Attendi qualche minuto.");
       } else if (error?.message?.includes('2000 caratteri')) {
@@ -170,7 +163,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
             </div>
           </div>
 
-          {/* Media Preview */}
           {mediaPreview && (
             <div className="relative rounded-lg overflow-hidden border">
               {mediaType === "image" && (
@@ -188,16 +180,15 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
               <Button
                 size="icon"
                 variant="destructive"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 h-7 w-7"
                 onClick={clearMedia}
                 disabled={uploading}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </Button>
             </div>
           )}
 
-          {/* Upload Progress */}
           {uploading && (
             <div className="space-y-2 animate-fade-in">
               <div className="flex items-center justify-between text-sm">
@@ -208,7 +199,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex gap-1 md:gap-2">
               <input
@@ -288,124 +278,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  );
-          <div className="relative rounded-lg overflow-hidden border">
-            {mediaType === "image" && (
-              <img src={mediaPreview} alt="Preview" className="w-full h-48 object-cover" />
-            )}
-            {mediaType === "video" && (
-              <video src={mediaPreview} className="w-full h-48 object-cover" controls />
-            )}
-            {mediaType === "audio" && (
-              <div className="flex items-center gap-3 p-4 bg-accent">
-                <Mic className="h-6 w-6 text-primary" />
-                <span className="text-sm font-medium">Audio selezionato</span>
-              </div>
-            )}
-            <Button
-              size="icon"
-              variant="destructive"
-              className="absolute top-2 right-2"
-              onClick={clearMedia}
-              disabled={uploading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-
-        {/* Upload Progress */}
-        {uploading && (
-          <div className="space-y-2 animate-fade-in">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Caricamento in corso...</span>
-              <span className="font-medium text-primary">{uploadProgress}%</span>
-            </div>
-            <Progress value={uploadProgress} className="h-2" />
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleMediaSelect(e.target.files[0], "image")}
-              disabled={uploading || !!mediaFile}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => imageInputRef.current?.click()}
-              disabled={uploading || !!mediaFile}
-              title="Aggiungi immagine"
-            >
-              <Image className="h-5 w-5" />
-            </Button>
-
-            <input
-              ref={videoInputRef}
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleMediaSelect(e.target.files[0], "video")}
-              disabled={uploading || !!mediaFile}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => videoInputRef.current?.click()}
-              disabled={uploading || !!mediaFile}
-              title="Aggiungi video"
-            >
-              <Video className="h-5 w-5" />
-            </Button>
-
-            <input
-              ref={audioInputRef}
-              type="file"
-              accept="audio/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleMediaSelect(e.target.files[0], "audio")}
-              disabled={uploading || !!mediaFile}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => audioInputRef.current?.click()}
-              disabled={uploading || !!mediaFile}
-              title="Aggiungi audio"
-            >
-              <Mic className="h-5 w-5" />
-            </Button>
-          </div>
-
-          <Button
-            onClick={handleSubmit}
-            disabled={uploading || (!content.trim() && !mediaFile)}
-          >
-            {uploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Pubblicazione...
-              </>
-            ) : (
-              <>
-                <Send className="mr-2 h-4 w-4" />
-                Pubblica
-              </>
-            )}
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Usa #hashtag per categorizzare il tuo post
-        </p>
       </CardContent>
     </Card>
   );
