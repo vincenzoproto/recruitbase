@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Share2, Copy, CheckCircle, Heart } from "lucide-react";
 import TRSBadge from "@/components/trm/TRSBadge";
 import { hapticFeedback } from "@/lib/haptics";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface PersonalBrandCardProps {
   profile: {
@@ -20,7 +20,7 @@ interface PersonalBrandCardProps {
 
 export const PersonalBrandCard = ({ profile }: PersonalBrandCardProps) => {
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
+  
 
   const profileUrl = `${window.location.origin}/profile/${profile.id}`;
 
@@ -28,8 +28,7 @@ export const PersonalBrandCard = ({ profile }: PersonalBrandCardProps) => {
     await hapticFeedback.success();
     navigator.clipboard.writeText(profileUrl);
     setCopied(true);
-    toast({
-      title: "Link copiato!",
+    toast.success("Link copiato!", {
       description: "Il link al tuo profilo è stato copiato negli appunti",
     });
     setTimeout(() => setCopied(false), 2000);

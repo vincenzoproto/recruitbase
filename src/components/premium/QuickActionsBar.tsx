@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus, MessageCircle, UserPlus } from "lucide-react";
 import { hapticFeedback } from "@/lib/haptics";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface QuickActionsBarProps {
@@ -15,7 +15,6 @@ export const QuickActionsBar = ({
   onAIChat, 
   onInviteRecruiter 
 }: QuickActionsBarProps) => {
-  const { toast } = useToast();
   const isMobile = useIsMobile();
 
   const handleAction = async (action: () => void, message: string) => {
@@ -23,7 +22,7 @@ export const QuickActionsBar = ({
     if (action) {
       action();
     } else {
-      toast({ title: message, description: "Funzionalità in arrivo!" });
+      toast(message, { description: "Funzionalità in arrivo!" });
     }
   };
 
