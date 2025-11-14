@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Image, Mic, Video, Send, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
+import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -18,9 +19,20 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const [mediaType, setMediaType] = useState<"image" | "audio" | "video" | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const { trackAction } = useAdvancedXPSystem(userId || undefined);
+
+  useEffect(() => {
+    loadUserId();
+  }, []);
+
+  const loadUserId = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUserId(user?.id || null);
+  };
 
   const extractHashtags = (text: string): string[] => {
     const hashtagRegex = /#[\w\u00C0-\u017F]+/g;
@@ -125,6 +137,9 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
       toast.success("Post pubblicato con successo! ✅", {
         duration: 3000,
       });
+
+      // Award XP for creating a post
+      trackAction('posts', 5, 'Post pubblicato sul feed');
 
       onPostCreated();
     } catch (error: any) {
