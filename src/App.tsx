@@ -34,6 +34,8 @@ const Career = lazy(() => import("./pages/Career"));
 const Pipeline = lazy(() => import("./pages/Pipeline"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const SearchPeople = lazy(() => import("./pages/SearchPeople"));
+const Connections = lazy(() => import("./pages/Connections"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -74,6 +76,8 @@ const App = () => (
       <Route path="/pipeline" element={<Pipeline />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/calendar" element={<CalendarPage />} />
+      <Route path="/search-people" element={<SearchPeople />} />
+      <Route path="/connections" element={<Connections />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

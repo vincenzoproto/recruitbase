@@ -145,9 +145,9 @@ export const SidebarMenu = ({
         locked: false 
       },
       { 
-        id: "search", 
+        id: "search-people", 
         icon: Search, 
-        label: "Ricerca", 
+        label: "Cerca Persone", 
         locked: false 
       },
       { 
@@ -189,6 +189,12 @@ export const SidebarMenu = ({
         label: "Badge", 
         locked: false 
       },
+      { 
+        id: "connections", 
+        icon: UserPlus, 
+        label: "Connessioni", 
+        locked: false 
+      },
     ],
     settings: [
       { 
@@ -223,7 +229,7 @@ export const SidebarMenu = ({
       { id: "career", icon: Compass, label: "Carriera", locked: false },
       { id: "cv", icon: Briefcase, label: "CV & Portfolio", locked: false },
       { id: "create-group", icon: UserPlus, label: "Crea Gruppo", locked: false },
-      { id: "search", icon: Search, label: "Ricerca", locked: false },
+      { id: "search-people", icon: Search, label: "Cerca Persone", locked: false },
       { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },
     ],
@@ -242,6 +248,12 @@ export const SidebarMenu = ({
         id: "badges", 
         icon: Award, 
         label: "Badge", 
+        locked: false 
+      },
+      { 
+        id: "connections", 
+        icon: UserPlus, 
+        label: "Connessioni", 
         locked: false 
       },
     ],
@@ -294,11 +306,12 @@ export const SidebarMenu = ({
         offers: "/offers",
         analytics: "/analytics",
         calendar: "/calendar",
-        search: "/search",
+        "search-people": "/search-people",
         "notifications-archive": "/notifications",
         copilot: "/copilot",
         feed: "/feed",
         badges: "/badges",
+        connections: "/connections",
         ambassador: "/ambassador",
         settings: "/settings",
         help: "/help",
