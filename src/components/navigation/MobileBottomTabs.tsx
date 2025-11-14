@@ -4,14 +4,14 @@ import { Home, Briefcase, Heart, MessageCircle, User } from "lucide-react";
 const TABS = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: Briefcase, label: "Offerte", path: "/offers" },
-  { icon: Heart, label: "Feed", path: "/social" },
+  { icon: Heart, label: "Feed", path: "/feed" },
   { icon: MessageCircle, label: "Messaggi", path: "/messages" },
   { icon: User, label: "Profilo", path: "/profile" },
 ];
 
 const MobileBottomTabs = () => {
   return (
-    <nav className="h-16 bg-background border-t border-border flex items-center justify-around fixed bottom-0 left-0 right-0 z-40">
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-40">
       {TABS.map(tab => {
         const Icon = tab.icon;
         return (
