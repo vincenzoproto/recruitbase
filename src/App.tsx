@@ -11,6 +11,7 @@ const Invite = lazy(() => import("./pages/Invite"));
 const InviteRef = lazy(() => import("./pages/InviteRef"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Profile = lazy(() => import("./pages/Profile"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const Social = lazy(() => import("./pages/Social"));
 const Feed = lazy(() => import("./pages/Feed"));
 const SearchProfiles = lazy(() => import("./pages/SearchProfiles"));
@@ -41,7 +42,7 @@ const App = () => (
       <Route path="/invite" element={<InviteRef />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/profile/:userId" element={<Profile />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile" element={<ProfilePage />} />
       <Route path="/social" element={<Social />} />
       <Route path="/feed" element={<Feed />} />
       <Route path="/search" element={<SearchProfiles />} />

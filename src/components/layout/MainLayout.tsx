@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import UnifiedTopBar from "@/components/navigation/UnifiedTopBar";
+import GlobalTopBar from "@/components/navigation/GlobalTopBar";
 import MobileBottomTabs from "@/components/navigation/MobileBottomTabs";
 
 interface LayoutProps {
@@ -9,15 +9,12 @@ interface LayoutProps {
 export const MainLayout = ({ children }: LayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* TOP BAR UNIFICATA */}
-      <UnifiedTopBar />
+      {/* TOP BAR GLOBALE */}
+      <GlobalTopBar />
 
-      {/* CONTENUTO - SEMPRE RENDERIZZA SUBITO */}
+      {/* CONTENUTO */}
       <main className="flex-1 overflow-y-auto pt-14 pb-16">
-        {/* Swipe semplice opzionale senza logica complessa */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory">
-          {children}
-        </div>
+        {children}
       </main>
 
       {/* TABS IN BASSO */}
