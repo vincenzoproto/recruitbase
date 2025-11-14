@@ -340,7 +340,6 @@ const Profile = () => {
           onSuccess={loadProfile}
         />
       )}
-      </div>
     </MainLayout>
   );
 };
