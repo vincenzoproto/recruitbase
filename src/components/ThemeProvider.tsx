@@ -1,16 +1,8 @@
-import * as React from "react";
+import { PropsWithChildren } from "react";
 
-// FIXED: Removed all hooks - simple wrapper only
-interface ThemeProviderProps {
-  children: React.ReactNode;
-}
-
-export function ThemeProvider({ children }: ThemeProviderProps) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {children}
-    </div>
-  );
+// ThemeProvider molto semplice e senza hook:
+export function ThemeProvider({ children }: PropsWithChildren) {
+  return <>{children}</>;
 }
 
 export default ThemeProvider;
