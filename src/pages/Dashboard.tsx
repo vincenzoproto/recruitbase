@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { EnhancedSplashScreen } from "@/components/splash/EnhancedSplashScreen";
 import UnifiedOnboarding from "@/components/onboarding/UnifiedOnboarding";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 // Lazy load dashboard components
 const RecruiterDashboard = lazy(() => import("@/components/dashboard/RecruiterDashboard"));
@@ -182,47 +183,56 @@ const Dashboard = () => {
 
 
 
+  if (showSplash) {
+    return <EnhancedSplashScreen />;
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-lg text-muted-foreground">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {showSplash && (
-        <EnhancedSplashScreen />
-      )}
+      <UnifiedOnboarding
+        open={showOnboarding}
+        userId={profile.id}
+        onComplete={handleOnboardingComplete}
+      />
       
-      {!showSplash && (
-        <>
-          <UnifiedOnboarding
-            open={showOnboarding}
-            userId={profile?.id || ""}
-            onComplete={handleOnboardingComplete}
-          />
-          
-          <ErrorBoundary 
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-center space-y-4 animate-fade-in">
-                  <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  <p className="text-lg text-muted-foreground">Caricamento dashboard...</p>
-                </div>
+      <MainLayout>
+        <ErrorBoundary 
+          fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background">
+              <div className="text-center space-y-4 animate-fade-in">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-lg text-muted-foreground">Caricamento dashboard...</p>
               </div>
-            }
-          >
-          <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="text-center space-y-4 animate-fade-in">
-              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-lg text-muted-foreground">Preparazione dashboard...</p>
             </div>
-          </div>
-        }>
-          {profile.role === "recruiter" ? (
-            <RecruiterDashboard profile={profile} />
-          ) : (
-            <CandidateDashboard profile={profile} />
-          )}
-        </Suspense>
+          }
+        >
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background">
+              <div className="text-center space-y-4 animate-fade-in">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-lg text-muted-foreground">Preparazione dashboard...</p>
+              </div>
+            </div>
+          }>
+            {profile.role === "recruiter" ? (
+              <RecruiterDashboard profile={profile} />
+            ) : (
+              <CandidateDashboard profile={profile} />
+            )}
+          </Suspense>
         </ErrorBoundary>
-        </>
-      )}
+      </MainLayout>
     </>
   );
 };

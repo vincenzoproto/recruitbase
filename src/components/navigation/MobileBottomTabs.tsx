@@ -10,7 +10,6 @@ const MobileBottomTabs = () => {
     { icon: Rss, label: "Feed", path: "/feed" },
     { icon: MessageCircle, label: "Messaggi", path: "/messages" },
     { icon: Briefcase, label: "Offerte", path: "/offers" },
-    { icon: User, label: "Profilo", path: "/profile" },
   ];
 
   const candidateTabs = [
@@ -18,7 +17,6 @@ const MobileBottomTabs = () => {
     { icon: Rss, label: "Feed", path: "/feed" },
     { icon: Briefcase, label: "Job Match", path: "/offers" },
     { icon: MessageCircle, label: "Messaggi", path: "/messages" },
-    { icon: User, label: "Profilo", path: "/profile" },
   ];
 
   const TABS = role === "recruiter" ? recruiterTabs : candidateTabs;

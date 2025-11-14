@@ -424,65 +424,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         onLogout={handleSignOut}
       />
 
-      <header className="border-b bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarMenuOpen(true)}
-              className="flex-shrink-0 md:hidden"
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-            <Briefcase className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
-            <div className="min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">Recruit Base TRM</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                {profile.full_name}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/search')}
-              className="gap-1"
-            >
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Cerca</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/profile')}
-              className="gap-1"
-            >
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Profilo</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/social')}
-              className="gap-1"
-            >
-              <Rss className="h-4 w-4" />
-              <span className="hidden sm:inline">Social</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSignOut}
-              className="gap-1"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Esci</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Header rimosso - ora gestito da GlobalTopBar */}
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
         {/* Meeting Confirmation Banner */}
@@ -766,27 +708,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         <LinkedInIntegration />
       </main>
 
-      <MobileBottomNav 
-        activeTab={
-          currentView === 0 ? "home" :
-          currentView === 2 ? "match" :
-          currentView === 4 ? "trm" :
-          currentView === 9 ? "messages" :
-          currentView === 10 ? "notifications" :
-          "home"
-        }
-        onTabChange={(tab) => {
-          if (tab === "home") setCurrentView(0);
-          else if (tab === "match") setCurrentView(2);
-          else if (tab === "trm") setCurrentView(4);
-          else if (tab === "messages") setCurrentView(9);
-          else if (tab === "notifications") setCurrentView(10);
-          hapticFeedback.light();
-        }}
-        userRole="recruiter"
-        unreadCount={unreadCount}
-        notificationCount={notificationCount}
-      />
+      {/* BottomNav rimosso - ora gestito da MobileBottomTabs */}
 
       <QuickActionsFAB actions={recruiterActions} userRole="recruiter" />
 

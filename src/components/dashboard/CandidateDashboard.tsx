@@ -329,39 +329,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         onLogout={handleSignOut}
       />
 
-      <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">RecruitBase</h1>
-              {profile.is_premium && (
-                <Badge variant="default" className="bg-gradient-to-r from-amber-500 to-yellow-500 text-xs">
-                  <Crown className="h-3 w-3 mr-1" />
-                  Premium
-                </Badge>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/search')}
-              className="gap-1"
-            >
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Cerca</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Header rimosso - ora gestito da GlobalTopBar */}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Meeting Confirmation Banner */}
@@ -726,27 +694,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         </div>
       </main>
 
-      {isMobile && (
-        <MobileBottomNav
-          activeTab={
-            currentView === 0 ? "home" :
-            currentView === 1 ? "offers" :
-            currentView === 3 ? "carriera" :
-            currentView === 5 ? "messages" :
-            currentView === 6 ? "notifications" :
-            "home"
-          }
-          onTabChange={(tab) => {
-            if (tab === "home") setCurrentView(0);
-            else if (tab === "offers") setCurrentView(1);
-            else if (tab === "carriera") setCurrentView(3);
-            else if (tab === "messages") setCurrentView(5);
-            else if (tab === "notifications") setCurrentView(6);
-          }}
-          userRole="candidate"
-          unreadCount={unreadCount}
-        />
-      )}
+      {/* BottomNav rimosso - ora gestito da MobileBottomTabs */}
 
       <QuickActionsFAB actions={candidateActions} userRole="candidate" />
 
