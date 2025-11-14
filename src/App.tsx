@@ -1,9 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { Routes, Route } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -28,17 +24,6 @@ const Copilot = lazy(() => import("./pages/Copilot"));
 const Offers = lazy(() => import("./pages/Offers"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 10,
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
     <Skeleton className="h-full w-full" />
@@ -46,40 +31,32 @@ const LoadingFallback = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="recruit-base-theme">
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/invite/:code" element={<Invite />} />
-            <Route path="/invite" element={<InviteRef />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/profile/:userId" element={<Profile />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/social" element={<Social />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/search" element={<SearchProfiles />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/score-info" element={<ScoreInfo />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/copilot" element={<Copilot />} />
-            <Route path="/offers" element={<Offers />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <Suspense fallback={<LoadingFallback />}>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/invite/:code" element={<Invite />} />
+      <Route path="/invite" element={<InviteRef />} />
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/profile/:userId" element={<Profile />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/social" element={<Social />} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/search" element={<SearchProfiles />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/score-info" element={<ScoreInfo />} />
+      <Route path="/demo" element={<Demo />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/messages" element={<Messages />} />
+      <Route path="/copilot" element={<Copilot />} />
+      <Route path="/offers" element={<Offers />} />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </Suspense>
 );
 
 export default App;
