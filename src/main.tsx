@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider defaultTheme="system" storageKey="recruit-base-theme">
+        <ThemeProvider>
           <Toaster />
           <Sonner />
           <App />
