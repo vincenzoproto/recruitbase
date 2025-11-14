@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// FIXED: Removed all hooks - simple wrapper only
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
@@ -11,3 +12,5 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     </div>
   );
 }
+
+export default ThemeProvider;
