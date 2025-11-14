@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, Mail, Phone, Linkedin, ArrowLeft, MessageCircle, Edit, FileText, Upload } from "lucide-react";
+import { MapPin, Briefcase, Mail, Phone, Linkedin, Edit, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import EditProfileDialog from "@/components/dashboard/EditProfileDialog";
+import { CVUploader } from "@/components/candidate/CVUploader";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -17,6 +19,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [showCVUploader, setShowCVUploader] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -68,17 +71,21 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Caricamento...</p>
-      </div>
+      <MainLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-muted-foreground">Caricamento...</p>
+        </div>
+      </MainLayout>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Profilo non trovato</p>
-      </div>
+      <MainLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-muted-foreground">Profilo non trovato</p>
+        </div>
+      </MainLayout>
     );
   }
 
@@ -99,17 +106,8 @@ const Profile = () => {
   const completionPercentage = Math.round((filledFields / completionFields.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <MainLayout>
       <div className="container max-w-4xl mx-auto py-8 px-4">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/dashboard")}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Torna alla Dashboard
-        </Button>
-
         {/* Profile Completion Banner */}
         {isOwnProfile && completionPercentage < 100 && (
           <Card className="mb-6 border-primary/30 bg-primary/5 animate-fade-in">
@@ -342,7 +340,8 @@ const Profile = () => {
           onSuccess={loadProfile}
         />
       )}
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

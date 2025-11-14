@@ -27,7 +27,7 @@ export const MobileBottomNav = ({
     { id: "offers", icon: Briefcase, label: "Offerte" },
     { id: "feed", icon: Heart, label: "Feed" },
     { id: "messages", icon: MessageCircle, label: "Messaggi", badge: unreadCount },
-    { id: "profile", icon: Bell, label: "Profilo", badge: notificationCount },
+    { id: "profile", icon: Kanban, label: "Profilo", badge: notificationCount },
   ];
 
   const handleTabChange = (tabId: string) => {
