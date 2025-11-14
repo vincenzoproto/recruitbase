@@ -21,24 +21,13 @@ export const MobileBottomNav = ({
 
   if (!isMobile) return null;
 
-  // Navbar specifica per ruolo v20
-  const recruiterItems = [
+  // Unified 4-tab navigation (same for all users)
+  const navItems = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
-    { id: "match", icon: Heart, label: "Match" },
-    { id: "trm", icon: Kanban, label: "TRM" },
+    { id: "feed", icon: Heart, label: "Feed" },
     { id: "messages", icon: MessageCircle, label: "Messaggi", badge: unreadCount },
-    { id: "notifications", icon: Bell, label: "Notifiche", badge: notificationCount },
+    { id: "profile", icon: Bell, label: "Profilo", badge: notificationCount },
   ];
-
-  const candidateItems = [
-    { id: "home", icon: LayoutDashboard, label: "Home" },
-    { id: "offers", icon: Briefcase, label: "Offerte" },
-    { id: "carriera", icon: Kanban, label: "Carriera" },
-    { id: "messages", icon: MessageCircle, label: "Messaggi", badge: unreadCount },
-    { id: "notifications", icon: Bell, label: "Notifiche", badge: notificationCount },
-  ];
-
-  const navItems = userRole === "recruiter" ? recruiterItems : candidateItems;
 
   const handleTabChange = (tabId: string) => {
     hapticFeedback.light();
