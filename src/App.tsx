@@ -23,6 +23,8 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Messages = lazy(() => import("./pages/Messages"));
+const Copilot = lazy(() => import("./pages/Copilot"));
+const Offers = lazy(() => import("./pages/Offers"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +67,8 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/copilot" element={<Copilot />} />
+            <Route path="/offers" element={<Offers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

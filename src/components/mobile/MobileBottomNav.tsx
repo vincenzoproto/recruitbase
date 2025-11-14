@@ -21,9 +21,10 @@ export const MobileBottomNav = ({
 
   if (!isMobile) return null;
 
-  // Unified 4-tab navigation (same for all users)
+  // Unified 5-tab navigation (same for all users)
   const navItems = [
     { id: "home", icon: LayoutDashboard, label: "Home" },
+    { id: "offers", icon: Briefcase, label: "Offerte" },
     { id: "feed", icon: Heart, label: "Feed" },
     { id: "messages", icon: MessageCircle, label: "Messaggi", badge: unreadCount },
     { id: "profile", icon: Bell, label: "Profilo", badge: notificationCount },
