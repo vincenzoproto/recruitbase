@@ -63,7 +63,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const isMobile = useIsMobile();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [showCreateJob, setShowCreateJob] = useState(false);
-  const [currentView, setCurrentView] = useState(0); // 0: Home, 1: Feed, 2: Match, 3: Candidati, 4: Pipeline, 5: Offerte, 6: Insights, 7: Gruppi Chat
+  const [currentView, setCurrentView] = useState(0); // 0: Home
   const [miniNavSection, setMiniNavSection] = useState<"dashboard" | "chat" | "trm">("dashboard");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
@@ -352,7 +352,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <OnboardingFlow 
+      <OnboardingFlow
         open={showOnboarding} 
         onComplete={handleOnboardingComplete}
         userId={profile.id}
