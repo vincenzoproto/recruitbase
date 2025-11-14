@@ -1,19 +1,22 @@
 import { useUserRole } from "@/hooks/useUserRole";
-import { Bell, MessageCircle } from "lucide-react";
+import { Bell, MessageCircle, Menu } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { SidebarMenu } from "@/components/navigation/SidebarMenu";
 
 const GlobalTopBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const role = useUserRole();
   const [userId, setUserId] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { unreadCount } = useMessageNotifications(userId || "");
   const [notificationCount, setNotificationCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -29,6 +32,16 @@ const GlobalTopBar = () => {
   const loadUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUserId(user?.id || null);
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      
+      if (profile) setUserProfile(profile);
+    }
   };
 
   const loadNotificationCount = async () => {
@@ -75,12 +88,33 @@ const GlobalTopBar = () => {
     return role === "candidate" ? "RecruitBase" : "RecruitBase HR";
   };
 
+  const handleNavigate = (section: string) => {
+    setSidebarOpen(false);
+    navigate(`/${section}`);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border flex items-center justify-between z-50">
-      
-      <h1 className="font-semibold text-lg truncate">
-        {getPageTitle()}
-      </h1>
+    <>
+      <header className="fixed top-0 left-0 right-0 h-14 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border flex items-center justify-between z-50">
+        
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+          
+          <h1 className="font-semibold text-lg truncate">
+            {getPageTitle()}
+          </h1>
+        </div>
 
       <div className="flex items-center gap-2">
         <Button
@@ -118,7 +152,23 @@ const GlobalTopBar = () => {
         </Button>
       </div>
 
-    </header>
+      </header>
+
+      {userProfile && (
+        <SidebarMenu
+          open={sidebarOpen}
+          onOpenChange={setSidebarOpen}
+          fullName={userProfile.full_name || "Utente"}
+          avatarUrl={userProfile.avatar_url}
+          role={role || "candidate"}
+          planType={userProfile.is_premium ? "pro" : "free"}
+          trsScore={userProfile.talent_relationship_score}
+          cultureFit={85}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+        />
+      )}
+    </>
   );
 };
 

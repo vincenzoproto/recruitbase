@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import type { Comment } from "@/types";
+import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
 
 interface CommentSectionProps {
   postId: string;
@@ -17,6 +18,17 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const { trackAction } = useAdvancedXPSystem(userId || undefined);
+
+  useEffect(() => {
+    loadUserId();
+  }, []);
+
+  const loadUserId = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUserId(user?.id || null);
+  };
 
   const loadComments = useCallback(async () => {
     setLoading(true);
@@ -103,6 +115,9 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       
       setNewComment("");
       toast.success("Commento aggiunto!");
+      
+      // Award XP for commenting
+      trackAction('comments', 3, 'Commento su un post');
     } catch (error: any) {
       console.error('Error adding comment:', error);
       

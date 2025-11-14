@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
 import { toast } from "sonner";
 import { hapticFeedback } from "@/lib/haptics";
+import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
 
 interface PostActionsProps {
   postId: string;
@@ -18,6 +19,7 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
   const [hasReposted, setHasReposted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { trackAction } = useAdvancedXPSystem(userId || undefined);
 
   useEffect(() => {
     loadStats();
@@ -102,6 +104,9 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
         
         if (error) throw error;
         toast.success("❤️ Like aggiunto", { duration: 1500 });
+        
+        // Award XP for like
+        trackAction('posts', 1, 'Like su un post');
       }
     } catch (error: any) {
       console.error('Error toggling like:', error);
@@ -153,6 +158,9 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
         
         if (error) throw error;
         toast.success("🔄 Post condiviso!", { duration: 1500 });
+        
+        // Award XP for repost
+        trackAction('shares', 10, 'Repost di un contenuto');
       }
     } catch (error: any) {
       console.error('Error toggling repost:', error);
