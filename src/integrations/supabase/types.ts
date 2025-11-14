@@ -1372,6 +1372,27 @@ export type Database = {
           },
         ]
       }
+      user_post_rate_limit: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -1431,6 +1452,16 @@ export type Database = {
           full_name: string
         }[]
       }
+      check_rate_limit: {
+        Args: {
+          p_action_type: string
+          p_max_actions: number
+          p_time_window_minutes: number
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
