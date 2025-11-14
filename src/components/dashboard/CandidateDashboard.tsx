@@ -1,34 +1,22 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, LogOut, User, CheckCircle, Clock, Crown, Rss, Search, Heart, MessageCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Briefcase, User, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
-import JobOfferCard from "./JobOfferCard";
 import { Badge } from "@/components/ui/badge";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
-import { TinderMatch } from "@/components/match/TinderMatch";
-import { MatchesList } from "@/components/match/MatchesList";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { CVUploader } from "@/components/candidate/CVUploader";
-import RecruiterCard from "./RecruiterCard";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ChatDialog } from "@/components/chat/ChatDialog";
-import { GroupChatSection } from "@/components/chat/GroupChatSection";
 import { PremiumCandidateDashboard } from "./PremiumCandidateDashboard";
 import { CVCopilot } from "@/components/candidate/CVCopilot";
-import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
-import { FeedWithTabs } from "@/components/social/FeedWithTabs";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
 import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 import { SidebarMenu } from "@/components/navigation/SidebarMenu";
 import { QuickActionsFAB, candidateActions } from "@/components/ui/quick-actions-fab";
-import { Menu } from "lucide-react";
-
 import { calculateCultureFit } from "@/lib/utils/profileHelper";
 
 interface CandidateDashboardProps {
@@ -38,156 +26,15 @@ interface CandidateDashboardProps {
 
 const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProps) => {
   const navigate = useNavigate();
-  const [jobOffers, setJobOffers] = useState<any[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
-  const [applications, setApplications] = useState<any[]>([]);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const isMobile = useIsMobile();
-  const [currentView, setCurrentView] = useState(0);
-  const [recruiters, setRecruiters] = useState<any[]>([]);
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [chatUserName, setChatUserName] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { unreadCount, requestNotificationPermission } = useMessageNotifications(profile.id);
-  const [showCVUploader, setShowCVUploader] = useState(false);
-  const [showAISuggest, setShowAISuggest] = useState(false);
+  const { unreadCount } = useMessageNotifications(profile.id);
 
-  // Listen for custom events from Quick Actions
-  useEffect(() => {
-    const handleCVUpload = () => setShowCVUploader(true);
-    const handleAISuggest = () => setShowAISuggest(true);
-    
-    window.addEventListener('openCVUpload', handleCVUpload);
-    window.addEventListener('openAISuggest', handleAISuggest);
-    
-    return () => {
-      window.removeEventListener('openCVUpload', handleCVUpload);
-      window.removeEventListener('openAISuggest', handleAISuggest);
-    };
-  }, []);
-
-  // Calculate Culture Fit Score using helper
   const cultureFitScore = calculateCultureFit(profile);
-
-  const views = [
-    { id: 0, name: "Home", icon: "🏠" },
-    { id: 1, name: "Offerte", icon: "📋" },
-    { id: 2, name: "Feed", icon: "📱" },
-    { id: 3, name: "Carriera", icon: "🧭" },
-    { id: 4, name: "Profilo", icon: "👤" },
-    { id: 5, name: "Messaggi", icon: "💬" },
-    { id: 6, name: "Notifiche", icon: "🔔" },
-  ];
-
-  useEffect(() => {
-    loadJobOffers();
-    loadApplications();
-    loadRecruiters();
-  }, []);
-
-  const loadJobOffers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("job_offers")
-        .select("id, title, city, sector, experience_level, description, created_at")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(30);
-
-      if (error) {
-        console.error("RLS ERROR loading job offers:", error);
-        toast.error("Errore nel caricamento delle offerte");
-        setJobOffers([]);
-        setFilteredJobs([]);
-        return;
-      }
-      
-      setJobOffers(data || []);
-      setFilteredJobs(data || []);
-    } catch (error) {
-      console.error("Error loading job offers:", error);
-      setJobOffers([]);
-      setFilteredJobs([]);
-    }
-  };
-
-  const handleSearch = (query: string, filters: SearchFilterValues) => {
-    let filtered = [...jobOffers];
-
-    // Filter by query
-    if (query) {
-      filtered = filtered.filter(j =>
-        j.title?.toLowerCase().includes(query.toLowerCase()) ||
-        j.description?.toLowerCase().includes(query.toLowerCase()) ||
-        j.sector?.toLowerCase().includes(query.toLowerCase())
-      );
-    }
-
-    // Filter by city
-    if (filters.city) {
-      filtered = filtered.filter(j => j.city === filters.city);
-    }
-
-    // Filter by sector
-    if (filters.sector) {
-      filtered = filtered.filter(j => j.sector === filters.sector);
-    }
-
-    // Filter by experience level
-    if (filters.experienceLevel) {
-      filtered = filtered.filter(j => j.experience_level === filters.experienceLevel);
-    }
-
-    setFilteredJobs(filtered);
-  };
-
-  const loadApplications = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("applications")
-        .select("job_offer_id")
-        .eq("candidate_id", user.id);
-
-      if (error) {
-        console.error("RLS ERROR loading applications:", error);
-        toast.error("Errore nel caricamento delle candidature");
-        setApplications([]);
-        return;
-      }
-      
-      setApplications(data || []);
-    } catch (error) {
-      console.error("Error loading applications:", error);
-      setApplications([]);
-    }
-  };
-
-  const loadRecruiters = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url, job_title, city, bio")
-        .eq("role", "recruiter")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error("RLS ERROR loading recruiters:", error);
-        toast.error("Errore nel caricamento dei recruiter");
-        setRecruiters([]);
-        return;
-      }
-      
-      setRecruiters(data || []);
-    } catch (error) {
-      console.error("Error loading recruiters:", error);
-      setRecruiters([]);
-    }
-  };
 
   const handleOpenChat = async (userId: string) => {
     const { data } = await supabase
@@ -208,83 +55,16 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   };
 
   const handleMenuNavigate = (section: string) => {
-    switch(section) {
-      case "profile":
-        setCurrentView(4);
-        break;
-      case "cv":
-        setCurrentView(4);
-        setShowEditProfile(true);
-        break;
-      case "saved-offers":
-        setCurrentView(1);
-        break;
-      case "feed":
-        setCurrentView(2);
-        break;
-      case "career":
-        setCurrentView(3);
-        break;
-      case "ai-suggestions":
-        if (profile.is_premium) {
-          toast.info("Funzionalità in arrivo");
-        }
-        break;
-      case "settings":
-        toast.info("Impostazioni in arrivo");
-        break;
-      case "billing":
-        window.open("https://buy.stripe.com/7sYfZh2br4aUfNW24GabK00", "_blank");
-        break;
-      case "support":
-        navigate("/contact");
-        break;
-      case "privacy":
-        navigate("/privacy");
-        break;
-      case "terms":
-        navigate("/terms");
-        break;
-      case "contact":
-        navigate("/contact");
-        break;
-    }
-  };
-
-  const handleApply = async (jobOfferId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Devi effettuare l'accesso");
-        return;
-      }
-
-      const { error } = await supabase.from("applications").insert({
-        job_offer_id: jobOfferId,
-        candidate_id: user.id,
-      });
-
-      if (error) {
-        console.error("RLS ERROR applying to job:", error);
-        const code = (error as any).code;
-        if (code === "23505") {
-          toast.error("Ti sei già candidato per questa posizione");
-        } else {
-          toast.error("Errore nell'invio della candidatura");
-        }
-        return;
-      }
-
-      toast.success("Candidatura inviata con successo!");
-      loadApplications();
-    } catch (error) {
-      console.error("Error applying to job:", error);
-      toast.error("Errore nell'invio della candidatura");
+    setSidebarOpen(false);
+    if (section.startsWith("/")) {
+      navigate(section);
+    } else {
+      navigate(`/${section}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <MeetingRequestDialog 
         userId={profile.id}
         open={meetingDialogOpen}
@@ -301,7 +81,6 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         />
       )}
       
-      {/* Sidebar Menu */}
       <SidebarMenu
         open={sidebarOpen}
         onOpenChange={setSidebarOpen}
@@ -315,368 +94,68 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         onLogout={handleSignOut}
       />
 
-      {/* Header rimosso - ora gestito da GlobalTopBar */}
-
       <main className="container mx-auto px-4 py-8 space-y-6">
-        {/* Meeting Confirmation Banner */}
         <MeetingConfirmationBanner userId={profile.id} userRole="candidate" />
 
-        {/* Indicatori vista - solo mobile */}
-        {isMobile && (
-          <div className="flex justify-center gap-2 -mt-2">
-            {views.map((v) => (
-              <button
-                key={v.id}
-                onClick={() => setCurrentView(v.id)}
-                className={`h-2 rounded-full transition-all ${
-                  currentView === v.id ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"
-                }`}
-              />
-            ))}
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">
+                👋 Benvenuto, {profile.full_name}
+                {profile.is_premium && (
+                  <Badge className="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-none">
+                    <Crown className="h-3 w-3 mr-1" />
+                    Premium
+                  </Badge>
+                )}
+              </h2>
+              <p className="text-muted-foreground">Pannello Carriera · controlla CV, candidature e match consigliati</p>
+            </div>
+            <CVCopilot profile={profile} />
           </div>
-        )}
 
-        {/* Header vista corrente - solo mobile */}
-        {isMobile && (
-          <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <div className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <span>{views[currentView].icon}</span>
-                  {views[currentView].name}
-                </div>
-              </div>
-              <div className="flex gap-1">
-                {views.map((v) => (
-                  <Button
-                    key={v.id}
-                    onClick={() => setCurrentView(v.id)}
-                    variant={currentView === v.id ? "default" : "ghost"}
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    {v.icon}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
+          <Card className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg font-semibold">🚀 Azioni Rapide</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowEditProfile(true)}
+                className="gap-2"
+              >
+                <User className="h-4 w-4" />
+                Completa profilo
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate("/offers")}
+                className="gap-2"
+              >
+                <Briefcase className="h-4 w-4" />
+                Vedi offerte
+              </Button>
+            </div>
           </Card>
-        )}
 
-        <div className="min-h-[60vh]">{/* Vista 0: Home */}
-          {(!isMobile || currentView === 0) && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">
-                    👋 Benvenuto, {profile.full_name}
-                    {profile.is_premium && (
-                      <Badge className="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-none">
-                        <Crown className="h-3 w-3 mr-1" />
-                        Premium
-                      </Badge>
-                    )}
-                  </h2>
-                  <p className="text-muted-foreground">Pannello Carriera · controlla CV, candidature e match consigliati</p>
-                </div>
-                <CVCopilot profile={profile} />
-              </div>
-
-              {/* Azioni rapide */}
-              <Card className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg font-semibold">🚀 Azioni Rapide</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setCurrentView(4)}
-                    className="gap-2"
-                  >
-                    <User className="h-4 w-4" />
-                    Completa profilo
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setCurrentView(1)}
-                    className="gap-2"
-                  >
-                    <Briefcase className="h-4 w-4" />
-                    Vedi offerte
-                  </Button>
-                </div>
-              </Card>
-
-              <PremiumCandidateDashboard profile={profile} onNavigate={setCurrentView} />
-            </div>
-          )}
-
-          {/* Vista 1: Offerte */}
-          {(!isMobile || currentView === 1) && (
-            <Card className="animate-fade-in">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    Offerte Disponibili
-                  </CardTitle>
-                  <CardDescription>
-                    {jobOffers.length === 0
-                      ? "Nessuna offerta disponibile al momento"
-                      : `${jobOffers.length} offerte disponibili`}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <SearchFilters userRole="candidate" onSearch={handleSearch} />
-                <div className="grid gap-4 md:grid-cols-2">
-                  {filteredJobs.length === 0 ? (
-                    <div className="col-span-2 text-center py-12 space-y-4 animate-fade-in">
-                      <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                        <Briefcase className="h-10 w-10 text-primary" />
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-lg font-semibold text-foreground">Nessuna offerta trovata</p>
-                        <p className="text-sm text-muted-foreground">
-                          {jobOffers.length === 0
-                            ? "Torna più tardi per scoprire nuove opportunità"
-                            : "Prova a modificare i filtri di ricerca"}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    filteredJobs.map((job) => {
-                      const hasApplied = applications.some((app) => app.job_offer_id === job.id);
-                      return (
-                        <JobOfferCard
-                          key={job.id}
-                          job={job}
-                          onApply={() => handleApply(job.id)}
-                          hasApplied={hasApplied}
-                          isCandidate
-                        />
-                      );
-                    })
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Vista 2: Feed SOLO */}
-          {(!isMobile || currentView === 2) && (
-            <div className="animate-fade-in">
-              <FeedWithTabs />
-            </div>
-          )}
-
-          {/* Vista 3: Carriera (Messaggi + Stats) */}
-          {(!isMobile || currentView === 3) && (
-            <div className="space-y-6 animate-fade-in">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                    🧭 Pannello Carriera
-                  </CardTitle>
-                  <CardDescription>
-                    Monitora il tuo percorso professionale
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Candidature</div>
-                      <div className="text-2xl font-bold">{applications.length}</div>
-                    </Card>
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">TRS</div>
-                      <div className="text-2xl font-bold">{profile.talent_relationship_score || 0}</div>
-                    </Card>
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Culture Fit</div>
-                      <div className="text-2xl font-bold">
-                        {cultureFitScore}%
-                      </div>
-                    </Card>
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Messaggi</div>
-                      <div className="text-2xl font-bold flex items-center gap-2">
-                        <MessageCircle className="h-5 w-5 text-primary" />
-                        {unreadCount}
-                      </div>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    💬 Messaggi
-                    {unreadCount > 0 && (
-                      <Badge variant="destructive" className="ml-2">
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </CardTitle>
-                  <CardDescription>
-                    Contatta i recruiter per opportunità
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Clicca su "Contatta" nelle card dei recruiter per iniziare una conversazione
-                    </p>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {recruiters.slice(0, 4).map((recruiter) => (
-                        <RecruiterCard
-                          key={recruiter.id}
-                          recruiter={recruiter}
-                          currentUserId={profile.id}
-                        />
-                      ))}
-                    </div>
-                    {recruiters.length > 4 && (
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => navigate('/search')}
-                      >
-                        Vedi tutti i recruiter →
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Vista 4: Profilo */}
-          {(!isMobile || currentView === 4) && (
-            <Card className="animate-fade-in">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Il Tuo Profilo
-                  </CardTitle>
-                  <CardDescription>
-                    {!profile.city || !profile.job_title || !profile.skills?.length
-                      ? "⚠️ Completa il profilo per essere più visibile ai recruiter"
-                      : "Il tuo profilo è completo e visibile ai recruiter"}
-                  </CardDescription>
-                </div>
-                <Button onClick={() => setShowEditProfile(true)} size="lg">
-                  {!profile.city || !profile.job_title || !profile.skills?.length
-                    ? "Completa Profilo"
-                    : "Modifica"}
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div>
-                    <span className="font-medium">Nome: </span>
-                    <span>{profile.full_name}</span>
-                  </div>
-                  {profile.city && (
-                    <div>
-                      <span className="font-medium">Città: </span>
-                      <span>{profile.city}</span>
-                    </div>
-                  )}
-                  {profile.job_title && (
-                    <div>
-                      <span className="font-medium">Ruolo: </span>
-                      <span>{profile.job_title}</span>
-                    </div>
-                  )}
-                  {profile.skills && profile.skills.length > 0 && (
-                    <div>
-                      <span className="font-medium">Competenze: </span>
-                      <span>{profile.skills.join(", ")}</span>
-                    </div>
-                  )}
-                  {profile.linkedin_url && (
-                    <div>
-                      <span className="font-medium">LinkedIn: </span>
-                      <a
-                        href={profile.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Visualizza profilo
-                      </a>
-                    </div>
-                  )}
-                  {profile.phone_number && (
-                    <div>
-                      <span className="font-medium">Telefono: </span>
-                      <span>{profile.phone_number}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <p className="font-medium mb-2">Curriculum Vitae</p>
-                  <CVUploader
-                    userId={profile.id}
-                    currentCvUrl={profile.cv_url}
-                    onUploadComplete={() => window.location.reload()}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Vista 5: Messaggi */}
-          {(!isMobile || currentView === 5) && (
-            <Card className="animate-fade-in">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" />
-                  Messaggi
-                </CardTitle>
-                <CardDescription>
-                  Le tue conversazioni con recruiter
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <GroupChatSection />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Vista 6: Notifiche */}
-          {(!isMobile || currentView === 6) && (
-            <Card className="animate-fade-in">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5" />
-                  Centro Notifiche
-                </CardTitle>
-                <CardDescription>
-                  Tutte le tue notifiche in un unico posto
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <NotificationBell
-                  userId={profile.id}
-                  onMeetingNotificationClick={() => setMeetingDialogOpen(true)}
-                  onMessageNotificationClick={(senderId) => handleOpenChat(senderId)}
-                />
-              </CardContent>
-            </Card>
-          )}
+          <PremiumCandidateDashboard 
+            profile={profile} 
+            onNavigate={(view) => {
+              if (view === 1) navigate("/offers");
+              else if (view === 2) navigate("/feed");
+              else if (view === 3) navigate("/career");
+              else if (view === 4) setShowEditProfile(true);
+              else if (view === 5) navigate("/messages");
+              else if (view === 6) navigate("/notifications");
+            }} 
+          />
         </div>
       </main>
 
-      {/* BottomNav rimosso - ora gestito da MobileBottomTabs */}
-
       <QuickActionsFAB actions={candidateActions} userRole="candidate" />
+      <GlobalCopilotFAB userRole="candidate" />
 
       <EditProfileDialog
         open={showEditProfile}
