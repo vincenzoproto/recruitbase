@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Fingerprint, X, Check } from "lucide-react";
 import { biometricAuth } from "@/lib/biometric-auth";
 import { hapticFeedback } from "@/lib/haptics";
-import { useToast } from "@/hooks/use-toast";
+import { showToast } from "@/hooks/use-toast";
 
 interface BiometricSetupProps {
   userId: string;
@@ -14,7 +14,6 @@ interface BiometricSetupProps {
 
 export const BiometricSetup = ({ userId, userName, onComplete }: BiometricSetupProps) => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const { toast } = useToast();
 
   const handleSetup = async () => {
     setIsRegistering(true);
@@ -24,10 +23,10 @@ export const BiometricSetup = ({ userId, userName, onComplete }: BiometricSetupP
       const available = await biometricAuth.isAvailable();
       
       if (!available) {
-        toast({
+        showToast({
           title: "Biometria non disponibile",
           description: "Il tuo dispositivo non supporta l'autenticazione biometrica",
-          variant: "destructive"
+          variant: "error"
         });
         onComplete();
         return;
@@ -37,24 +36,26 @@ export const BiometricSetup = ({ userId, userName, onComplete }: BiometricSetupP
 
       if (registered) {
         await hapticFeedback.success();
-        toast({
+        showToast({
           title: "✓ Biometria attivata!",
           description: "Potrai accedere rapidamente con impronta o Face ID",
+          variant: "success"
         });
         onComplete();
       } else {
-        toast({
+        showToast({
           title: "Configurazione non completata",
           description: "Potrai attivare la biometria più tardi dalle impostazioni",
+          variant: "warning"
         });
         onComplete();
       }
     } catch (error) {
       console.error('Biometric setup error:', error);
-      toast({
+      showToast({
         title: "Errore",
         description: "Si è verificato un errore durante la configurazione",
-        variant: "destructive"
+        variant: "error"
       });
       onComplete();
     } finally {

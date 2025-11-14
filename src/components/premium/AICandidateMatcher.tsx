@@ -5,7 +5,7 @@ import { Sparkles, TrendingUp, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import TRSBadge from "@/components/trm/TRSBadge";
 import { hapticFeedback } from "@/lib/haptics";
-import { useToast } from "@/hooks/use-toast";
+import { showToast } from "@/hooks/use-toast";
 
 interface CandidateMatch {
   id: string;
@@ -20,7 +20,7 @@ interface CandidateMatch {
 export const AICandidateMatcher = ({ recruiterId }: { recruiterId: string }) => {
   const [matches, setMatches] = useState<CandidateMatch[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     loadAIMatches();
@@ -67,7 +67,7 @@ export const AICandidateMatcher = ({ recruiterId }: { recruiterId: string }) => 
 
   const handleContactCandidate = async (candidateId: string) => {
     await hapticFeedback.medium();
-    toast({
+    showToast({
       title: "Apertura chat",
       description: "Funzionalità in arrivo!",
     });
