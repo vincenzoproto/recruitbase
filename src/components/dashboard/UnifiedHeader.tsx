@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-import { GlobalSearchBar } from "@/components/search/GlobalSearchBar";
 
 interface UnifiedHeaderProps {
   fullName?: string;
@@ -24,7 +23,7 @@ export const UnifiedHeader = ({ fullName, avatarUrl, role }: UnifiedHeaderProps)
     .slice(0, 2) || "U";
 
   return (
-    <div className="space-y-4 mb-6 animate-fade-in">
+    <div className="mb-6 animate-fade-in">
       <div className="flex items-center gap-3">
         <Avatar className="h-12 w-12 border-2 border-primary/20">
           <AvatarImage src={avatarUrl} alt={fullName} />
@@ -41,7 +40,6 @@ export const UnifiedHeader = ({ fullName, avatarUrl, role }: UnifiedHeaderProps)
           </h1>
         </div>
       </div>
-      <GlobalSearchBar />
     </div>
   );
 };

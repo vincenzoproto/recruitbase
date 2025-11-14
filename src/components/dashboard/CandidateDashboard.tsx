@@ -8,13 +8,11 @@ import { toast } from "sonner";
 import EditProfileDialog from "./EditProfileDialog";
 import JobOfferCard from "./JobOfferCard";
 import { Badge } from "@/components/ui/badge";
-import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SearchFilters, SearchFilterValues } from "@/components/search/SearchFilters";
 import { TinderMatch } from "@/components/match/TinderMatch";
 import { MatchesList } from "@/components/match/MatchesList";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSwipe } from "@/hooks/use-swipe";
 import { CVUploader } from "@/components/candidate/CVUploader";
 import RecruiterCard from "./RecruiterCard";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
@@ -285,18 +283,6 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
     }
   };
 
-  const swipeHandlers = useSwipe({
-    onSwipedLeft: () => {
-      if (!isMobile) return;
-      if (currentView < views.length - 1) setCurrentView(currentView + 1);
-    },
-    onSwipedRight: () => {
-      if (!isMobile) return;
-      if (currentView > 0) setCurrentView(currentView - 1);
-    },
-    minSwipeDistance: 50,
-  });
-
   return (
     <div className="min-h-screen bg-background">
       <MeetingRequestDialog 
@@ -359,7 +345,6 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
                   <span>{views[currentView].icon}</span>
                   {views[currentView].name}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">👈 Swipe per navigare 👉</p>
               </div>
               <div className="flex gap-1">
                 {views.map((v) => (
@@ -378,8 +363,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
           </Card>
         )}
 
-        <div {...(isMobile ? swipeHandlers : {})} className="min-h-[60vh] touch-pan-y" style={{ touchAction: 'pan-y' }}>
-          {/* Vista 0: Home */}
+        <div className="min-h-[60vh]">{/* Vista 0: Home */}
           {(!isMobile || currentView === 0) && (
             <div className="space-y-6 animate-fade-in">
               <div className="flex items-center justify-between mb-4">
@@ -426,10 +410,6 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
               </Card>
 
               <PremiumCandidateDashboard profile={profile} onNavigate={setCurrentView} />
-
-              {profile.referral_code && (
-                <AmbassadorSection userId={profile.id} referralCode={profile.referral_code} />
-              )}
             </div>
           )}
 

@@ -1,5 +1,5 @@
 import { useUserRole } from "@/hooks/useUserRole";
-import { Bell, MessageCircle, Menu } from "lucide-react";
+import { Bell, MessageCircle, Menu, Search } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -117,6 +117,14 @@ const GlobalTopBar = () => {
         </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/search-people")}
+        >
+          <Search className="w-5 h-5" />
+        </Button>
+
         <Button
           variant="ghost"
           size="icon"

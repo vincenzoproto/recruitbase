@@ -145,12 +145,6 @@ export const SidebarMenu = ({
         locked: false 
       },
       { 
-        id: "search-people", 
-        icon: Search, 
-        label: "Cerca Persone", 
-        locked: false 
-      },
-      { 
         id: "notifications-archive", 
         icon: Bell, 
         label: "Archivio notifiche", 
@@ -229,7 +223,6 @@ export const SidebarMenu = ({
       { id: "career", icon: Compass, label: "Carriera", locked: false },
       { id: "cv", icon: Briefcase, label: "CV & Portfolio", locked: false },
       { id: "create-group", icon: UserPlus, label: "Crea Gruppo", locked: false },
-      { id: "search-people", icon: Search, label: "Cerca Persone", locked: false },
       { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },
     ],
