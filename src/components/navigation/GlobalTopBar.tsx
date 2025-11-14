@@ -90,7 +90,9 @@ const GlobalTopBar = () => {
 
   const handleNavigate = (section: string) => {
     setSidebarOpen(false);
-    navigate(`/${section}`);
+    // Handle routes with or without leading slash
+    const route = section.startsWith('/') ? section : `/${section}`;
+    navigate(route);
   };
 
   const handleLogout = async () => {
