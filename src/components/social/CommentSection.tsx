@@ -71,7 +71,15 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   }, [postId, loadComments]);
 
   const handleSubmitComment = useCallback(async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) {
+      toast.error("Il commento non può essere vuoto");
+      return;
+    }
+
+    if (newComment.length > 800) {
+      toast.error("Il commento non può superare gli 800 caratteri");
+      return;
+    }
 
     setSending(true);
     try {
@@ -86,16 +94,26 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         .insert({
           post_id: postId,
           user_id: user.id,
-          content: newComment
+          content: newComment.trim()
         });
 
       if (error) throw error;
       
       setNewComment("");
       toast.success("Commento aggiunto!");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding comment:', error);
-      toast.error("Errore nell'aggiungere il commento");
+      
+      // Handle specific errors
+      if (error?.message?.includes('troppo velocemente')) {
+        toast.error("⚠️ Stai commentando troppo velocemente. Attendi qualche minuto.");
+      } else if (error?.message?.includes('800 caratteri')) {
+        toast.error("Il commento non può superare gli 800 caratteri");
+      } else if (error?.message?.includes('script')) {
+        toast.error("Contenuto non valido: script o codice non consentito");
+      } else {
+        toast.error("Errore nell'aggiungere il commento");
+      }
     } finally {
       setSending(false);
     }
@@ -116,23 +134,27 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   }
 
   return (
-    <div className="space-y-4 mt-4 pt-4 border-t">
+    <div className="space-y-3 md:space-y-4 mt-3 md:mt-4 pt-3 md:pt-4 border-t">
       {hasComments ? (
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-3">
-              <Avatar className="h-8 w-8">
+            <div key={comment.id} className="flex gap-2 md:gap-3">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8 shrink-0">
                 <AvatarImage src={comment.profiles?.avatar_url || undefined} />
                 <AvatarFallback className="text-xs">
                   {getInitials(comment.profiles?.full_name || 'Utente')}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <div className="bg-muted rounded-lg p-3">
-                  <p className="font-semibold text-sm">{comment.profiles?.full_name || 'Utente'}</p>
-                  <p className="text-sm">{comment.content}</p>
+              <div className="flex-1 min-w-0">
+                <div className="bg-accent/50 rounded-lg p-2 md:p-3">
+                  <p className="font-semibold text-xs md:text-sm">
+                    {comment.profiles?.full_name || 'Utente'}
+                  </p>
+                  <p className="text-xs md:text-sm text-foreground mt-0.5 md:mt-1 break-words">
+                    {comment.content}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 ml-1">
+                <p className="text-xs text-muted-foreground mt-1 ml-2 md:ml-3">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: it })}
                 </p>
               </div>
@@ -140,14 +162,40 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground text-center py-4">
-          Ancora nessun commento. Sii il primo!
+        <p className="text-xs md:text-sm text-muted-foreground text-center py-2 md:py-4">
+          Nessun commento ancora. Sii il primo!
         </p>
       )}
 
-      <div className="flex gap-2">
-        <Textarea
-          placeholder="Scrivi un commento..."
+      <div className="flex gap-2 md:gap-3">
+        <div className="relative flex-1">
+          <Textarea
+            placeholder="Scrivi un commento..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="min-h-[60px] md:min-h-[80px] resize-none text-sm pr-12 md:pr-14"
+            disabled={sending}
+            maxLength={800}
+          />
+          <div className="absolute bottom-1.5 right-1.5 md:bottom-2 md:right-2 text-xs text-muted-foreground">
+            {newComment.length}/800
+          </div>
+        </div>
+        <Button
+          onClick={handleSubmitComment}
+          disabled={sending || !newComment.trim()}
+          size="sm"
+          className="self-end h-[60px] md:h-[80px] w-12 md:w-14"
+        >
+          {sending ? (
+            <div className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          ) : (
+            <span className="text-base md:text-lg">💬</span>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           className="resize-none"

@@ -86,37 +86,40 @@ export const PostCard = ({ post }: PostCardProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-3">
+    <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader className="pb-2 md:pb-3">
+        <div className="flex items-start gap-2 md:gap-3">
           <Avatar 
-            className="cursor-pointer" 
+            className="cursor-pointer h-8 w-8 md:h-10 md:w-10" 
             onClick={() => navigate(`/profile/${post.profiles.id}`)}
           >
             <AvatarImage src={post.profiles.avatar_url || undefined} />
-            <AvatarFallback>{getInitials(post.profiles.full_name)}</AvatarFallback>
+            <AvatarFallback className="text-xs">{getInitials(post.profiles.full_name)}</AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
               <h4 
-                className="font-semibold cursor-pointer hover:underline"
+                className="font-semibold text-sm md:text-base cursor-pointer hover:underline truncate"
                 onClick={() => navigate(`/profile/${post.profiles.id}`)}
               >
                 {post.profiles.full_name}
               </h4>
               {post.profiles.role && (
-                <Badge variant="secondary" className="text-xs">
-                  {post.profiles.role === 'recruiter' ? '👔 Recruiter' : '👤 Candidato'}
+                <Badge variant="secondary" className="text-xs shrink-0">
+                  {post.profiles.role === 'recruiter' ? '👔' : '👤'}
+                  <span className="hidden sm:inline ml-1">
+                    {post.profiles.role === 'recruiter' ? 'Recruiter' : 'Candidato'}
+                  </span>
                 </Badge>
               )}
               {post.profiles.talent_relationship_score && post.profiles.talent_relationship_score > 70 && (
-                <Badge variant="outline" className="text-xs text-primary border-primary">
+                <Badge variant="outline" className="text-xs text-primary border-primary shrink-0">
                   TRS {post.profiles.talent_relationship_score}
                 </Badge>
               )}
             </div>
             {post.profiles.job_title && (
-              <p className="text-sm text-muted-foreground">{post.profiles.job_title}</p>
+              <p className="text-xs md:text-sm text-muted-foreground truncate">{post.profiles.job_title}</p>
             )}
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: it })}
@@ -127,31 +130,32 @@ export const PostCard = ({ post }: PostCardProps) => {
               variant="ghost"
               size="icon"
               onClick={handleDeletePost}
-              className="h-8 w-8"
+              className="h-7 w-7 md:h-8 md:w-8 shrink-0"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
             </Button>
           )}
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 md:space-y-3 pb-3 md:pb-4">
         {post.content && (
-          <p className="whitespace-pre-wrap">{formatContent(post.content)}</p>
+          <p className="whitespace-pre-wrap text-sm md:text-base leading-relaxed">{formatContent(post.content)}</p>
         )}
 
         {post.media_url && post.media_type === 'image' && (
           <img 
             src={post.media_url} 
             alt="Post media" 
-            className="rounded-lg max-h-96 w-full object-cover"
+            className="rounded-lg max-h-80 md:max-h-96 w-full object-cover"
+            loading="lazy"
           />
         )}
 
         {post.media_url && post.media_type === 'video' && (
           <video 
             controls 
-            className="rounded-lg max-h-96 w-full"
+            className="rounded-lg max-h-80 md:max-h-96 w-full"
             preload="metadata"
           >
             <source src={post.media_url} />
@@ -160,7 +164,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         )}
 
         {post.media_url && post.media_type === 'audio' && (
-          <div className="bg-accent/50 rounded-lg p-4">
+          <div className="bg-accent/50 rounded-lg p-3 md:p-4">
             <audio controls className="w-full">
               <source src={post.media_url} />
               Il tuo browser non supporta l'elemento audio.
@@ -169,7 +173,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         )}
 
         {post.hashtags && post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-1.5 md:gap-2 pt-1 md:pt-2">
             {post.hashtags.map((tag, idx) => (
               <Badge key={idx} variant="secondary" className="text-xs">
                 {tag}

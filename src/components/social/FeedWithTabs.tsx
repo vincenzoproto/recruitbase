@@ -1,94 +1,30 @@
-import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef } from "react";
 import { CreatePost } from "./CreatePost";
 import { PostCard } from "./PostCard";
+import { PostSkeleton } from "./PostSkeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
-import { Search, TrendingUp, Users, Briefcase } from "lucide-react";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Search, TrendingUp, Users, Briefcase, Loader2, MessageSquare } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { useSocialFeed } from "@/hooks/useSocialFeed";
 
 interface FeedWithTabsProps {
   highlightPostId?: string;
 }
 
 export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
-  const [posts, setPosts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const postRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
-  useEffect(() => {
-    loadPosts();
-    
-    // Subscribe to new posts with confirmation
-    const channel = supabase
-      .channel('posts-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'posts'
-        },
-        (payload) => {
-          // Add new post to the list
-          const newPost = payload.new as any;
-          loadPosts(); // Reload to get profile data
-          toast.success("Nuovo post pubblicato! ✅");
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  // Scroll to highlighted post
-  useEffect(() => {
-    if (highlightPostId && posts.length > 0) {
-      const postRef = postRefs.current[highlightPostId];
-      if (postRef) {
-        setTimeout(() => {
-          postRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Highlight effect
-          postRef.style.animation = 'pulse 1s ease-in-out 2';
-        }, 500);
-      }
-    }
-  }, [highlightPostId, posts]);
-
-  const loadPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            id,
-            full_name,
-            avatar_url,
-            job_title,
-            role,
-            talent_relationship_score,
-            core_values
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (error) {
-      console.error('Error loading posts:', error);
-      toast.error("Errore nel caricamento dei post");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  const { 
+    posts, 
+    loading, 
+    hasMore, 
+    loadMore, 
+    refreshPosts 
+  } = useSocialFeed({ pageSize: 20 });
 
   const getFilteredPosts = () => {
     let filtered = posts;
@@ -99,12 +35,8 @@ export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
     } else if (activeTab === "candidates") {
       filtered = filtered.filter(post => post.profiles?.role === "candidate");
     } else if (activeTab === "trending") {
-      // Mock trending logic: posts with more engagement
-      filtered = [...filtered].sort((a, b) => {
-        const aEngagement = (a.reactions_count || 0) + (a.comments_count || 0);
-        const bEngagement = (b.reactions_count || 0) + (b.comments_count || 0);
-        return bEngagement - aEngagement;
-      }).slice(0, 20);
+      // Trending: just show top 20 for now
+      filtered = [...filtered].slice(0, 20);
     }
 
     // Filter by search query
@@ -116,6 +48,7 @@ export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
           tag.toLowerCase().includes(query)
         );
         const authorMatch = post.profiles?.full_name?.toLowerCase().includes(query);
+        
         return contentMatch || hashtagMatch || authorMatch;
       });
     }
@@ -125,20 +58,9 @@ export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
 
   const filteredPosts = getFilteredPosts();
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4 animate-fade-in">
-      <CreatePost onPostCreated={loadPosts} />
+    <div className="space-y-4 md:space-y-6">
+      <CreatePost onPostCreated={refreshPosts} />
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -146,68 +68,83 @@ export const FeedWithTabs = ({ highlightPostId }: FeedWithTabsProps = {}) => {
           placeholder="Cerca per hashtag, contenuto o autore..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-10 text-sm"
         />
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-4">
-          <TabsTrigger value="all" className="gap-2">
-            <Users className="h-4 w-4" />
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="w-full grid grid-cols-4 mb-4 md:mb-6 h-auto p-1">
+          <TabsTrigger value="all" className="flex items-center gap-1.5 px-2 py-2 text-xs md:text-sm">
+            <Users className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span className="hidden sm:inline">Tutti</span>
           </TabsTrigger>
-          <TabsTrigger value="recruiters" className="gap-2">
-            <Briefcase className="h-4 w-4" />
-            <span className="hidden sm:inline">Recruiter</span>
-          </TabsTrigger>
-          <TabsTrigger value="candidates" className="gap-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Candidati</span>
-          </TabsTrigger>
-          <TabsTrigger value="trending" className="gap-2">
-            <TrendingUp className="h-4 w-4" />
+          <TabsTrigger value="trending" className="flex items-center gap-1.5 px-2 py-2 text-xs md:text-sm">
+            <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span className="hidden sm:inline">Trend</span>
+          </TabsTrigger>
+          <TabsTrigger value="recruiters" className="flex items-center gap-1.5 px-2 py-2 text-xs md:text-sm">
+            <Briefcase className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            <span className="hidden sm:inline">HR</span>
+          </TabsTrigger>
+          <TabsTrigger value="candidates" className="flex items-center gap-1.5 px-2 py-2 text-xs md:text-sm">
+            <Users className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            <span className="hidden sm:inline">Talent</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="space-y-4 mt-0">
-          {filteredPosts.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground space-y-2">
-              <p className="text-lg font-medium">
-                {searchQuery ? "Nessun post trovato" : "Nessun post ancora"}
-              </p>
-              <p className="text-sm">
-                {!searchQuery && "Sii il primo a pubblicare!"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {activeTab === "trending" && filteredPosts.length > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">
-                    Post più popolari della settimana
-                  </span>
-                  <Badge variant="secondary">{filteredPosts.length}</Badge>
-                </div>
-              )}
-              
-              <div className="space-y-4">
-                {filteredPosts.map((post) => (
-                  <div
-                    key={post.id}
-                    ref={(el) => {
-                      if (el) postRefs.current[post.id] = el;
-                    }}
-                    className={highlightPostId === post.id ? "ring-2 ring-primary rounded-lg" : ""}
-                  >
-                    <PostCard post={post} />
-                  </div>
+        {["all", "trending", "recruiters", "candidates"].map((tab) => (
+          <TabsContent key={tab} value={tab} className="mt-0 space-y-4">
+            {loading && filteredPosts.length === 0 ? (
+              <div className="space-y-3 md:space-y-4">
+                {[1, 2, 3].map(i => (
+                  <PostSkeleton key={i} />
                 ))}
               </div>
-            </>
-          )}
-        </TabsContent>
+            ) : filteredPosts.length === 0 ? (
+              <EmptyState
+                icon={searchQuery ? Search : MessageSquare}
+                title={searchQuery ? "Nessun risultato" : "Nessun post"}
+                description={searchQuery 
+                  ? `Nessun post trovato per "${searchQuery}"` 
+                  : "Sii il primo a pubblicare nella community!"}
+              />
+            ) : (
+              <>
+                <div className="space-y-3 md:space-y-4">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      ref={el => postRefs.current[post.id] = el}
+                      className={highlightPostId === post.id ? 'ring-2 ring-primary rounded-lg animate-pulse' : ''}
+                    >
+                      <PostCard post={post} />
+                    </div>
+                  ))}
+                </div>
+                
+                {hasMore && !searchQuery && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={loadMore}
+                      disabled={loading}
+                      className="min-w-[200px]"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Caricamento...
+                        </>
+                      ) : (
+                        'Carica altri post'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );
