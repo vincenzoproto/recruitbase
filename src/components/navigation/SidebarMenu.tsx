@@ -18,7 +18,8 @@ import {
   Lock,
   Crown,
   Heart,
-  Globe
+  Globe,
+  Gift
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -153,6 +154,12 @@ export const SidebarMenu = ({
     ],
     settings: [
       { 
+        id: "ambassador", 
+        icon: Gift, 
+        label: "Programma Ambassador", 
+        locked: false 
+      },
+      { 
         id: "settings", 
         icon: Settings, 
         label: "Impostazioni e Privacy", 
@@ -190,6 +197,12 @@ export const SidebarMenu = ({
     ],
     enterprise: [],
     settings: [
+      { 
+        id: "ambassador", 
+        icon: Gift, 
+        label: "Programma Ambassador", 
+        locked: false 
+      },
       { 
         id: "settings", 
         icon: Settings, 

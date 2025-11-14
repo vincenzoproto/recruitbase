@@ -28,6 +28,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Help = lazy(() => import("./pages/Help"));
 const Language = lazy(() => import("./pages/Language"));
+const Ambassador = lazy(() => import("./pages/Ambassador"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -62,6 +63,7 @@ const App = () => (
       <Route path="/settings" element={<Settings />} />
       <Route path="/help" element={<Help />} />
       <Route path="/language" element={<Language />} />
+      <Route path="/ambassador" element={<Ambassador />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
