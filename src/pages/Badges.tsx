@@ -44,11 +44,11 @@ const Badges = () => {
       setAchievements((achievementsData || []) as Achievement[]);
 
       // Load recruiter points
-      const { data: pointsData } = await supabase
+      const { data: pointsData, error: pointsError } = await supabase
         .from("recruiter_points")
         .select("points, level")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (pointsData) {
         setPoints(pointsData.points);
@@ -66,6 +66,11 @@ const Badges = () => {
         } else {
           setProgress(100);
         }
+      } else {
+        // Initialize points for new users
+        setPoints(0);
+        setLevel("bronze");
+        setProgress(0);
       }
     } catch (error) {
       console.error("Error loading user data:", error);

@@ -11,14 +11,12 @@ import CreateJobDialog from "./CreateJobDialog";
 import JobOfferCard from "./JobOfferCard";
 import LinkedInIntegration from "../LinkedInIntegration";
 import StatsCard from "./StatsCard";
-import AmbassadorSection from "@/components/ambassador/AmbassadorSection";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import TRSDashboardCard from "../trm/TRSDashboardCard";
 import { TinderMatch } from "@/components/match/TinderMatch";
 import { MatchesList } from "@/components/match/MatchesList";
 import KanbanBoard from "../trm/KanbanBoard";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSwipe } from "@/hooks/use-swipe";
 import { RecruiterScore } from "@/components/mobile/RecruiterScore";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
@@ -326,29 +324,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
     setShowOnboarding(false);
   };
 
-  // Swipe per navigare tra le viste
-  const handleSwipeLeft = () => {
-    if (!isMobile) return;
-    if (currentView < views.length - 1) {
-      setCurrentView(currentView + 1);
-      hapticFeedback.light();
-    }
-  };
-
-  const handleSwipeRight = () => {
-    if (!isMobile) return;
-    if (currentView > 0) {
-      setCurrentView(currentView - 1);
-      hapticFeedback.light();
-    }
-  };
-
-  const swipeHandlers = useSwipe({
-    onSwipedLeft: handleSwipeLeft,
-    onSwipedRight: handleSwipeRight,
-    minSwipeDistance: 50
-  });
-
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -460,9 +435,6 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                     <span>{views[currentView].icon}</span>
                     {views[currentView].name}
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    👈 Swipe per navigare 👉
-                  </p>
                 </div>
                 <div className="flex gap-1 overflow-x-auto scrollbar-hide" style={{ maxWidth: '200px' }}>
                   {views.map((view) => (
@@ -485,12 +457,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
           </Card>
         )}
         
-        <div 
-          {...(isMobile ? swipeHandlers : {})}
-          className="min-h-[60vh] touch-pan-y mb-6"
-          style={{ touchAction: 'pan-y' }}
-        >
-          {/* Vista 0: Home Premium */}
+        <div className="min-h-[60vh] mb-6">{/* Vista 0: Home Premium */}
           {(!isMobile || currentView === 0) && (
             <div className="space-y-6 animate-fade-in">
               {/* Dynamic Dashboard Cards */}
