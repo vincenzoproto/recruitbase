@@ -29,6 +29,11 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Help = lazy(() => import("./pages/Help"));
 const Language = lazy(() => import("./pages/Language"));
 const Ambassador = lazy(() => import("./pages/Ambassador"));
+const Badges = lazy(() => import("./pages/Badges"));
+const Career = lazy(() => import("./pages/Career"));
+const Pipeline = lazy(() => import("./pages/Pipeline"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -64,6 +69,11 @@ const App = () => (
       <Route path="/help" element={<Help />} />
       <Route path="/language" element={<Language />} />
       <Route path="/ambassador" element={<Ambassador />} />
+      <Route path="/badges" element={<Badges />} />
+      <Route path="/career" element={<Career />} />
+      <Route path="/pipeline" element={<Pipeline />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/calendar" element={<CalendarPage />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

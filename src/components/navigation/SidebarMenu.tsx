@@ -19,7 +19,13 @@ import {
   Crown,
   Heart,
   Globe,
-  Gift
+  Gift,
+  Award,
+  Calendar,
+  Columns,
+  UserPlus,
+  Compass,
+  Search
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -99,6 +105,7 @@ export const SidebarMenu = ({
     premium: MenuItem[];
     enterprise: MenuItem[];
     settings: MenuItem[];
+    gamification: MenuItem[];
   } = role === "recruiter" ? {
     main: [
       { 
@@ -108,11 +115,16 @@ export const SidebarMenu = ({
         locked: false 
       },
       { 
-        id: "copilot", 
-        icon: Brain, 
-        label: "Copilot AI", 
-        locked: !canAccessFeature(planType, 'pro'),
-        requiredPlan: "Pro"
+        id: "matches", 
+        icon: Users, 
+        label: "Match Candidati", 
+        locked: false 
+      },
+      { 
+        id: "pipeline", 
+        icon: Columns, 
+        label: "Pipeline", 
+        locked: false 
       },
       { 
         id: "offers", 
@@ -121,10 +133,35 @@ export const SidebarMenu = ({
         locked: false 
       },
       { 
+        id: "analytics", 
+        icon: TrendingUp, 
+        label: "Analytics", 
+        locked: false 
+      },
+      { 
+        id: "calendar", 
+        icon: Calendar, 
+        label: "Calendario", 
+        locked: false 
+      },
+      { 
+        id: "search", 
+        icon: Search, 
+        label: "Ricerca", 
+        locked: false 
+      },
+      { 
         id: "notifications-archive", 
         icon: Bell, 
         label: "Archivio notifiche", 
         locked: false 
+      },
+      { 
+        id: "copilot", 
+        icon: Brain, 
+        label: "Copilot AI", 
+        locked: !canAccessFeature(planType, 'pro'),
+        requiredPlan: "Pro"
       },
     ],
     premium: [
@@ -132,13 +169,6 @@ export const SidebarMenu = ({
         id: "feed", 
         icon: Users, 
         label: "Feed sociale", 
-        locked: !canAccessFeature(planType, 'business'),
-        requiredPlan: "Business"
-      },
-      { 
-        id: "analytics", 
-        icon: TrendingUp, 
-        label: "Analytics & Insight", 
         locked: !canAccessFeature(planType, 'business'),
         requiredPlan: "Business"
       },
@@ -150,6 +180,14 @@ export const SidebarMenu = ({
         label: "Gestione Team", 
         locked: !canAccessFeature(planType, 'enterprise'),
         requiredPlan: "Enterprise"
+      },
+    ],
+    gamification: [
+      { 
+        id: "badges", 
+        icon: Award, 
+        label: "Badge", 
+        locked: false 
       },
     ],
     settings: [
@@ -181,10 +219,13 @@ export const SidebarMenu = ({
   } : {
     main: [
       { id: "profile", icon: User, label: "Profilo personale", locked: false },
+      { id: "offers", icon: Briefcase, label: "Offerte", locked: false },
+      { id: "career", icon: Compass, label: "Carriera", locked: false },
       { id: "cv", icon: Briefcase, label: "CV & Portfolio", locked: false },
+      { id: "create-group", icon: UserPlus, label: "Crea Gruppo", locked: false },
+      { id: "search", icon: Search, label: "Ricerca", locked: false },
       { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },
-      { id: "career", icon: TrendingUp, label: "Carriera", locked: false },
     ],
     premium: [
       { 
@@ -196,6 +237,14 @@ export const SidebarMenu = ({
       },
     ],
     enterprise: [],
+    gamification: [
+      { 
+        id: "badges", 
+        icon: Award, 
+        label: "Badge", 
+        locked: false 
+      },
+    ],
     settings: [
       { 
         id: "ambassador", 
@@ -228,6 +277,7 @@ export const SidebarMenu = ({
     ...menuSections.main,
     ...menuSections.premium,
     ...menuSections.enterprise,
+    ...menuSections.gamification,
     ...menuSections.settings
   ];
 
@@ -236,7 +286,34 @@ export const SidebarMenu = ({
       handleLockedFeatureClick(item.label, item.requiredPlan || "Pro");
     } else {
       hapticFeedback.light();
-      onNavigate(item.id);
+      
+      const routeMap: Record<string, string> = {
+        profile: "/profile",
+        matches: "/offers",
+        pipeline: "/pipeline",
+        offers: "/offers",
+        analytics: "/analytics",
+        calendar: "/calendar",
+        search: "/search",
+        "notifications-archive": "/notifications",
+        copilot: "/copilot",
+        feed: "/feed",
+        badges: "/badges",
+        ambassador: "/ambassador",
+        settings: "/settings",
+        help: "/help",
+        language: "/language",
+        cv: "/profile",
+        "saved-offers": "/offers",
+        career: "/career",
+        "create-group": "/messages",
+        "ai-suggestions": "/copilot",
+      };
+      
+      const route = routeMap[item.id];
+      if (route) {
+        onNavigate(route);
+      }
       onOpenChange(false);
     }
   };
@@ -247,12 +324,14 @@ export const SidebarMenu = ({
         <SheetContent side="left" className="w-[85vw] max-w-sm p-0 bg-background">
           <SheetHeader className="border-b border-border p-6 space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary/20">
-                <AvatarImage src={avatarUrl} alt={fullName} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-16 w-16 border-2 border-primary/20">
+                  <AvatarImage src={avatarUrl} alt={fullName} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-lg text-foreground truncate">
                   {fullName}
@@ -364,6 +443,25 @@ export const SidebarMenu = ({
                 })}
               </div>
             )}
+
+            {/* Gamification Section */}
+            <div className="border-t border-border py-2">
+              {menuSections.gamification.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
+                    className="w-full flex items-center gap-3 px-6 py-3 hover:bg-accent transition-colors smooth-transition"
+                  >
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="flex-1 text-left text-sm font-medium text-foreground">
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
             {/* Settings Section */}
             <div className="border-t border-border py-2">
