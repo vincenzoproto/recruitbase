@@ -4,11 +4,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Globe, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 const Language = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("it");
+
+  useEffect(() => {
+    // Load saved language from localStorage
+    const savedLang = localStorage.getItem("app-language") || "it";
+    setSelectedLanguage(savedLang);
+  }, []);
 
   const languages = [
     { code: "it", name: "Italiano", native: "Italiano" },
@@ -19,9 +25,13 @@ const Language = () => {
     { code: "pt", name: "Portuguese", native: "Português" },
   ];
 
-  const handleSaveLanguage = () => {
+  const handleLanguageChange = (langCode: string) => {
+    setSelectedLanguage(langCode);
+    localStorage.setItem("app-language", langCode);
+    
+    const selectedLang = languages.find(l => l.code === langCode);
     toast.success("Lingua aggiornata", {
-      description: `Lingua impostata su ${languages.find(l => l.code === selectedLanguage)?.native}`,
+      description: `Lingua impostata su ${selectedLang?.native}`,
     });
   };
 
@@ -41,12 +51,13 @@ const Language = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={selectedLanguage} onValueChange={setSelectedLanguage}>
+            <RadioGroup value={selectedLanguage} onValueChange={handleLanguageChange}>
               <div className="space-y-3">
                 {languages.map((language) => (
                   <div
                     key={language.code}
-                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => handleLanguageChange(language.code)}
                   >
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value={language.code} id={language.code} />
@@ -107,10 +118,6 @@ const Language = () => {
             </div>
           </CardContent>
         </Card>
-
-        <Button onClick={handleSaveLanguage} className="w-full">
-          Salva preferenze
-        </Button>
       </div>
     </MainLayout>
   );

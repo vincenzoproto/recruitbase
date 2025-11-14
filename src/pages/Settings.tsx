@@ -4,17 +4,22 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Bell, Lock, Eye, Mail, Globe, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 
 const Settings = () => {
+  const { theme, setTheme } = useTheme();
   const [userId, setUserId] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [profileVisible, setProfileVisible] = useState(true);
+  const [showEmailChange, setShowEmailChange] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -22,7 +27,38 @@ const Settings = () => {
 
   const loadUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    setUserId(user?.id || null);
+    if (user) {
+      setUserId(user.id);
+      setCurrentEmail(user.email || "");
+    }
+  };
+
+  const handleThemeToggle = (checked: boolean) => {
+    setTheme(checked ? "dark" : "light");
+    toast.success(`Tema ${checked ? "scuro" : "chiaro"} attivato`);
+  };
+
+  const handleEmailChange = async () => {
+    if (!newEmail || newEmail === currentEmail) {
+      toast.error("Inserisci una nuova email valida");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      
+      if (error) throw error;
+
+      toast.success("Email aggiornata", {
+        description: "Controlla la tua nuova email per confermare il cambiamento.",
+      });
+      setShowEmailChange(false);
+      setNewEmail("");
+    } catch (error: any) {
+      toast.error("Errore nell'aggiornamento email", {
+        description: error.message,
+      });
+    }
   };
 
   const handleSaveSettings = () => {
@@ -106,15 +142,15 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Aspetto */}
+        {/* Appearance */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {darkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+              {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
               Aspetto
             </CardTitle>
             <CardDescription>
-              Personalizza l'aspetto dell'app
+              Personalizza l'aspetto dell'interfaccia
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -122,13 +158,13 @@ const Settings = () => {
               <Label htmlFor="dark-mode" className="flex flex-col gap-1">
                 <span>Modalità scura</span>
                 <span className="text-sm text-muted-foreground font-normal">
-                  Attiva il tema scuro
+                  Attiva il tema scuro per ridurre l'affaticamento visivo
                 </span>
               </Label>
               <Switch
                 id="dark-mode"
-                checked={darkMode}
-                onCheckedChange={setDarkMode}
+                checked={theme === "dark"}
+                onCheckedChange={handleThemeToggle}
               />
             </div>
           </CardContent>
