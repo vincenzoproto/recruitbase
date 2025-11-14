@@ -25,6 +25,9 @@ const Conversation = lazy(() => import("./pages/Conversation"));
 const Copilot = lazy(() => import("./pages/Copilot"));
 const Offers = lazy(() => import("./pages/Offers"));
 const Notifications = lazy(() => import("./pages/Notifications"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Help = lazy(() => import("./pages/Help"));
+const Language = lazy(() => import("./pages/Language"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -56,6 +59,9 @@ const App = () => (
       <Route path="/messages/:userId" element={<Conversation />} />
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/offers" element={<Offers />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/language" element={<Language />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

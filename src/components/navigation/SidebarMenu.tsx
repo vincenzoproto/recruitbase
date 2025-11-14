@@ -17,7 +17,8 @@ import {
   LogOut,
   Lock,
   Crown,
-  Heart
+  Heart,
+  Globe
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -154,37 +155,19 @@ export const SidebarMenu = ({
       { 
         id: "settings", 
         icon: Settings, 
-        label: "Impostazioni account", 
+        label: "Impostazioni e Privacy", 
         locked: false 
       },
       { 
-        id: "billing", 
-        icon: CreditCard, 
-        label: "Abbonamenti e fatture", 
-        locked: false 
-      },
-      { 
-        id: "support", 
+        id: "help", 
         icon: HelpCircle, 
-        label: "Supporto & FAQ", 
+        label: "Centro assistenza", 
         locked: false 
       },
       { 
-        id: "privacy", 
-        icon: Settings, 
-        label: "Privacy Policy", 
-        locked: false 
-      },
-      { 
-        id: "terms", 
-        icon: Settings, 
-        label: "Termini e Condizioni", 
-        locked: false 
-      },
-      { 
-        id: "contact", 
-        icon: HelpCircle, 
-        label: "Contattaci", 
+        id: "language", 
+        icon: Globe, 
+        label: "Lingua", 
         locked: false 
       },
     ]
@@ -207,12 +190,24 @@ export const SidebarMenu = ({
     ],
     enterprise: [],
     settings: [
-      { id: "settings", icon: Settings, label: "Impostazioni", locked: false },
-      { id: "billing", icon: CreditCard, label: "Abbonamento & Fatture", locked: false },
-      { id: "support", icon: HelpCircle, label: "Supporto & FAQ", locked: false },
-      { id: "privacy", icon: Settings, label: "Privacy Policy", locked: false },
-      { id: "terms", icon: Settings, label: "Termini e Condizioni", locked: false },
-      { id: "contact", icon: HelpCircle, label: "Contattaci", locked: false },
+      { 
+        id: "settings", 
+        icon: Settings, 
+        label: "Impostazioni e Privacy", 
+        locked: false 
+      },
+      { 
+        id: "help", 
+        icon: HelpCircle, 
+        label: "Centro assistenza", 
+        locked: false 
+      },
+      { 
+        id: "language", 
+        icon: Globe, 
+        label: "Lingua", 
+        locked: false 
+      },
     ]
   };
 
