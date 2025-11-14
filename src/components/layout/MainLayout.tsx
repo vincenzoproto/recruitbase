@@ -15,7 +15,7 @@ export const MainLayout = ({ children }: LayoutProps) => {
   const PAGES_ORDER = [
     "/dashboard",
     "/offers",
-    "/social",
+    "/feed",
     "/messages",
     "/profile",
   ];

@@ -16,6 +16,7 @@ const InviteRef = lazy(() => import("./pages/InviteRef"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Social = lazy(() => import("./pages/Social"));
+const Feed = lazy(() => import("./pages/Feed"));
 const SearchProfiles = lazy(() => import("./pages/SearchProfiles"));
 const ScoreInfo = lazy(() => import("./pages/ScoreInfo"));
 const Demo = lazy(() => import("./pages/Demo"));
@@ -25,6 +26,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Copilot = lazy(() => import("./pages/Copilot"));
 const Offers = lazy(() => import("./pages/Offers"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,7 +62,9 @@ const App = () => (
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/social" element={<Social />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/search" element={<SearchProfiles />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/score-info" element={<ScoreInfo />} />
             <Route path="/demo" element={<Demo />} />
             <Route path="/privacy" element={<Privacy />} />
