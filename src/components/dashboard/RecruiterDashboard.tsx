@@ -147,7 +147,8 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
         <MeetingConfirmationBanner userId={profile.id} userRole="recruiter" />
         
         <div className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 1. Da ricontattare oggi */}
+          <div className="cursor-pointer" onClick={() => navigate('/pipeline')}>
             <FollowUpManager 
               recruiterId={profile.id} 
               onOpenChat={(candidateId, candidateName) => {
@@ -155,10 +156,15 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 setChatUserName(candidateName);
               }}
             />
+          </div>
+          
+          {/* 2. Prossimi colloqui (48h) */}
+          <div className="cursor-pointer" onClick={() => navigate('/calendar')}>
             <UpcomingMeetingsCard userId={profile.id} userRole="recruiter" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 3. Top 5 candidati da contattare */}
+          <div className="cursor-pointer" onClick={() => navigate('/pipeline')}>
             <PriorityCard 
               recruiterId={profile.id}
               onOpenChat={(candidateId, candidateName) => {
@@ -166,6 +172,10 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
                 setChatUserName(candidateName);
               }}
             />
+          </div>
+          
+          {/* 4. Candidati con feedback positivo */}
+          <div className="cursor-pointer" onClick={() => navigate('/pipeline')}>
             <PositiveFeedbackCard 
               recruiterId={profile.id}
               onOpenChat={(candidateId, candidateName) => {

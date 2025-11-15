@@ -9,13 +9,13 @@ const MobileBottomTabs = () => {
     { icon: Home, label: "Home", path: "/dashboard" },
     { icon: Rss, label: "Feed", path: "/feed" },
     { icon: MessageCircle, label: "Messaggi", path: "/messages" },
-    { icon: Briefcase, label: "Offerte", path: "/offers" },
+    { icon: Briefcase, label: "Offerte", path: "/my-offers" },
   ];
 
   const candidateTabs = [
     { icon: Home, label: "Home", path: "/dashboard" },
     { icon: Rss, label: "Feed", path: "/feed" },
-    { icon: Briefcase, label: "Job Match", path: "/offers" },
+    { icon: Briefcase, label: "Offerte", path: "/offers" },
     { icon: MessageCircle, label: "Messaggi", path: "/messages" },
   ];
 
