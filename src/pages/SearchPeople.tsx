@@ -196,7 +196,12 @@ const SearchPeople = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg">{person.full_name}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-lg">{person.full_name}</h3>
+                        <Badge variant="outline" className="shrink-0 font-semibold">
+                          {person.role === 'recruiter' ? '👔 Recruiter' : '👤 Candidato'}
+                        </Badge>
+                      </div>
                       {person.job_title && (
                         <p className="text-sm text-muted-foreground">{person.job_title}</p>
                       )}
@@ -208,9 +213,6 @@ const SearchPeople = () => {
                           {person.bio}
                         </p>
                       )}
-                      <Badge variant="secondary" className="mt-2">
-                        {person.role === "recruiter" ? "Recruiter" : "Candidato"}
-                      </Badge>
                     </div>
 
                     <div className="flex gap-2">

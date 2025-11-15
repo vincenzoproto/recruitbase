@@ -189,6 +189,12 @@ export const SidebarMenu = ({
         label: "Connessioni", 
         locked: false 
       },
+      {
+        id: "premium-candidate",
+        icon: Crown,
+        label: "💎 Diventa Premium",
+        locked: false
+      },
     ],
     settings: [
       { 

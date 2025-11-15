@@ -145,10 +145,35 @@ export const TinderMatch = ({ userId, userRole }: TinderMatchProps) => {
           query = query.gte("talent_relationship_score", filters.minTRS);
         }
 
-        const { data: candidates, error } = await query.limit(20);
+        const { data, error } = await query.limit(50);
         if (error) throw error;
-        setQueue(candidates || []);
-        setCurrentCard(candidates?.[0]);
+
+        // Boost premium candidates
+        const sortedData = (data || []).sort((a: any, b: any) => {
+          if (a.is_premium && !b.is_premium) return -1;
+          if (!a.is_premium && b.is_premium) return 1;
+          return (b.talent_relationship_score || 0) - (a.talent_relationship_score || 0);
+        });
+
+        let processedData = sortedData.map((candidate: any) => ({
+          ...candidate,
+          cultureFitScore: calculateCultureFit(candidate.core_values || [], recruiterValues),
+        }));
+
+        // Apply filters manually
+        if (filters.city) {
+          processedData = processedData.filter((c: any) => 
+            c.city?.toLowerCase().includes(filters.city!.toLowerCase())
+          );
+        }
+        if (filters.minTRS && filters.minTRS > 0) {
+          processedData = processedData.filter((c: any) => 
+            (c.talent_relationship_score || 0) >= filters.minTRS!
+          );
+        }
+
+        setQueue(processedData);
+        setCurrentCard(processedData[0]);
       }
     } catch (error) {
       console.error("Error loading cards:", error);

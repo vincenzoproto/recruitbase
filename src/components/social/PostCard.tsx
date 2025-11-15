@@ -11,6 +11,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { PostActions } from "./PostActions";
 import { CommentSection } from "./CommentSection";
+import { ProfileBadge } from "@/components/profile/ProfileBadge";
 
 interface PostCardProps {
   post: {
@@ -87,13 +88,16 @@ export const PostCard = ({ post }: PostCardProps) => {
     <Card className="shadow-sm hover:shadow-md transition-shadow">
       <CardHeader className="pb-2 md:pb-3">
         <div className="flex items-start gap-2 md:gap-3">
-          <Avatar 
-            className="cursor-pointer h-8 w-8 md:h-10 md:w-10 shrink-0" 
-            onClick={() => navigate(`/profile/${post.profiles.id}`)}
-          >
-            <AvatarImage src={post.profiles.avatar_url || undefined} />
-            <AvatarFallback className="text-xs">{getInitials(post.profiles.full_name)}</AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar 
+              className="cursor-pointer h-8 w-8 md:h-10 md:w-10 shrink-0" 
+              onClick={() => navigate(`/profile/${post.profiles.id}`)}
+            >
+              <AvatarImage src={post.profiles.avatar_url || undefined} />
+              <AvatarFallback className="text-xs">{getInitials(post.profiles.full_name)}</AvatarFallback>
+            </Avatar>
+            <ProfileBadge userId={post.profiles.id} size="sm" />
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
               <h4 
