@@ -27,14 +27,16 @@ export const ProfileBadge = ({ userId, size = "md", showIcon = true }: ProfileBa
   const loadUserLevel = async () => {
     try {
       const { data } = await supabase
-        .from("recruiter_points")
-        .select("level, points")
+        .from("recruiter_stats")
+        .select("badge_type")
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
 
-      if (data) {
-        const userLevel = (data.level?.toLowerCase() || "bronze") as keyof typeof LEVEL_CONFIG;
-        setLevel(userLevel);
+      if (data?.badge_type) {
+        const key = (data.badge_type.toLowerCase() as keyof typeof LEVEL_CONFIG);
+        setLevel(LEVEL_CONFIG[key] ? key : "bronze");
+      } else {
+        setLevel("bronze");
       }
     } catch (error) {
       console.error("Error loading user level:", error);
