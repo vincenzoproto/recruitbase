@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Image, Mic, Video, Send, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
-import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
+import { awardGamificationPoints } from "@/lib/gamification";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -23,7 +23,6 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
-  const { trackAction } = useAdvancedXPSystem(userId || undefined);
 
   useEffect(() => {
     loadUserId();
@@ -139,7 +138,9 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
       });
 
       // Award XP for creating a post
-      trackAction('posts', 5, 'Post pubblicato sul feed');
+      if (userId) {
+        await awardGamificationPoints(userId, 'feed_post_created', { contentLength: content.length });
+      }
 
       onPostCreated();
     } catch (error: any) {
