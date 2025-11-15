@@ -100,6 +100,8 @@ const Profile = () => {
   };
 
   const isOwnProfile = currentUserId === profile?.id;
+  const { isFollowing, loading: followLoading, toggleFollow } = useFollowUser(currentUserId, profile?.id);
+
 
   if (loading) {
     return (
