@@ -16,6 +16,7 @@ interface Post {
     job_title: string | null;
     role?: string | null;
     talent_relationship_score?: number | null;
+    is_premium?: boolean | null;
   };
 }
 
@@ -52,7 +53,8 @@ export const useSocialFeed = ({
             avatar_url,
             job_title,
             role,
-            talent_relationship_score
+            talent_relationship_score,
+            is_premium
           )
         `)
         .order('created_at', { ascending: false })
@@ -67,16 +69,24 @@ export const useSocialFeed = ({
 
       if (error) throw error;
 
-      const newPosts = data || [];
+      // Boost premium users' posts
+      const sortedData = (data || []).sort((a: any, b: any) => {
+        const aIsPremium = a.profiles?.is_premium || false;
+        const bIsPremium = b.profiles?.is_premium || false;
+        
+        if (aIsPremium && !bIsPremium) return -1;
+        if (!aIsPremium && bIsPremium) return 1;
+        return 0;
+      });
       
       if (append) {
-        setPosts(prev => [...prev, ...newPosts]);
+        setPosts(prev => [...prev, ...sortedData]);
       } else {
-        setPosts(newPosts);
+        setPosts(sortedData);
       }
       
       // Check if there are more posts
-      setHasMore(newPosts.length === pageSize);
+      setHasMore(sortedData.length === pageSize);
     } catch (error) {
       console.error('Error loading posts:', error);
       toast.error("Errore nel caricamento dei post");
