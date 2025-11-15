@@ -617,6 +617,47 @@ export type Database = {
           },
         ]
       }
+      gamification_events: {
+        Row: {
+          created_at: string | null
+          engagement_points: number | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          trs_points: number | null
+          user_id: string
+          xp_awarded: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          engagement_points?: number | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          trs_points?: number | null
+          user_id: string
+          xp_awarded?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          engagement_points?: number | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          trs_points?: number | null
+          user_id?: string
+          xp_awarded?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_messages: {
         Row: {
           content: string
@@ -1132,6 +1173,7 @@ export type Database = {
           job_title: string | null
           languages: string | null
           last_contact_date: string | null
+          level: number | null
           linkedin_url: string | null
           linkedin_verified: boolean | null
           onboarding_completed: boolean | null
@@ -1143,6 +1185,7 @@ export type Database = {
           talent_relationship_score: number | null
           trs_last_updated: string | null
           updated_at: string | null
+          xp: number | null
           years_experience: number | null
         }
         Insert: {
@@ -1166,6 +1209,7 @@ export type Database = {
           job_title?: string | null
           languages?: string | null
           last_contact_date?: string | null
+          level?: number | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
@@ -1177,6 +1221,7 @@ export type Database = {
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
           updated_at?: string | null
+          xp?: number | null
           years_experience?: number | null
         }
         Update: {
@@ -1200,6 +1245,7 @@ export type Database = {
           job_title?: string | null
           languages?: string | null
           last_contact_date?: string | null
+          level?: number | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           onboarding_completed?: boolean | null
@@ -1211,6 +1257,7 @@ export type Database = {
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
           updated_at?: string | null
+          xp?: number | null
           years_experience?: number | null
         }
         Relationships: [
@@ -1448,6 +1495,17 @@ export type Database = {
     Functions: {
       award_achievement: {
         Args: { p_badge_type: string; p_user_id: string }
+        Returns: undefined
+      }
+      award_gamification_points: {
+        Args: {
+          p_engagement?: number
+          p_event_type: string
+          p_metadata?: Json
+          p_trs?: number
+          p_user_id: string
+          p_xp?: number
+        }
         Returns: undefined
       }
       award_recruiter_points: {

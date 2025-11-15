@@ -13,9 +13,10 @@ interface ShareMenuProps {
   postId: string;
   content?: string;
   className?: string;
+  onShare?: () => void;
 }
 
-export const ShareMenu = ({ postId, content, className }: ShareMenuProps) => {
+export const ShareMenu = ({ postId, content, className, onShare }: ShareMenuProps) => {
   const [copied, setCopied] = useState(false);
   const shareUrl = `${window.location.origin}/post/${postId}`;
   const shareText = content ? content.slice(0, 100) : "Guarda questo post su RecruitBase";
@@ -32,28 +33,33 @@ export const ShareMenu = ({ postId, content, className }: ShareMenuProps) => {
   };
 
   const shareToWhatsApp = () => {
+    onShare?.();
     const text = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
 
   const shareToTelegram = () => {
+    onShare?.();
     const text = encodeURIComponent(shareText);
     const url = encodeURIComponent(shareUrl);
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
   };
 
   const shareToTwitter = () => {
+    onShare?.();
     const text = encodeURIComponent(shareText);
     const url = encodeURIComponent(shareUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
   };
 
   const shareToThreads = () => {
+    onShare?.();
     const text = encodeURIComponent(`${shareText} ${shareUrl}`);
     window.open(`https://threads.net/intent/post?text=${text}`, '_blank');
   };
 
   const shareToLinkedIn = () => {
+    onShare?.();
     const url = encodeURIComponent(shareUrl);
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
   };

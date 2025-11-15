@@ -14,10 +14,12 @@ import { ChatDialog } from "@/components/chat/ChatDialog";
 import { PremiumCandidateDashboard } from "./PremiumCandidateDashboard";
 import { CVCopilot } from "@/components/candidate/CVCopilot";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
-import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 import { SidebarMenu } from "@/components/navigation/SidebarMenu";
 import { QuickActionsFAB, candidateActions } from "@/components/ui/quick-actions-fab";
 import { calculateCultureFit } from "@/lib/utils/profileHelper";
+import { GamificationCard } from "@/components/gamification/GamificationCard";
+import { QuickMissions } from "@/components/gamification/QuickMissions";
+import { useGamification } from "@/hooks/useGamification";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -33,6 +35,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   const [chatUserName, setChatUserName] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount } = useMessageNotifications(profile.id);
+  const { stats, loading: gamificationLoading } = useGamification(profile.id);
 
   const cultureFitScore = calculateCultureFit(profile);
 
