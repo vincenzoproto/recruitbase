@@ -12,7 +12,6 @@ import EditProfileDialog from "./EditProfileDialog";
 import { PremiumHomeDashboard } from "./PremiumHomeDashboard";
 import { QuickActionsFAB, recruiterActions } from "@/components/ui/quick-actions-fab";
 import { GlobalCopilotFAB } from "@/components/ui/global-copilot-fab";
-import { MeetingConfirmationBanner } from "@/components/mobile/MeetingConfirmationBanner";
 import { MeetingRequestDialog } from "@/components/mobile/MeetingRequestDialog";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { PriorityCard } from "./PriorityCard";
@@ -21,6 +20,10 @@ import { UpcomingMeetingsCard } from "./UpcomingMeetingsCard";
 import { PositiveFeedbackCard } from "./PositiveFeedbackCard";
 import { RBCopilot } from "@/components/mobile/RBCopilot";
 import { WeeklyInsights } from "@/components/mobile/WeeklyInsights";
+import { GamificationCard } from "@/components/gamification/GamificationCard";
+import { QuickMissions } from "@/components/gamification/QuickMissions";
+import { useGamification } from "@/hooks/useGamification";
+import { getXPForNextLevel } from "@/lib/gamification";
 
 interface RecruiterDashboardProps {
   profile: any;
@@ -38,6 +41,7 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
   const [sidebarMenuOpen, setSidebarMenuOpen] = useState(false);
   const { unreadCount } = useMessageNotifications(profile.id);
   const premiumFeatures = usePremiumFeatures(profile.id);
+  const { stats, loading: gamificationLoading } = useGamification(profile.id);
 
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem("rb_onboarding_completed");
@@ -144,12 +148,11 @@ const RecruiterDashboard = ({ profile }: RecruiterDashboardProps) => {
       />
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
-        <MeetingConfirmationBanner userId={profile.id} userRole="recruiter" />
         
         <div className="space-y-6 animate-fade-in">
           {/* 1. Da ricontattare oggi */}
           <div className="cursor-pointer" onClick={() => navigate('/pipeline')}>
-            <FollowUpManager 
+            <FollowUpManager
               recruiterId={profile.id} 
               onOpenChat={(candidateId, candidateName) => {
                 setChatUserId(candidateId);

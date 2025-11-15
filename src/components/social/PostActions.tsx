@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
 import { toast } from "sonner";
 import { hapticFeedback } from "@/lib/haptics";
-import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
 import { ShareMenu } from "./ShareMenu";
+import { awardGamificationPoints } from "@/lib/gamification";
 
 interface PostActionsProps {
   postId: string;
@@ -21,7 +21,6 @@ export const PostActions = ({ postId, onCommentClick, postContent }: PostActions
   const [hasReposted, setHasReposted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { trackAction } = useAdvancedXPSystem(userId || undefined);
 
   useEffect(() => {
     loadStats();
@@ -108,7 +107,7 @@ export const PostActions = ({ postId, onCommentClick, postContent }: PostActions
         toast.success("❤️ Like aggiunto", { duration: 1500 });
         
         // Award XP for like
-        trackAction('posts', 1, 'Like su un post');
+        await awardGamificationPoints(userId, 'feed_reaction', { postId }, false);
       }
     } catch (error: any) {
       console.error('Error toggling like:', error);
@@ -162,7 +161,7 @@ export const PostActions = ({ postId, onCommentClick, postContent }: PostActions
         toast.success("🔄 Post condiviso!", { duration: 1500 });
         
         // Award XP for repost
-        trackAction('shares', 10, 'Repost di un contenuto');
+        await awardGamificationPoints(userId, 'feed_repost', { postId });
       }
     } catch (error: any) {
       console.error('Error toggling repost:', error);
@@ -174,6 +173,11 @@ export const PostActions = ({ postId, onCommentClick, postContent }: PostActions
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExternalShare = async () => {
+    if (!userId) return;
+    await awardGamificationPoints(userId, 'external_share', { postId });
   };
 
   return (
@@ -210,7 +214,7 @@ export const PostActions = ({ postId, onCommentClick, postContent }: PostActions
         <span className="text-xs font-medium">{reposts}</span>
       </Button>
 
-      <ShareMenu postId={postId} content={postContent} className="flex-1" />
+      <ShareMenu postId={postId} content={postContent} className="flex-1" onShare={handleExternalShare} />
     </div>
   );
 };
