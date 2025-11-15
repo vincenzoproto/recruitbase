@@ -41,6 +41,9 @@ const SearchPeople = lazy(() => import("./pages/SearchPeople"));
 const Connections = lazy(() => import("./pages/Connections"));
 const ELearning = lazy(() => import("./pages/ELearning"));
 const Applications = lazy(() => import("./pages/Applications"));
+const MyOffers = lazy(() => import("./pages/MyOffers"));
+const SavedOffers = lazy(() => import("./pages/SavedOffers"));
+const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -59,6 +62,7 @@ const App = () => (
       <Route path="/admin" element={<Admin />} />
       <Route path="/profile/:userId" element={<Profile />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile-complete" element={<ProfileComplete />} />
       <Route path="/social" element={<Social />} />
       <Route path="/feed" element={<Feed />} />
       <Route path="/search" element={<SearchProfiles />} />
@@ -75,6 +79,9 @@ const App = () => (
           <Route path="/premium-candidate" element={<PremiumCandidate />} />
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/offers" element={<Offers />} />
+      <Route path="/my-offers" element={<MyOffers />} />
+      <Route path="/saved-offers" element={<SavedOffers />} />
+      <Route path="/applications" element={<Applications />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/help" element={<Help />} />
       <Route path="/language" element={<Language />} />
