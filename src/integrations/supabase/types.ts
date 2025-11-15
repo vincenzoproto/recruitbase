@@ -1372,6 +1372,87 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_claims: {
+        Row: {
+          claimed_at: string | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          reward_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reward_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reward_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_claims_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "reward_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_items: {
+        Row: {
+          category: string
+          cost_xp: number
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          is_active: boolean | null
+          name: string
+          stock: number | null
+        }
+        Insert: {
+          category: string
+          cost_xp: number
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          stock?: number | null
+        }
+        Update: {
+          category?: string
+          cost_xp?: number
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          stock?: number | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -1545,6 +1626,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      claim_reward: {
+        Args: { p_reward_id: string; p_user_id: string }
+        Returns: Json
       }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       has_role: {

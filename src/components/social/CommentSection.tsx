@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import type { Comment } from "@/types";
-import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
+import { awardGamificationPoints } from "@/lib/gamification";
 
 interface CommentSectionProps {
   postId: string;
@@ -19,7 +19,6 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const { trackAction } = useAdvancedXPSystem(userId || undefined);
 
   useEffect(() => {
     loadUserId();
@@ -117,7 +116,9 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       toast.success("Commento aggiunto!");
       
       // Award XP for commenting
-      trackAction('comments', 3, 'Commento su un post');
+      if (user.id) {
+        await awardGamificationPoints(user.id, 'feed_comment_created', { postId });
+      }
     } catch (error: any) {
       console.error('Error adding comment:', error);
       

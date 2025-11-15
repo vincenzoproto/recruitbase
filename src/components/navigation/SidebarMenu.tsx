@@ -177,6 +177,12 @@ export const SidebarMenu = ({
     ],
     gamification: [
       { 
+        id: "rewards", 
+        icon: Gift, 
+        label: "🎁 Marketplace Premi", 
+        locked: false 
+      },
+      { 
         id: "badges", 
         icon: Award, 
         label: "Badge", 
@@ -228,6 +234,12 @@ export const SidebarMenu = ({
     premium: [],
     enterprise: [],
     gamification: [
+      { 
+        id: "rewards", 
+        icon: Gift, 
+        label: "🎁 Marketplace Premi", 
+        locked: false 
+      },
       { 
         id: "badges", 
         icon: Award, 
@@ -300,6 +312,7 @@ export const SidebarMenu = ({
         copilot: "/copilot",
         feed: "/feed",
         badges: "/badges",
+        rewards: "/rewards",
         connections: "/connections",
         ambassador: "/ambassador",
         settings: "/settings",
