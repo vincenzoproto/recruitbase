@@ -232,9 +232,11 @@ export const SidebarMenu = ({
   } : {
     main: [
       { id: "profile", icon: User, label: "Profilo personale", locked: false },
+      { id: "applications", icon: Briefcase, label: "Candidature attive", locked: false },
       { id: "offers", icon: Briefcase, label: "Offerte", locked: false },
       { id: "career", icon: Compass, label: "Carriera", locked: false },
       { id: "cv", icon: Briefcase, label: "CV & Portfolio", locked: false },
+      { id: "e-learning", icon: GraduationCap, label: "E-learning", locked: false },
       { id: "create-group", icon: UserPlus, label: "Crea Gruppo", locked: false },
       { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },

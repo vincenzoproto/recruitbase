@@ -40,6 +40,7 @@ const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 const SearchPeople = lazy(() => import("./pages/SearchPeople"));
 const Connections = lazy(() => import("./pages/Connections"));
 const ELearning = lazy(() => import("./pages/ELearning"));
+const Applications = lazy(() => import("./pages/Applications"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -86,6 +87,7 @@ const App = () => (
       <Route path="/search-people" element={<SearchPeople />} />
       <Route path="/connections" element={<Connections />} />
       <Route path="/e-learning" element={<ELearning />} />
+      <Route path="/applications" element={<Applications />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

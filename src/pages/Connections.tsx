@@ -196,7 +196,8 @@ const Connections = () => {
   ) => (
     <div
       key={connection.id}
-      className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+      className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
+      onClick={() => navigate(`/profile/${connection.user_id}`)}
     >
       <div className="relative">
         <Avatar className="h-12 w-12">
@@ -216,15 +217,7 @@ const Connections = () => {
         </Badge>
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/profile/${connection.user_id}`)}
-        >
-          <Eye className="h-4 w-4" />
-        </Button>
-
+      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
         {showAcceptReject && (
           <>
             <Button
