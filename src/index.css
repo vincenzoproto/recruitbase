@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Recruit Base Design System - Apple Premium Edition */
+/* Recruit Base Design System - LinkedIn Talent / Notion / iOS Inspired */
 
 /* Custom scrollbar hide for mobile tabs */
 .scrollbar-hide::-webkit-scrollbar {
@@ -16,111 +16,111 @@
 
 @layer base {
   :root {
-    /* Recruit Base TRM v4.0 - Apple Premium Design System */
-    --background: 240 6% 98%; /* #F9FAFB */
-    --foreground: 222 47% 11%; /* #111827 */
+    /* LinkedIn Talent / Notion / iOS Professional Design System */
+    --background: 0 0% 99%; /* #FCFCFC Ultra clean white */
+    --foreground: 0 0% 9%; /* #171717 Deep black for max readability */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 211 100% 50%; /* #007AFF Apple Blue */
+    --primary: 210 100% 45%; /* LinkedIn Blue #0A66C2 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 9% 96%; /* #F2F2F7 */
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 210 17% 95%; /* #EEF3F8 Subtle LinkedIn gray */
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 240 9% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 17% 95%;
+    --muted-foreground: 0 0% 45%; /* #737373 Readable gray */
 
-    --accent: 211 100% 97%;
-    --accent-foreground: 211 100% 50%;
+    --accent: 210 100% 97%; /* Subtle blue accent */
+    --accent-foreground: 210 100% 45%;
 
-    --success: 152 69% 31%; /* #00A86B Green */
+    --success: 142 71% 45%; /* #10A37F Professional green */
     --success-foreground: 0 0% 100%;
 
-    --warning: 45 93% 47%; /* Amber */
+    --warning: 38 92% 50%; /* #F59E0B Warning orange */
     --warning-foreground: 0 0% 100%;
 
-    --destructive: 348 83% 47%; /* #E11D48 Red */
+    --destructive: 0 84% 60%; /* #F44336 Clean red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 211 100% 50%;
+    --border: 0 0% 90%; /* #E5E5E5 Notion-style borders */
+    --input: 0 0% 90%;
+    --ring: 210 100% 45%;
     
     --progress-background: hsl(var(--primary));
 
-    --radius: 0.875rem; /* 14px Apple-style */
+    --radius: 0.5rem; /* 8px Minimal, iOS-inspired */
     
-    /* Recruit Match Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(211 100% 50%) 0%, hsl(211 100% 60%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(152 76% 60%) 0%, hsl(152 76% 70%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(240 9% 98%) 100%);
-    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
-    --gradient-card-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+    /* Professional Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 100% 45%) 0%, hsl(210 100% 55%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 71% 55%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 17% 98%) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 100%);
+    --gradient-card-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
     
-    /* Recruit Match Shadows */
-    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12);
-    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12), 0 16px 56px rgba(0, 0, 0, 0.16);
-    --shadow-glow-blue: 0 0 40px rgba(0, 122, 255, 0.3);
-    --shadow-glow-green: 0 0 40px rgba(62, 213, 152, 0.3);
+    /* Minimal Shadows - LinkedIn/Notion style */
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-strong: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-glow-blue: 0 0 24px rgba(10, 102, 194, 0.2);
+    --shadow-glow-green: 0 0 24px rgba(16, 163, 127, 0.2);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 210 100% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 17% 95%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 210 100% 45%;
   }
 
   .dark {
-    --background: 240 11% 11%; /* #1C1C1E Dark */
-    --foreground: 0 0% 100%; /* #FFFFFF */
+    --background: 0 0% 9%; /* #171717 True dark */
+    --foreground: 0 0% 98%; /* #FAFAFA */
 
-    --card: 240 6% 13%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 240 6% 13%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 211 100% 50%;
+    --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 16%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 6% 16%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 240 6% 20%;
-    --accent-foreground: 211 100% 60%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 210 100% 55%;
 
-    --success: 152 69% 45%;
-    --warning: 45 93% 60%;
+    --success: 142 71% 50%;
+    --warning: 38 92% 55%;
 
-    --destructive: 348 83% 55%;
+    --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 20%;
-    --input: 240 6% 20%;
-    --ring: 211 100% 50%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 210 100% 50%;
 
-    --sidebar-background: 240 6% 10%;
+    --sidebar-background: 0 0% 9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 211 100% 50%;
+    --sidebar-primary: 210 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 16%;
+    --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 6% 20%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 210 100% 50%;
     
-    --gradient-glass: linear-gradient(135deg, rgba(28, 28, 30, 0.9) 0%, rgba(28, 28, 30, 0.7) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(23, 23, 23, 0.95) 0%, rgba(23, 23, 23, 0.85) 100%);
   }
 }
 
@@ -131,61 +131,71 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer components {
-  /* Glassmorphism Effect */
-  .glass-card {
-    background: var(--gradient-glass);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  /* Minimal Card - LinkedIn/Notion style */
+  .minimal-card {
+    @apply bg-card rounded-lg border border-border shadow-soft;
+    transition: all 0.15s ease;
   }
   
-  /* Apple Button Hover Effect */
-  .apple-button {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  .minimal-card:hover {
+    @apply shadow-medium;
+    border-color: hsl(var(--border) / 0.6);
   }
   
-  .apple-button:hover {
+  /* Professional Button */
+  .pro-button {
+    transition: all 0.15s ease;
+  }
+  
+  .pro-button:hover {
     transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
   }
   
-  .apple-button:active {
-    transform: scale(0.96);
+  .pro-button:active {
+    transform: translateY(0);
   }
   
   /* Smooth Transitions */
   .smooth-transition {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
   }
   
-  /* Staggered Animations */
+  /* Minimal Shadows - LinkedIn/Notion style */
+  .shadow-minimal {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+  
+  .shadow-professional {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-elevated {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Avatar with subtle glow */
+  .avatar-glow {
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.1);
+  }
+  
+  /* Staggered Animations - subtle */
   .stagger-fade-in > * {
-    animation: fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation: fade-in 0.3s ease backwards;
   }
   
   .stagger-fade-in > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger-fade-in > *:nth-child(2) { animation-delay: 100ms; }
-  .stagger-fade-in > *:nth-child(3) { animation-delay: 200ms; }
-  .stagger-fade-in > *:nth-child(4) { animation-delay: 300ms; }
-  .stagger-fade-in > *:nth-child(5) { animation-delay: 400ms; }
-  
-  /* Apple Shadow Styles */
-  .shadow-apple-sm {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-  }
-  
-  .shadow-apple-md {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12);
-  }
-  
-  .shadow-apple-lg {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 16px 56px rgba(0, 0, 0, 0.16);
-  }
+  .stagger-fade-in > *:nth-child(2) { animation-delay: 50ms; }
+  .stagger-fade-in > *:nth-child(3) { animation-delay: 100ms; }
+  .stagger-fade-in > *:nth-child(4) { animation-delay: 150ms; }
+  .stagger-fade-in > *:nth-child(5) { animation-delay: 200ms; }
 }
