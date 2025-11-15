@@ -217,32 +217,32 @@ const SearchPeople = () => {
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="icon"
                         onClick={() => navigate(`/profile/${person.id}`)}
+                        title="Visualizza Profilo"
                       >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Profilo
+                        <Eye className="h-4 w-4" />
                       </Button>
 
                       {person.connectionStatus === "none" && (
                         <Button
                           variant="default"
-                          size="sm"
+                          size="icon"
                           onClick={() => handleFollow(person.id)}
+                          title="Segui"
                         >
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Segui
+                          <UserPlus className="h-4 w-4" />
                         </Button>
                       )}
 
                       {person.connectionStatus === "accepted" && (
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon"
                           onClick={() => handleUnfollow(person.id)}
+                          title="Segui già"
                         >
-                          <UserCheck className="h-4 w-4 mr-2" />
-                          Segui già
+                          <UserCheck className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
