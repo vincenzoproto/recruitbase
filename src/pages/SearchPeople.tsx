@@ -51,7 +51,7 @@ const SearchPeople = () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("id, full_name, avatar_url, bio, role, job_title, city")
-        .or(`full_name.ilike.%${searchQuery}%,job_title.ilike.%${searchQuery}%`)
+        .or(`full_name.ilike.%${searchQuery}%,job_title.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`)
         .limit(50);
 
       if (error) throw error;

@@ -142,12 +142,12 @@
 @layer components {
   /* Minimal Card - LinkedIn/Notion style */
   .minimal-card {
-    @apply bg-card rounded-lg border border-border shadow-soft;
-    transition: all 0.15s ease;
+    @apply bg-card rounded-2xl border border-border/60 shadow-sm;
+    transition: all 0.2s ease;
   }
   
   .minimal-card:hover {
-    @apply shadow-medium;
+    @apply shadow-md border-border;
     border-color: hsl(var(--border) / 0.6);
   }
   
