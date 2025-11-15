@@ -49,7 +49,7 @@ export const useFollowUser = (currentUserId: string | null, targetUserId: string
         toast.success('Non segui più questo utente');
         return -1; // Return -1 to decrease follower count
       } else {
-        // Follow
+        // Follow - directly set as accepted (no approval needed)
         const { error } = await supabase
           .from('connections')
           .insert({

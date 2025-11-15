@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
+import { ProfileBadge } from "@/components/profile/ProfileBadge";
 
 interface Chat {
   id: string;
@@ -97,10 +98,13 @@ const ChatList = () => {
               className="p-4 rounded-none border-0 hover:bg-accent cursor-pointer transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage src={chat.otherUserAvatar || ""} />
-                  <AvatarFallback>{chat.otherUserName[0]}</AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar>
+                    <AvatarImage src={chat.otherUserAvatar || ""} />
+                    <AvatarFallback>{chat.otherUserName[0]}</AvatarFallback>
+                  </Avatar>
+                  <ProfileBadge userId={chat.otherUserId} size="sm" />
+                </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">

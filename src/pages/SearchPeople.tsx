@@ -18,7 +18,7 @@ interface SearchResult {
   role: "recruiter" | "candidate" | "admin";
   job_title?: string;
   city?: string;
-  connectionStatus?: "none" | "pending" | "accepted";
+  connectionStatus?: "none" | "accepted";
 }
 
 const SearchPeople = () => {
@@ -47,13 +47,12 @@ const SearchPeople = () => {
   const performSearch = async () => {
     setLoading(true);
     try {
-      // Search profiles
+      // Search profiles - show all users (including current user for testing)
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("id, full_name, avatar_url, bio, role, job_title, city")
-        .ilike("full_name", `%${searchQuery}%`)
-        .neq("id", currentUserId)
-        .limit(20);
+        .or(`full_name.ilike.%${searchQuery}%,job_title.ilike.%${searchQuery}%`)
+        .limit(50);
 
       if (error) throw error;
 
@@ -72,7 +71,7 @@ const SearchPeople = () => {
 
         const resultsWithStatus: SearchResult[] = profiles.map(profile => ({
           ...profile,
-          connectionStatus: (connectionMap.get(profile.id) as "pending" | "accepted") || "none"
+          connectionStatus: (connectionMap.get(profile.id) as "accepted") || "none"
         }));
 
         setResults(resultsWithStatus);
@@ -85,33 +84,33 @@ const SearchPeople = () => {
     }
   };
 
-  const handleConnectionRequest = async (userId: string) => {
+  const handleFollow = async (userId: string) => {
     try {
       const { error } = await supabase
         .from("connections")
         .insert({
           follower_id: currentUserId,
           following_id: userId,
-          status: "pending"
+          status: "accepted" // Direct follow without approval
         });
 
       if (error) throw error;
 
-      toast.success("Richiesta di connessione inviata");
+      toast.success("Ora segui questo utente");
       setResults(prev => 
-        prev.map(r => r.id === userId ? { ...r, connectionStatus: "pending" } : r)
+        prev.map(r => r.id === userId ? { ...r, connectionStatus: "accepted" } : r)
       );
     } catch (error: any) {
-      console.error("Error sending connection request:", error);
+      console.error("Error following user:", error);
       if (error.code === "23505") {
-        toast.error("Hai già inviato una richiesta");
+        toast.error("Segui già questo utente");
       } else {
-        toast.error("Errore nell'invio della richiesta");
+        toast.error("Errore nel seguire l'utente");
       }
     }
   };
 
-  const handleCancelRequest = async (userId: string) => {
+  const handleUnfollow = async (userId: string) => {
     try {
       const { error } = await supabase
         .from("connections")
@@ -121,13 +120,13 @@ const SearchPeople = () => {
 
       if (error) throw error;
 
-      toast.success("Richiesta annullata");
+      toast.success("Non segui più questo utente");
       setResults(prev => 
         prev.map(r => r.id === userId ? { ...r, connectionStatus: "none" } : r)
       );
     } catch (error) {
-      console.error("Error canceling request:", error);
-      toast.error("Errore nell'annullare la richiesta");
+      console.error("Error unfollowing user:", error);
+      toast.error("Errore nello smettere di seguire");
     }
   };
 
@@ -229,28 +228,21 @@ const SearchPeople = () => {
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => handleConnectionRequest(person.id)}
+                          onClick={() => handleFollow(person.id)}
                         >
                           <UserPlus className="h-4 w-4 mr-2" />
-                          Connetti
-                        </Button>
-                      )}
-
-                      {person.connectionStatus === "pending" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCancelRequest(person.id)}
-                        >
-                          <UserX className="h-4 w-4 mr-2" />
-                          Annulla
+                          Segui
                         </Button>
                       )}
 
                       {person.connectionStatus === "accepted" && (
-                        <Button variant="outline" size="sm" disabled>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleUnfollow(person.id)}
+                        >
                           <UserCheck className="h-4 w-4 mr-2" />
-                          Connesso
+                          Segui già
                         </Button>
                       )}
                     </div>
