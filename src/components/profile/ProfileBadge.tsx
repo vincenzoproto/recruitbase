@@ -63,12 +63,9 @@ export const ProfileBadge = ({ userId, size = "md", showIcon = true }: ProfileBa
   };
 
   if (!showIcon) {
-    // Return just a colored border ring
+    // Return just the icon inline, no absolute positioning
     return (
-      <div className={cn(
-        "absolute -inset-1 rounded-full border-2",
-        config.color.split(' ')[1]
-      )} />
+      <Icon className={cn(sizeClasses[size], config.color.split(' ')[0])} />
     );
   }
 

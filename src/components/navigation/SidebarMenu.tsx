@@ -25,7 +25,8 @@ import {
   Columns,
   UserPlus,
   Compass,
-  Search
+  Search,
+  GraduationCap
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -142,6 +143,12 @@ export const SidebarMenu = ({
         id: "calendar", 
         icon: Calendar, 
         label: "Calendario", 
+        locked: false 
+      },
+      { 
+        id: "e-learning", 
+        icon: GraduationCap, 
+        label: "E-learning", 
         locked: false 
       },
       { 
