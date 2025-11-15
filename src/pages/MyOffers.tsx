@@ -10,26 +10,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import CreateJobDialog from "@/components/dashboard/CreateJobDialog";
 import EditJobDialog from "@/components/dashboard/EditJobDialog";
+import { useOptimizedOffers } from "@/hooks/useOptimizedOffers";
 
 const MyOffers = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
-  const [jobOffers, setJobOffers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showCreateJob, setShowCreateJob] = useState(false);
   const [editingJob, setEditingJob] = useState<any>(null);
 
   useEffect(() => {
     loadProfile();
   }, []);
-
-  useEffect(() => {
-    if (profile && profile.role === "recruiter") {
-      loadMyOffers();
-    } else if (profile && profile.role !== "recruiter") {
-      navigate("/offers");
-    }
-  }, [profile]);
 
   const loadProfile = async () => {
     try {
@@ -49,35 +40,14 @@ const MyOffers = () => {
         setProfile(profileData);
       }
     } catch (error) {
-      console.error("Error loading profile:", error);
       navigate("/auth");
     }
   };
 
-  const loadMyOffers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("job_offers")
-        .select(`
-          *,
-          applications (
-            id,
-            status
-          )
-        `)
-        .eq("recruiter_id", profile.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setJobOffers(data || []);
-    } catch (error) {
-      console.error("Error loading offers:", error);
-      toast.error("Errore nel caricamento delle offerte");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { offers: jobOffers, loading, refetch, invalidate } = useOptimizedOffers({
+    recruiterId: profile?.id,
+    active: undefined
+  });
 
   const handleDeleteJob = async (jobId: string) => {
     if (!confirm("Sei sicuro di voler eliminare questa offerta?")) return;
@@ -90,9 +60,9 @@ const MyOffers = () => {
 
       if (error) throw error;
       toast.success("Offerta eliminata");
-      loadMyOffers();
+      invalidate();
+      refetch();
     } catch (error) {
-      console.error("Error deleting job:", error);
       toast.error("Errore nell'eliminazione dell'offerta");
     }
   };
@@ -208,7 +178,8 @@ const MyOffers = () => {
         onOpenChange={setShowCreateJob}
         onSuccess={() => {
           setShowCreateJob(false);
-          loadMyOffers();
+          invalidate();
+          refetch();
         }}
         recruiterId={profile?.id || ""}
       />
@@ -219,7 +190,8 @@ const MyOffers = () => {
           onOpenChange={(open) => !open && setEditingJob(null)}
           onSuccess={() => {
             setEditingJob(null);
-            loadMyOffers();
+            invalidate();
+            refetch();
           }}
           job={editingJob}
         />

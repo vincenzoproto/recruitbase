@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, MapPin, Building, Eye, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { useOptimizedApplications } from "@/hooks/useOptimizedApplications";
 
 interface Application {
   id: string;
@@ -43,58 +44,21 @@ const statusLabels: Record<string, string> = {
 
 const Applications = () => {
   const navigate = useNavigate();
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
+    const loadCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      } else {
+        navigate("/auth");
+      }
+    };
     loadCurrentUser();
-  }, []);
+  }, [navigate]);
 
-  const loadCurrentUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setUserId(user.id);
-      loadApplications(user.id);
-    } else {
-      navigate("/auth");
-    }
-  };
-
-  const loadApplications = async (candidateId: string) => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("applications")
-        .select(`
-          id,
-          status,
-          applied_at,
-          job_offers (
-            id,
-            title,
-            city,
-            sector,
-            experience_level,
-            description,
-            profiles:recruiter_id (
-              full_name,
-              company_size
-            )
-          )
-        `)
-        .eq("candidate_id", candidateId)
-        .order("applied_at", { ascending: false });
-
-      if (error) throw error;
-      setApplications(data || []);
-    } catch (error) {
-      console.error("Error loading applications:", error);
-      toast.error("Errore nel caricamento delle candidature");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { applications, loading } = useOptimizedApplications(userId);
 
   if (loading) {
     return (
