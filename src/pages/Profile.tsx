@@ -11,6 +11,7 @@ import { CVUploader } from "@/components/candidate/CVUploader";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { ProfileBadge } from "@/components/profile/ProfileBadge";
 import { Badge } from "@/components/ui/badge";
+import { useFollowUser } from "@/hooks/useFollowUser";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -117,27 +118,49 @@ const Profile = () => {
         {/* HEADER */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-              <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
+              </Avatar>
+              <ProfileBadge userId={profile?.id} size="sm" />
+            </div>
 
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">{profile?.full_name}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-2xl font-bold">{profile?.full_name}</h2>
+                <Badge variant="outline" className="shrink-0 font-semibold">
+                  {profile?.role === 'recruiter' ? '👔 Recruiter' : '👤 Candidato'}
+                </Badge>
+              </div>
               {profile?.job_title && (
                 <p className="text-muted-foreground">
                   {profile.job_title}
                 </p>
               )}
-              <div className="flex items-center gap-2 mt-2">
-                <ProfileBadge userId={profile?.id} size="sm" />
-              </div>
             </div>
 
-            {isOwnProfile && (
+            {isOwnProfile ? (
               <Button size="sm" onClick={() => setEditOpen(true)}>
                 <Edit className="h-4 w-4 mr-1" /> Modifica
               </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant={isFollowing ? "outline" : "default"}
+                  disabled={followLoading}
+                  onClick={async () => {
+                    const delta = await toggleFollow();
+                    if (typeof delta === "number") setFollowersCount((c) => c + delta);
+                  }}
+                >
+                  {isFollowing ? "Segui già" : "Segui"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleOpenChat}>
+                  Messaggio
+                </Button>
+              </div>
             )}
           </CardHeader>
         </Card>
