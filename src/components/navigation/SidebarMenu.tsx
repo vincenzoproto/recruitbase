@@ -165,15 +165,7 @@ export const SidebarMenu = ({
         requiredPlan: "Pro"
       },
     ],
-    premium: [
-      { 
-        id: "feed", 
-        icon: Users, 
-        label: "Feed sociale", 
-        locked: !canAccessFeature(planType, 'business'),
-        requiredPlan: "Business"
-      },
-    ],
+    premium: [],
     enterprise: [
       { 
         id: "team", 
@@ -195,12 +187,6 @@ export const SidebarMenu = ({
         icon: UserPlus, 
         label: "Connessioni", 
         locked: false 
-      },
-      {
-        id: "premium-candidate",
-        icon: Crown,
-        label: "💎 Diventa Premium",
-        locked: false
       },
     ],
     settings: [
@@ -239,15 +225,7 @@ export const SidebarMenu = ({
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },
       { id: "notifications-archive", icon: Bell, label: "Archivio notifiche", locked: false },
     ],
-    premium: [
-      { 
-        id: "ai-suggestions", 
-        icon: Brain, 
-        label: "Suggerimenti AI", 
-        locked: planType === "free",
-        requiredPlan: "Business"
-      },
-    ],
+    premium: [],
     enterprise: [],
     gamification: [
       { 
