@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,8 +7,6 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { Download, TrendingUp, Users, MessageCircle, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 interface RecruiterAnalyticsProps {
   userId: string;
@@ -21,7 +19,6 @@ export const RecruiterAnalytics = ({ userId }: RecruiterAnalyticsProps) => {
   const [matchData, setMatchData] = useState<any[]>([]);
   const [responseTime, setResponseTime] = useState(0);
   const [insights, setInsights] = useState<string>("");
-  const analyticsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadAnalytics();
@@ -92,37 +89,8 @@ export const RecruiterAnalytics = ({ userId }: RecruiterAnalyticsProps) => {
     return result;
   };
 
-  const handleDownloadPDF = async () => {
-    if (!analyticsRef.current) return;
-    
-    try {
-      toast.info("Generazione PDF in corso...");
-      
-      // Capture the analytics content
-      const canvas = await html2canvas(analyticsRef.current, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-      });
-      
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-      
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      pdf.save(`analytics-report-${new Date().toLocaleDateString()}.pdf`);
-      
-      toast.success("Report PDF scaricato con successo!");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Errore nella generazione del PDF");
-    }
+  const handleDownloadPDF = () => {
+    window.print();
   };
 
   if (loading) {
@@ -130,7 +98,7 @@ export const RecruiterAnalytics = ({ userId }: RecruiterAnalyticsProps) => {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in" ref={analyticsRef}>
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
