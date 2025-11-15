@@ -49,19 +49,32 @@ export const useFollowUser = (currentUserId: string | null, targetUserId: string
         toast.success('Non segui più questo utente');
         return -1; // Return -1 to decrease follower count
       } else {
-        // Follow - directly set as accepted (no approval needed)
-        const { error } = await supabase
+        // Follow - create pending request
+        const { error: connError } = await supabase
           .from('connections')
           .insert({
             follower_id: currentUserId,
             following_id: targetUserId,
-            status: 'accepted'
+            status: 'pending'
           });
 
-        if (error) throw error;
-        setIsFollowing(true);
-        toast.success('Ora segui questo utente');
-        return 1; // Return 1 to increase follower count
+        if (connError) throw connError;
+
+        // Create notification for the target user
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert({
+            user_id: targetUserId,
+            type: 'follow_request',
+            title: 'Nuova richiesta di connessione',
+            message: 'Vuole iniziare a seguirti',
+            link: `/connections`
+          });
+
+        if (notifError) console.error('Error creating notification:', notifError);
+        
+        toast.success('Richiesta di connessione inviata');
+        return 0; // Return 0 as it's pending
       }
     } catch (error) {
       console.error('Error toggling follow:', error);
