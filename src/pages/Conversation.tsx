@@ -111,13 +111,18 @@ const Conversation = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/messages")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={otherUser?.avatar_url} />
-            <AvatarFallback>{getInitials(otherUser?.full_name || "")}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <h2 className="font-semibold">{otherUser?.full_name}</h2>
-            <p className="text-sm text-muted-foreground">{otherUser?.job_title}</p>
+          <div 
+            className="flex items-center gap-3 flex-1 cursor-pointer hover:opacity-80"
+            onClick={() => navigate(`/profile/${userId}`)}
+          >
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={otherUser?.avatar_url} />
+              <AvatarFallback>{getInitials(otherUser?.full_name || "")}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="font-semibold">{otherUser?.full_name}</h2>
+              <p className="text-sm text-muted-foreground">{otherUser?.job_title}</p>
+            </div>
           </div>
         </div>
 

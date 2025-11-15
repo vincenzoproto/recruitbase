@@ -22,6 +22,8 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Conversation = lazy(() => import("./pages/Conversation"));
+const Groups = lazy(() => import("./pages/Groups"));
+const Matches = lazy(() => import("./pages/Matches"));
 const Copilot = lazy(() => import("./pages/Copilot"));
 const Offers = lazy(() => import("./pages/Offers"));
 const Notifications = lazy(() => import("./pages/Notifications"));
@@ -65,6 +67,8 @@ const App = () => (
       <Route path="/contact" element={<Contact />} />
       <Route path="/messages" element={<Messages />} />
       <Route path="/messages/:userId" element={<Conversation />} />
+      <Route path="/groups" element={<Groups />} />
+      <Route path="/matches" element={<Matches />} />
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/offers" element={<Offers />} />
       <Route path="/settings" element={<Settings />} />

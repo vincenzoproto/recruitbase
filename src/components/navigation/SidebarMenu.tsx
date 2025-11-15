@@ -294,7 +294,7 @@ export const SidebarMenu = ({
       
       const routeMap: Record<string, string> = {
         profile: "/profile",
-        matches: "/offers",
+        matches: "/matches",
         pipeline: "/pipeline",
         offers: "/offers",
         analytics: "/analytics",
@@ -312,7 +312,7 @@ export const SidebarMenu = ({
         cv: "/profile",
         "saved-offers": "/offers",
         career: "/career",
-        "create-group": "/messages",
+        "create-group": "/groups",
         "ai-suggestions": "/copilot",
       };
       
