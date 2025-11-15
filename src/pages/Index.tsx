@@ -6,29 +6,29 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+      {/* Header - iOS Style */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/95 border-b border-border/40">
+        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">RB</span>
+            <div className="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center shadow-sm">
+              <span className="text-white font-semibold text-lg">RB</span>
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <span className="font-semibold text-xl tracking-tight text-foreground">
               Recruit Base
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button 
               variant="ghost" 
               onClick={() => navigate("/auth")} 
-              className="font-semibold hidden sm:inline-flex"
+              className="font-medium hidden sm:inline-flex rounded-xl hover:bg-accent/50 transition-all duration-200"
             >
               Accedi
             </Button>
             <Button 
               onClick={() => navigate("/auth")} 
-              className="font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 bg-primary hover:bg-primary/90"
             >
               Inizia Gratis
             </Button>
@@ -36,94 +36,100 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full border border-primary/20 mb-4">
-            <span className="text-sm font-semibold text-primary">🚀 Il TRM che semplifica la vita ai Recruiter</span>
+      {/* Hero Section - iOS Minimal Style */}
+      <section className="container mx-auto px-4 sm:px-6 py-16 md:py-28">
+        <div className="max-w-4xl mx-auto text-center space-y-10 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/8 rounded-full border border-primary/15">
+            <span className="text-sm font-medium text-primary">🚀 Il TRM che semplifica la vita ai Recruiter</span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
             Candidature, Match e Follow-up
             <br />
-            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
               Gestiti in modo intelligente
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
             Velocità di selezione 10×, AI che scrive messaggi, match basati su valori reali
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-8">
             <Button 
               size="lg" 
               onClick={() => navigate("/auth")}
-              className="text-base px-8 h-14 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold group"
+              className="text-base px-10 h-14 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 font-semibold group bg-primary hover:bg-primary/90"
             >
               Inizia ora (gratis 30 giorni)
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </Button>
             <Button 
               size="lg" 
               variant="outline"
               onClick={() => navigate("/demo")}
-              className="text-base px-8 h-14 rounded-xl font-semibold"
+              className="text-base px-10 h-14 rounded-2xl font-semibold border-border/60 hover:border-border hover:bg-accent/50 transition-all duration-200"
             >
               Prova la Demo Live
             </Button>
           </div>
           
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap justify-center gap-6 pt-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-success" />
-              <span>30 giorni gratis</span>
+          {/* Trust Indicators - iOS Minimal */}
+          <div className="flex flex-wrap justify-center gap-8 pt-10 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle className="h-3.5 w-3.5 text-success" />
+              </div>
+              <span className="font-medium">30 giorni gratis</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-success" />
-              <span>Nessuna carta richiesta</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle className="h-3.5 w-3.5 text-success" />
+              </div>
+              <span className="font-medium">Nessuna carta richiesta</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-success" />
-              <span>Setup in 2 minuti</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle className="h-3.5 w-3.5 text-success" />
+              </div>
+              <span className="font-medium">Setup in 2 minuti</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Value Props */}
-      <section className="container mx-auto px-4 py-16 md:py-20">
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Speed */}
-          <div className="text-center space-y-4 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 hover:border-primary/30 transition-all animate-fade-in">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-              <Zap className="h-8 w-8 text-primary" />
+      {/* Value Props - iOS Card Style */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 md:py-32">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {/* Velocità */}
+          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
+            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
+              <Zap className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="text-xl font-bold">Velocità 10×</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <h3 className="text-xl font-semibold tracking-tight">Velocità 10×</h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">
               Gestisci candidature con swipe, aggiorna stati in 1 tap, pianifica colloqui istantaneamente
             </p>
           </div>
 
           {/* AI */}
-          <div className="text-center space-y-4 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 hover:border-primary/30 transition-all animate-fade-in animation-delay-100">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-              <Brain className="h-8 w-8 text-primary" />
+          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
+            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
+              <Brain className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="text-xl font-bold">AI che scrive per te</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <h3 className="text-xl font-semibold tracking-tight">AI che scrive per te</h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">
               Follow-up automatici, messaggi ottimizzati, insight su chi contattare per primo
             </p>
           </div>
 
           {/* Values */}
-          <div className="text-center space-y-4 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 hover:border-primary/30 transition-all animate-fade-in animation-delay-200">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-              <Heart className="h-8 w-8 text-primary" />
+          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
+            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
+              <Heart className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="text-xl font-bold">Match su valori reali</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <h3 className="text-xl font-semibold tracking-tight">Match su valori reali</h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">
               Algoritmo TRS™ che valuta relazioni autentiche, non solo competenze tecniche
             </p>
           </div>

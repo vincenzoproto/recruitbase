@@ -95,7 +95,6 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
       />
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <MeetingConfirmationBanner userId={profile.id} userRole="candidate" />
 
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between mb-4">
