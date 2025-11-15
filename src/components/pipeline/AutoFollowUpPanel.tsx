@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Send, Zap, CheckCircle, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Clock, Send, Zap, CheckCircle, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -53,7 +54,7 @@ const TEMPLATES = {
 export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
   const [scheduled, setScheduled] = useState<ScheduledFollowUp[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
-  const [selectedCandidate, setSelectedCandidate] = useState("");
+  const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -119,51 +120,52 @@ export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
   };
 
   const scheduleFollowUp = async () => {
-    if (!selectedCandidate || !selectedTemplate) {
-      toast.error("Seleziona candidato e template");
+    if (selectedCandidates.length === 0 || !selectedTemplate) {
+      toast.error("Seleziona almeno un candidato e un template");
       return;
     }
 
     setLoading(true);
     try {
       const template = TEMPLATES[selectedTemplate as keyof typeof TEMPLATES];
-      const candidate = candidates.find((c) => c.id === selectedCandidate);
-      
       const scheduledDate = new Date();
       scheduledDate.setDate(scheduledDate.getDate() + template.delay_days);
 
-      const message = template.message.replace("{name}", candidate.full_name);
+      for (const candidateId of selectedCandidates) {
+        const candidate = candidates.find((c) => c.id === candidateId);
+        const message = template.message.replace("{name}", candidate?.full_name || "");
 
-      // Create or update follow-up
-      const { data: existing } = await supabase
-        .from("follow_ups")
-        .select("id")
-        .eq("candidate_id", selectedCandidate)
-        .eq("recruiter_id", recruiterId)
-        .maybeSingle();
-
-      if (existing) {
-        await supabase
+        // Check if follow-up already exists
+        const { data: existing } = await supabase
           .from("follow_ups")
-          .update({
+          .select("id")
+          .eq("candidate_id", candidateId)
+          .eq("recruiter_id", recruiterId)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from("follow_ups")
+            .update({
+              followup_due: scheduledDate.toISOString(),
+              followup_message: message,
+              followup_sent: false,
+            })
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("follow_ups").insert({
+            candidate_id: candidateId,
+            recruiter_id: recruiterId,
             followup_due: scheduledDate.toISOString(),
             followup_message: message,
-            followup_sent: false,
-          })
-          .eq("id", existing.id);
-      } else {
-        await supabase.from("follow_ups").insert({
-          candidate_id: selectedCandidate,
-          recruiter_id: recruiterId,
-          followup_due: scheduledDate.toISOString(),
-          followup_message: message,
-          last_contact: new Date().toISOString(),
-        });
+            last_contact: new Date().toISOString(),
+          });
+        }
       }
 
-      toast.success(`Follow-up programmato per ${scheduledDate.toLocaleDateString()}`);
+      toast.success(`Follow-up programmato per ${selectedCandidates.length} candidati`);
       loadScheduled();
-      setSelectedCandidate("");
+      setSelectedCandidates([]);
       setSelectedTemplate("");
     } catch (error) {
       console.error("Error scheduling follow-up:", error);
@@ -233,19 +235,46 @@ export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-3">
-            <Select value={selectedCandidate} onValueChange={setSelectedCandidate}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleziona candidato" />
-              </SelectTrigger>
-              <SelectContent>
-                {candidates.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.full_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">Seleziona Candidati</p>
+              <Badge variant="secondary">
+                <Users className="h-3 w-3 mr-1" />
+                {selectedCandidates.length} selezionati
+              </Badge>
+            </div>
+            
+            <div className="max-h-[200px] overflow-y-auto space-y-2 border rounded-lg p-2">
+              {candidates.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">Nessun candidato trovato</p>
+              ) : (
+                candidates.map((candidate) => (
+                  <div
+                    key={candidate.id}
+                    className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 cursor-pointer"
+                    onClick={() => {
+                      setSelectedCandidates((prev) =>
+                        prev.includes(candidate.id)
+                          ? prev.filter((id) => id !== candidate.id)
+                          : [...prev, candidate.id]
+                      );
+                    }}
+                  >
+                    <Checkbox
+                      checked={selectedCandidates.includes(candidate.id)}
+                      onCheckedChange={() => {
+                        setSelectedCandidates((prev) =>
+                          prev.includes(candidate.id)
+                            ? prev.filter((id) => id !== candidate.id)
+                            : [...prev, candidate.id]
+                        );
+                      }}
+                    />
+                    <span className="text-sm flex-1">{candidate.full_name}</span>
+                  </div>
+                ))
+              )}
+            </div>
 
             <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
               <SelectTrigger>
@@ -261,15 +290,15 @@ export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
             </Select>
           </div>
 
-          {selectedTemplate && (
+          {selectedTemplate && selectedCandidates.length > 0 && (
             <div className="p-3 rounded-lg bg-accent/50 text-sm">
               <p className="font-medium mb-1">Anteprima messaggio:</p>
               <p className="text-muted-foreground">
                 {TEMPLATES[selectedTemplate as keyof typeof TEMPLATES].message.replace(
                   "{name}",
-                  selectedCandidate
-                    ? candidates.find((c) => c.id === selectedCandidate)?.full_name || "Candidato"
-                    : "Candidato"
+                  selectedCandidates.length === 1
+                    ? candidates.find((c) => c.id === selectedCandidates[0])?.full_name || "Candidato"
+                    : `${selectedCandidates.length} candidati`
                 )}
               </p>
             </div>
@@ -278,10 +307,10 @@ export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
           <Button
             className="w-full"
             onClick={scheduleFollowUp}
-            disabled={!selectedCandidate || !selectedTemplate || loading}
+            disabled={selectedCandidates.length === 0 || !selectedTemplate || loading}
           >
             <Clock className="h-4 w-4 mr-2" />
-            Programma Follow-up
+            Programma per {selectedCandidates.length} candidat{selectedCandidates.length === 1 ? 'o' : 'i'}
           </Button>
         </CardContent>
       </Card>

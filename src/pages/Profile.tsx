@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Mail, Phone, Linkedin, Edit, FileText, Users, Award, MessageCircle } from "lucide-react";
+import { MapPin, Mail, Phone, Linkedin, Edit, FileText, Users, Award, MessageCircle, UserPlus, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import EditProfileDialog from "@/components/dashboard/EditProfileDialog";
 import { CVUploader } from "@/components/candidate/CVUploader";
@@ -149,17 +149,18 @@ const Profile = () => {
             ) : (
               <div className="flex items-center gap-2">
                 <Button
-                  size="sm"
+                  size="icon"
                   variant={isFollowing ? "outline" : "default"}
                   disabled={followLoading}
                   onClick={async () => {
                     const delta = await toggleFollow();
                     if (typeof delta === "number") setFollowersCount((c) => c + delta);
                   }}
+                  title={isFollowing ? "Segui già" : "Segui"}
                 >
-                  {isFollowing ? "Segui già" : "Segui"}
+                  {isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
                 </Button>
-                <Button size="sm" variant="outline" onClick={handleOpenChat}>
+                <Button size="icon" variant="outline" onClick={handleOpenChat} title="Messaggio">
                   <MessageCircle className="h-4 w-4" />
                 </Button>
               </div>
