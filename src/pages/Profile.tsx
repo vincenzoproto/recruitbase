@@ -166,6 +166,27 @@ const Profile = () => {
               </div>
             )}
           </CardHeader>
+          
+          <CardContent className="pt-4 border-t">
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <button 
+                onClick={() => navigate('/connections')}
+                className="flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"
+              >
+                <Users className="h-4 w-4" />
+                <span className="font-semibold text-foreground">{followersCount}</span>
+                <span>Follower</span>
+              </button>
+              <button 
+                onClick={() => navigate('/connections')}
+                className="flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"
+              >
+                <Users className="h-4 w-4" />
+                <span className="font-semibold text-foreground">{followingCount}</span>
+                <span>Seguiti</span>
+              </button>
+            </div>
+          </CardContent>
         </Card>
 
         {/* INFO */}

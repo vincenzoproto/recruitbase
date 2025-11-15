@@ -49,13 +49,30 @@ const Settings = () => {
       
       if (error) throw error;
 
-      toast.success("Email aggiornata", {
+      toast.success("Email aggiornata con successo", {
         description: "Controlla la tua nuova email per confermare il cambiamento.",
       });
       setShowEmailChange(false);
       setNewEmail("");
+      setCurrentEmail(newEmail);
     } catch (error: any) {
       toast.error("Errore nell'aggiornamento email", {
+        description: error.message,
+      });
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    try {
+      const { error } = await supabase.auth.updateUser({ 
+        password: prompt("Inserisci la nuova password") || "" 
+      });
+      
+      if (error) throw error;
+
+      toast.success("Password aggiornata con successo");
+    } catch (error: any) {
+      toast.error("Errore nell'aggiornamento password", {
         description: error.message,
       });
     }
@@ -182,11 +199,46 @@ const Settings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full justify-start">
-              <Mail className="w-4 h-4 mr-2" />
-              Cambia email
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
+            {!showEmailChange ? (
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setShowEmailChange(true)}
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Cambia email
+              </Button>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="new-email">Nuova email</Label>
+                <Input
+                  id="new-email"
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder={currentEmail}
+                />
+                <div className="flex gap-2">
+                  <Button onClick={handleEmailChange} className="flex-1">
+                    Conferma
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowEmailChange(false);
+                      setNewEmail("");
+                    }}
+                  >
+                    Annulla
+                  </Button>
+                </div>
+              </div>
+            )}
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={handlePasswordChange}
+            >
               <Lock className="w-4 h-4 mr-2" />
               Cambia password
             </Button>
