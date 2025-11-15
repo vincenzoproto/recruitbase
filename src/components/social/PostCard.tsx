@@ -185,6 +185,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         <PostActions 
           postId={post.id} 
           onCommentClick={() => setShowComments(!showComments)}
+          postContent={post.content || undefined}
         />
 
         {showComments && <CommentSection postId={post.id} />}

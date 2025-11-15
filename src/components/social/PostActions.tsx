@@ -5,13 +5,15 @@ import { Heart, MessageCircle, Repeat2 } from "lucide-react";
 import { toast } from "sonner";
 import { hapticFeedback } from "@/lib/haptics";
 import { useAdvancedXPSystem } from "@/hooks/useAdvancedXPSystem";
+import { ShareMenu } from "./ShareMenu";
 
 interface PostActionsProps {
   postId: string;
   onCommentClick: () => void;
+  postContent?: string;
 }
 
-export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
+export const PostActions = ({ postId, onCommentClick, postContent }: PostActionsProps) => {
   const [likes, setLikes] = useState(0);
   const [reposts, setReposts] = useState(0);
   const [comments, setComments] = useState(0);
@@ -175,42 +177,40 @@ export const PostActions = ({ postId, onCommentClick }: PostActionsProps) => {
   };
 
   return (
-    <div className="flex items-center gap-4 md:gap-6 pt-2 md:pt-3 border-t">
+    <div className="flex items-center gap-1 pt-2 border-t border-border/50 mt-3">
       <Button
         variant="ghost"
         size="sm"
+        className={`h-9 gap-1.5 smooth-transition flex-1 ${hasLiked ? 'text-[#FF3B30]' : ''}`}
         onClick={toggleLike}
         disabled={loading}
-        className={`gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3 ${
-          hasLiked ? 'text-red-500 hover:text-red-600' : ''
-        }`}
       >
-        <Heart className={`h-4 w-4 ${hasLiked ? 'fill-current' : ''}`} />
-        <span className="text-xs md:text-sm font-medium">{likes}</span>
+        <Heart className={`h-4 w-4 ${hasLiked ? 'fill-current animate-scale-in' : ''}`} />
+        <span className="text-xs font-medium">{likes}</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
+        className="h-9 gap-1.5 smooth-transition flex-1"
         onClick={onCommentClick}
-        className="gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3"
       >
         <MessageCircle className="h-4 w-4" />
-        <span className="text-xs md:text-sm font-medium">{comments}</span>
+        <span className="text-xs font-medium">{comments}</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
+        className={`h-9 gap-1.5 smooth-transition flex-1 ${hasReposted ? 'text-[#34C759]' : ''}`}
         onClick={toggleRepost}
         disabled={loading}
-        className={`gap-1.5 md:gap-2 h-8 md:h-9 px-2 md:px-3 ${
-          hasReposted ? 'text-green-500 hover:text-green-600' : ''
-        }`}
       >
-        <Repeat2 className="h-4 w-4" />
-        <span className="text-xs md:text-sm font-medium">{reposts}</span>
+        <Repeat2 className={`h-4 w-4 ${hasReposted ? 'animate-scale-in' : ''}`} />
+        <span className="text-xs font-medium">{reposts}</span>
       </Button>
+
+      <ShareMenu postId={postId} content={postContent} className="flex-1" />
     </div>
   );
 };

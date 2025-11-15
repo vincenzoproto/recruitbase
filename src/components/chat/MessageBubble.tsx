@@ -37,10 +37,10 @@ export const MessageBubble = memo(({
 
       <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"} max-w-[70%]`}>
         <div
-          className={`rounded-2xl px-4 py-2 ${
+          className={`rounded-2xl px-4 py-2.5 shadow-soft smooth-transition hover:shadow-medium ${
             isOwn
               ? "bg-primary text-primary-foreground rounded-tr-sm"
-              : "bg-muted text-foreground rounded-tl-sm"
+              : "bg-secondary/80 text-foreground rounded-tl-sm"
           }`}
         >
           {/* Media attachments */}
@@ -76,20 +76,20 @@ export const MessageBubble = memo(({
           </p>
         </div>
 
-        {/* Timestamp and read status */}
-        <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}>
-          <span className="text-[10px] text-muted-foreground">
+        {/* Timestamp and read status - iOS style */}
+        <div className={`flex items-center gap-1.5 mt-1 px-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}>
+          <span className="text-[10px] text-muted-foreground font-medium">
             {formatDistanceToNow(new Date(message.created_at), {
               addSuffix: true,
               locale: it,
             })}
           </span>
           {isOwn && (
-            <span className="text-muted-foreground">
+            <span className="smooth-transition">
               {message.read ? (
-                <CheckCheck className="h-3 w-3 text-primary" />
+                <CheckCheck className="h-3.5 w-3.5 text-[#0A84FF] animate-scale-in" />
               ) : (
-                <Check className="h-3 w-3" />
+                <Check className="h-3.5 w-3.5 text-muted-foreground" />
               )}
             </span>
           )}
