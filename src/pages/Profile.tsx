@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Mail, Phone, Linkedin, Edit, FileText, Users, Award } from "lucide-react";
+import { MapPin, Mail, Phone, Linkedin, Edit, FileText, Users, Award, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import EditProfileDialog from "@/components/dashboard/EditProfileDialog";
 import { CVUploader } from "@/components/candidate/CVUploader";
@@ -160,7 +160,7 @@ const Profile = () => {
                   {isFollowing ? "Segui già" : "Segui"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleOpenChat}>
-                  Messaggio
+                  <MessageCircle className="h-4 w-4" />
                 </Button>
               </div>
             )}
