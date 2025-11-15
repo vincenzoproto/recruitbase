@@ -128,10 +128,18 @@ const Messages = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={conv.user.avatar_url} />
-                      <AvatarFallback>{getInitials(conv.user.full_name)}</AvatarFallback>
-                    </Avatar>
+                    <div
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${conv.user.id}`);
+                      }}
+                    >
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={conv.user.avatar_url} />
+                        <AvatarFallback>{getInitials(conv.user.full_name)}</AvatarFallback>
+                      </Avatar>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="font-semibold truncate">{conv.user.full_name}</h3>
