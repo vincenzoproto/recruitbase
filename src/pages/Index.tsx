@@ -52,7 +52,7 @@ const Index = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
-            Velocità di selezione 10×, AI che scrive messaggi, match basati su valori reali
+            Velocità di selezione 10×, AI che scrive messaggi, match basati su valori
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-8">

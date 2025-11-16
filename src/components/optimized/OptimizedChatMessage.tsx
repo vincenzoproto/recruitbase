@@ -2,6 +2,7 @@ import React from 'react';
 import OptimizedAvatar from './OptimizedAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { Check, CheckCheck } from 'lucide-react';
 
 interface OptimizedChatMessageProps {
   message: {
@@ -10,6 +11,7 @@ interface OptimizedChatMessageProps {
     created_at: string;
     sender_id: string;
     media_url?: string;
+    read?: boolean;
   };
   isCurrentUser: boolean;
   senderName: string;
@@ -57,12 +59,21 @@ const OptimizedChatMessage: React.FC<OptimizedChatMessageProps> = ({
           )}
         </div>
         
-        <span className="text-xs text-muted-foreground mt-1 px-1">
-          {formatDistanceToNow(new Date(message.created_at), {
-            addSuffix: true,
-            locale: it
-          })}
-        </span>
+        <div className="flex items-center gap-1 mt-1 px-1">
+          <span className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(message.created_at), {
+              addSuffix: true,
+              locale: it
+            })}
+          </span>
+          {isCurrentUser && (
+            message.read ? (
+              <CheckCheck className="h-3 w-3 text-primary" />
+            ) : (
+              <Check className="h-3 w-3 text-muted-foreground" />
+            )
+          )}
+        </div>
       </div>
     </div>
   );
