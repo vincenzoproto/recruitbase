@@ -49,13 +49,12 @@ const SavedOffers = () => {
   const loadSavedOffers = async (candidateId: string) => {
     try {
       setLoading(true);
-      // In questo esempio usiamo la tabella favorites come "saved offers"
       const { data, error } = await supabase
         .from("favorites")
         .select(`
           id,
           candidate_id,
-          job_offers!favorites_candidate_id_fkey (
+          job_offers:candidate_id (
             id,
             title,
             city,
@@ -72,7 +71,6 @@ const SavedOffers = () => {
 
       if (error) throw error;
       
-      // Trasformiamo i dati nel formato corretto
       const formattedData = data?.map(item => ({
         id: item.id,
         job_offer_id: item.candidate_id,

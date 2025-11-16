@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, UserPlus, UserMinus, Check, X, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileBadge } from "@/components/profile/ProfileBadge";
+import { useConnectionsCount } from "@/hooks/useConnectionsCount";
 
 interface Connection {
   id: string;
@@ -28,6 +29,7 @@ const Connections = () => {
   const [following, setFollowing] = useState<Connection[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
+  const { counts } = useConnectionsCount(currentUserId);
 
   useEffect(() => {
     loadCurrentUser();
@@ -274,13 +276,13 @@ const Connections = () => {
             <Tabs defaultValue="followers">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="followers">
-                  Followers ({followers.length})
+                  Followers ({counts.followers})
                 </TabsTrigger>
                 <TabsTrigger value="following">
-                  Following ({following.length})
+                  Following ({counts.following})
                 </TabsTrigger>
                 <TabsTrigger value="pending">
-                  Richieste ({pendingRequests.length})
+                  Richieste ({counts.pending})
                 </TabsTrigger>
               </TabsList>
 

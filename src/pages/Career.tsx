@@ -5,6 +5,7 @@ import { ArrowLeft, TrendingUp, Target, BookOpen, Award } from "lucide-react";
 import { TinderMatch } from "@/components/match/TinderMatch";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { CVATSReview } from "@/components/candidate/CVATSReview";
 
 const Career = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const Career = () => {
         </Button>
 
         <div className="space-y-6">
+          <CVATSReview />
+          
           <Card className="border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

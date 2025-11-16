@@ -146,18 +146,6 @@ export const SidebarMenu = ({
         locked: false 
       },
       { 
-        id: "e-learning", 
-        icon: GraduationCap, 
-        label: "E-learning", 
-        locked: false 
-      },
-      { 
-        id: "notifications-archive", 
-        icon: Bell, 
-        label: "Archivio notifiche", 
-        locked: false 
-      },
-      { 
         id: "copilot", 
         icon: Brain, 
         label: "Copilot AI", 
@@ -179,7 +167,7 @@ export const SidebarMenu = ({
       { 
         id: "rewards", 
         icon: Gift, 
-        label: "🎁 Marketplace Premi", 
+        label: "Marketplace Premi", 
         locked: false 
       },
       { 
@@ -227,9 +215,7 @@ export const SidebarMenu = ({
       { id: "applications", icon: Briefcase, label: "Candidature attive", locked: false },
       { id: "offers", icon: Briefcase, label: "Offerte", locked: false },
       { id: "saved-offers", icon: Heart, label: "Offerte salvate", locked: false },
-      { id: "e-learning", icon: GraduationCap, label: "E-learning", locked: false },
       { id: "feed", icon: Users, label: "Feed sociale", locked: false },
-      { id: "notifications-archive", icon: Bell, label: "Archivio notifiche", locked: false },
     ],
     premium: [],
     enterprise: [],
@@ -237,7 +223,7 @@ export const SidebarMenu = ({
       { 
         id: "rewards", 
         icon: Gift, 
-        label: "🎁 Marketplace Premi", 
+        label: "Marketplace Premi", 
         locked: false 
       },
       { 
