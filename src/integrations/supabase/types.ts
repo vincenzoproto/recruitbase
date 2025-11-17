@@ -346,6 +346,38 @@ export type Database = {
           },
         ]
       }
+      candidate_languages: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          id: string
+          language: string
+          proficiency_level: string
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          id?: string
+          language: string
+          proficiency_level: string
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          id?: string
+          language?: string
+          proficiency_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_languages_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidate_notes: {
         Row: {
           candidate_id: string
@@ -650,6 +682,47 @@ export type Database = {
           weekly_conversion_rate?: number | null
         }
         Relationships: []
+      }
+      education_records: {
+        Row: {
+          additional_courses: string[] | null
+          candidate_id: string
+          created_at: string | null
+          degree_title: string
+          graduation_year: number | null
+          id: string
+          institution: string
+          updated_at: string | null
+        }
+        Insert: {
+          additional_courses?: string[] | null
+          candidate_id: string
+          created_at?: string | null
+          degree_title: string
+          graduation_year?: number | null
+          id?: string
+          institution: string
+          updated_at?: string | null
+        }
+        Update: {
+          additional_courses?: string[] | null
+          candidate_id?: string
+          created_at?: string | null
+          degree_title?: string
+          graduation_year?: number | null
+          id?: string
+          institution?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "education_records_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       favorites: {
         Row: {
@@ -1310,15 +1383,20 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          ai_matching_vector: Json | null
           availability: string | null
+          availability_days: number | null
           avatar_url: string | null
           bio: string | null
           city: string | null
           company_size: string | null
+          contract_type_preference: string[] | null
           core_values: string[] | null
           created_at: string | null
           cv_url: string | null
           degree_title: string | null
+          desired_roles: string[] | null
           education: string | null
           email_verified: boolean | null
           engagement_score: number | null
@@ -1336,8 +1414,16 @@ export type Database = {
           onboarding_completed: boolean | null
           phone_number: string | null
           pipeline_stage_id: string | null
+          portfolio_url: string | null
+          professional_summary: string | null
+          profile_completion_percentage: number | null
           referral_code: string | null
+          relocation_available: boolean | null
+          remote_preference: number | null
           role: Database["public"]["Enums"]["user_role"]
+          salary_max: number | null
+          salary_min: number | null
+          seniority_level: string | null
           skills: string[] | null
           talent_relationship_score: number | null
           trs_last_updated: string | null
@@ -1346,15 +1432,20 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          age?: number | null
+          ai_matching_vector?: Json | null
           availability?: string | null
+          availability_days?: number | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           company_size?: string | null
+          contract_type_preference?: string[] | null
           core_values?: string[] | null
           created_at?: string | null
           cv_url?: string | null
           degree_title?: string | null
+          desired_roles?: string[] | null
           education?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
@@ -1372,8 +1463,16 @@ export type Database = {
           onboarding_completed?: boolean | null
           phone_number?: string | null
           pipeline_stage_id?: string | null
+          portfolio_url?: string | null
+          professional_summary?: string | null
+          profile_completion_percentage?: number | null
           referral_code?: string | null
+          relocation_available?: boolean | null
+          remote_preference?: number | null
           role: Database["public"]["Enums"]["user_role"]
+          salary_max?: number | null
+          salary_min?: number | null
+          seniority_level?: string | null
           skills?: string[] | null
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
@@ -1382,15 +1481,20 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          age?: number | null
+          ai_matching_vector?: Json | null
           availability?: string | null
+          availability_days?: number | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           company_size?: string | null
+          contract_type_preference?: string[] | null
           core_values?: string[] | null
           created_at?: string | null
           cv_url?: string | null
           degree_title?: string | null
+          desired_roles?: string[] | null
           education?: string | null
           email_verified?: boolean | null
           engagement_score?: number | null
@@ -1408,8 +1512,16 @@ export type Database = {
           onboarding_completed?: boolean | null
           phone_number?: string | null
           pipeline_stage_id?: string | null
+          portfolio_url?: string | null
+          professional_summary?: string | null
+          profile_completion_percentage?: number | null
           referral_code?: string | null
+          relocation_available?: boolean | null
+          remote_preference?: number | null
           role?: Database["public"]["Enums"]["user_role"]
+          salary_max?: number | null
+          salary_min?: number | null
+          seniority_level?: string | null
           skills?: string[] | null
           talent_relationship_score?: number | null
           trs_last_updated?: string | null
@@ -1803,6 +1915,56 @@ export type Database = {
         }
         Relationships: []
       }
+      work_experiences: {
+        Row: {
+          achievements: string[] | null
+          candidate_id: string
+          company_name: string
+          created_at: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          job_title: string
+          responsibilities: string | null
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          achievements?: string[] | null
+          candidate_id: string
+          company_name: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          job_title: string
+          responsibilities?: string | null
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          achievements?: string[] | null
+          candidate_id?: string
+          company_name?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          job_title?: string
+          responsibilities?: string | null
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_experiences_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1838,6 +2000,10 @@ export type Database = {
       }
       calculate_priority_score: {
         Args: { p_candidate_id: string; p_recruiter_id: string }
+        Returns: number
+      }
+      calculate_profile_completion: {
+        Args: { p_profile_id: string }
         Returns: number
       }
       calculate_smart_match_score: {
