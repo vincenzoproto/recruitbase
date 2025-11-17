@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { DailyAIMatch } from "@/components/match/DailyAIMatch";
+import { TopCandidatesToContact } from "@/components/match/TopCandidatesToContact";
 
 interface PremiumHomeDashboardProps {
   userId: string;
@@ -284,6 +286,12 @@ export const PremiumHomeDashboard = ({ userId, onNavigate }: PremiumHomeDashboar
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* AI Match widgets - Full width */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <DailyAIMatch recruiterId={userId} />
+        <TopCandidatesToContact recruiterId={userId} />
       </div>
     </div>
   );

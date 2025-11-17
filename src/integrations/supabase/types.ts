@@ -2040,6 +2040,25 @@ export type Database = {
         Returns: Json
       }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
+      get_matches_for_job: {
+        Args: { p_job_offer_id: string; p_min_completion?: number }
+        Returns: {
+          availability_days: number
+          avatar_url: string
+          candidate_id: string
+          city: string
+          full_name: string
+          job_title: string
+          match_score: number
+          pipeline_stage_id: string
+          salary_max: number
+          salary_min: number
+          seniority_level: string
+          skills: string[]
+          talent_relationship_score: number
+          years_experience: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
