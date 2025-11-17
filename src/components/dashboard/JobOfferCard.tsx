@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2, Edit, Trash2, Power, Users } from "lucide-react";
+import { MapPin, Briefcase, TrendingUp, Calendar, CheckCircle2, Edit, Trash2, Power, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EditJobDialog from "./EditJobDialog";
 import { JobApplicationsDialog } from "./JobApplicationsDialog";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ const experienceLevelLabels: Record<string, string> = {
 };
 
 const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUpdate, onOpenChat, onOpenCandidateDetail }: JobOfferCardProps) => {
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [applicationsOpen, setApplicationsOpen] = useState(false);
@@ -166,14 +168,26 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setApplicationsOpen(true);
+                  navigate(`/ai-match/${job.id}`);
                 }}
                 size="sm"
                 variant="default"
+                className="w-full bg-gradient-to-r from-primary to-primary/80"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Vedi AI Match
+              </Button>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setApplicationsOpen(true);
+                }}
+                size="sm"
+                variant="outline"
                 className="w-full"
               >
                 <Users className="h-4 w-4 mr-2" />
-                Vedi Candidature ({applicationsCount})
+                Candidature ({applicationsCount})
               </Button>
               <div className="flex gap-2">
                 <Button 

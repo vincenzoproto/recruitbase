@@ -24,6 +24,7 @@ import { ActionLimitBanner } from "@/components/premium/ActionLimitBanner";
 import { ProfileCompletionBar } from "@/components/profile/ProfileCompletionBar";
 import { CompleteProfileWizard } from "@/components/profile/CompleteProfileWizard";
 import { useProfileCompletion } from "@/hooks/useProfileCompletion";
+import { useProfileNotifications } from "@/hooks/useProfileNotifications";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -42,6 +43,9 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   const { unreadCount } = useMessageNotifications(profile.id);
   const { stats, loading: gamificationLoading } = useGamification(profile.id);
   const { percentage, items, loading: completionLoading, refresh } = useProfileCompletion(profile.id);
+  
+  // Enable profile notifications
+  useProfileNotifications({ userId: profile.id, role: profile.role });
 
   const cultureFitScore = calculateCultureFit(profile);
 
