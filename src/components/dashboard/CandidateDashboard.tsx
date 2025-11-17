@@ -21,6 +21,9 @@ import { GamificationCard } from "@/components/gamification/GamificationCard";
 import { QuickMissions } from "@/components/gamification/QuickMissions";
 import { useGamification } from "@/hooks/useGamification";
 import { ActionLimitBanner } from "@/components/premium/ActionLimitBanner";
+import { ProfileCompletionBar } from "@/components/profile/ProfileCompletionBar";
+import { CompleteProfileWizard } from "@/components/profile/CompleteProfileWizard";
+import { useProfileCompletion } from "@/hooks/useProfileCompletion";
 
 interface CandidateDashboardProps {
   profile: any;
@@ -30,6 +33,7 @@ interface CandidateDashboardProps {
 const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProps) => {
   const navigate = useNavigate();
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showProfileWizard, setShowProfileWizard] = useState(false);
   const isMobile = useIsMobile();
   const [meetingDialogOpen, setMeetingDialogOpen] = useState(false);
   const [chatUserId, setChatUserId] = useState<string | null>(null);
@@ -37,6 +41,7 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { unreadCount } = useMessageNotifications(profile.id);
   const { stats, loading: gamificationLoading } = useGamification(profile.id);
+  const { percentage, items, loading: completionLoading, refresh } = useProfileCompletion(profile.id);
 
   const cultureFitScore = calculateCultureFit(profile);
 
@@ -100,6 +105,14 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <ActionLimitBanner userId={profile.id} />
+
+        {!completionLoading && (
+          <ProfileCompletionBar
+            percentage={percentage}
+            items={items}
+            onOpenWizard={() => setShowProfileWizard(true)}
+          />
+        )}
 
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between mb-4">
@@ -166,6 +179,16 @@ const CandidateDashboard = ({ profile, onUpdateProfile }: CandidateDashboardProp
         onOpenChange={setShowEditProfile}
         profile={profile}
         onSuccess={() => window.location.reload()}
+      />
+
+      <CompleteProfileWizard
+        open={showProfileWizard}
+        onClose={() => setShowProfileWizard(false)}
+        userId={profile.id}
+        onComplete={() => {
+          refresh();
+          if (onUpdateProfile) onUpdateProfile();
+        }}
       />
     </div>
   );

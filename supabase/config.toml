@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.send-scheduled-followup]
 verify_jwt = false
+
+[functions.calculate-candidate-vector]
+verify_jwt = false
