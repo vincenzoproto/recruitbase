@@ -337,6 +337,82 @@ export type Database = {
           },
         ]
       }
+      candidate_rankings: {
+        Row: {
+          application_id: string | null
+          candidate_id: string
+          created_at: string | null
+          cv_relevance_score: number | null
+          experience_score: number | null
+          id: string
+          job_offer_id: string
+          job_title_score: number | null
+          last_calculated: string | null
+          location_score: number | null
+          match_reasons: Json | null
+          profile_completeness_score: number | null
+          response_quality_score: number | null
+          skills_match_score: number | null
+          smart_match_score: number
+        }
+        Insert: {
+          application_id?: string | null
+          candidate_id: string
+          created_at?: string | null
+          cv_relevance_score?: number | null
+          experience_score?: number | null
+          id?: string
+          job_offer_id: string
+          job_title_score?: number | null
+          last_calculated?: string | null
+          location_score?: number | null
+          match_reasons?: Json | null
+          profile_completeness_score?: number | null
+          response_quality_score?: number | null
+          skills_match_score?: number | null
+          smart_match_score?: number
+        }
+        Update: {
+          application_id?: string | null
+          candidate_id?: string
+          created_at?: string | null
+          cv_relevance_score?: number | null
+          experience_score?: number | null
+          id?: string
+          job_offer_id?: string
+          job_title_score?: number | null
+          last_calculated?: string | null
+          location_score?: number | null
+          match_reasons?: Json | null
+          profile_completeness_score?: number | null
+          response_quality_score?: number | null
+          skills_match_score?: number | null
+          smart_match_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_rankings_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_rankings_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_rankings_job_offer_id_fkey"
+            columns: ["job_offer_id"]
+            isOneToOne: false
+            referencedRelation: "job_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidate_tags: {
         Row: {
           candidate_id: string
@@ -1604,6 +1680,10 @@ export type Database = {
       }
       calculate_priority_score: {
         Args: { p_candidate_id: string; p_recruiter_id: string }
+        Returns: number
+      }
+      calculate_smart_match_score: {
+        Args: { p_candidate_id: string; p_job_offer_id: string }
         Returns: number
       }
       calculate_trs: {
