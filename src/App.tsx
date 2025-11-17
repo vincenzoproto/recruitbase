@@ -45,6 +45,7 @@ const MyOffers = lazy(() => import("./pages/MyOffers"));
 const SavedOffers = lazy(() => import("./pages/SavedOffers"));
 const ProfileComplete = lazy(() => import("./pages/ProfileComplete"));
 const Rewards = lazy(() => import("./pages/Rewards"));
+const CandidateRanking = lazy(() => import("./pages/CandidateRanking"));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center">
@@ -97,6 +98,7 @@ const App = () => (
       <Route path="/e-learning" element={<ELearning />} />
       <Route path="/applications" element={<Applications />} />
       <Route path="/rewards" element={<Rewards />} />
+      <Route path="/candidate-ranking" element={<CandidateRanking />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

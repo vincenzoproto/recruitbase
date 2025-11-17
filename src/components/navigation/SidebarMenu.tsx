@@ -26,7 +26,8 @@ import {
   UserPlus,
   Compass,
   Search,
-  GraduationCap
+  GraduationCap,
+  Target
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { PremiumUpgradePopup } from "@/components/premium/PremiumUpgradePopup";
@@ -143,6 +144,12 @@ export const SidebarMenu = ({
         id: "calendar", 
         icon: Calendar, 
         label: "Calendario", 
+        locked: false 
+      },
+      { 
+        id: "candidate-ranking", 
+        icon: Target, 
+        label: "AI Candidate Ranking", 
         locked: false 
       },
       { 
