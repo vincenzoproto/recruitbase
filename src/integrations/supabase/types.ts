@@ -207,6 +207,54 @@ export type Database = {
           },
         ]
       }
+      automation_logs: {
+        Row: {
+          action_type: string
+          candidate_id: string | null
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          id: string
+          recruiter_id: string
+          status: string
+        }
+        Insert: {
+          action_type: string
+          candidate_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          recruiter_id: string
+          status: string
+        }
+        Update: {
+          action_type?: string
+          candidate_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          recruiter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_logs_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_logs_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       biometric_credentials: {
         Row: {
           counter: number | null
@@ -638,6 +686,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      follow_up_templates: {
+        Row: {
+          ai_prompt: string
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          template_text: string
+        }
+        Insert: {
+          ai_prompt: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          template_text: string
+        }
+        Update: {
+          ai_prompt?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          template_text?: string
+        }
+        Relationships: []
       }
       follow_ups: {
         Row: {
@@ -1529,6 +1610,83 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_messages: {
+        Row: {
+          candidate_id: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          job_offer_id: string | null
+          message_content: string
+          pipeline_stage: string | null
+          recruiter_id: string
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          job_offer_id?: string | null
+          message_content: string
+          pipeline_stage?: string | null
+          recruiter_id: string
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          job_offer_id?: string | null
+          message_content?: string
+          pipeline_stage?: string | null
+          recruiter_id?: string
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_messages_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_messages_job_offer_id_fkey"
+            columns: ["job_offer_id"]
+            isOneToOne: false
+            referencedRelation: "job_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_messages_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_messages_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "follow_up_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -1697,6 +1855,10 @@ export type Database = {
           days_since_contact: number
           full_name: string
         }[]
+      }
+      check_duplicate_followup: {
+        Args: { p_candidate_id: string; p_recruiter_id: string }
+        Returns: boolean
       }
       check_rate_limit: {
         Args: {
