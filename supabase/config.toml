@@ -2,3 +2,12 @@ project_id = "uaqgkyvacumtnftnuody"
 
 [functions.ai-message-suggest]
 verify_jwt = false
+
+[functions.generate-match-reasons]
+verify_jwt = false
+
+[functions.generate-followup-message]
+verify_jwt = false
+
+[functions.send-scheduled-followup]
+verify_jwt = false
