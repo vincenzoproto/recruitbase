@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Clock, Send, Zap, CheckCircle, X, Users } from "lucide-react";
-import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -13,354 +15,386 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface ScheduledFollowUp {
-  id: string;
-  candidate_id: string;
-  candidate_name: string;
-  scheduled_date: string;
-  template_name: string;
-  status: string;
-}
-
-const TEMPLATES = {
-  gentle_reminder: {
-    name: "Promemoria Gentile",
-    message: "Ciao {name}! Solo un veloce promemoria per la nostra ultima conversazione. Hai avuto modo di pensarci? Resto a disposizione per qualsiasi chiarimento.",
-    delay_days: 3,
-  },
-  status_update: {
-    name: "Aggiornamento Stato",
-    message: "Buongiorno {name}, volevo aggiornarti sullo stato della tua candidatura. Ci sono novità interessanti. Quando possiamo fare una call?",
-    delay_days: 7,
-  },
-  urgent_response: {
-    name: "Risposta Urgente",
-    message: "Ciao {name}, ho bisogno di una tua conferma entro domani per procedere. Puoi farmi sapere?",
-    delay_days: 1,
-  },
-  friendly_checkin: {
-    name: "Check-in Amichevole",
-    message: "Ciao {name}! Come va? Volevo sapere se hai novità o domande sulla posizione. Sono qui per aiutarti!",
-    delay_days: 5,
-  },
-  final_call: {
-    name: "Ultimo Tentativo",
-    message: "Ciao {name}, questa è l'ultima occasione per questa opportunità. Se sei ancora interessato, rispondimi entro 48h. Altrimenti procederò con altri candidati.",
-    delay_days: 2,
-  },
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Zap, Send, Clock, Check, AlertCircle, Sparkles } from "lucide-react";
+import { useAutoFollowUp, type CandidateForFollowUp } from "@/hooks/useAutoFollowUp";
+import { toast } from "sonner";
 
 export const AutoFollowUpPanel = ({ recruiterId }: { recruiterId: string }) => {
-  const [scheduled, setScheduled] = useState<ScheduledFollowUp[]>([]);
-  const [candidates, setCandidates] = useState<any[]>([]);
-  const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [generatedMessage, setGeneratedMessage] = useState<string>("");
+  const [scheduleType, setScheduleType] = useState<"immediate" | "hours" | "datetime">("immediate");
+  const [hoursDelay, setHoursDelay] = useState<number>(24);
+  const [scheduledDateTime, setScheduledDateTime] = useState<string>("");
+  const [showPreview, setShowPreview] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentCandidate, setCurrentCandidate] = useState<CandidateForFollowUp | null>(null);
 
-  useEffect(() => {
-    loadCandidates();
-    loadScheduled();
-  }, [recruiterId]);
+  const { templates, candidates, loading, scheduledCount, generateMessage, scheduleMessage, refresh } = useAutoFollowUp(recruiterId);
 
-  const loadCandidates = async () => {
-    try {
-      // Load candidates from interactions
-      const { data: interactions } = await supabase
-        .from("interactions")
-        .select(`
-          candidate_id,
-          profiles!interactions_candidate_id_fkey(id, full_name)
-        `)
-        .eq("recruiter_id", recruiterId);
-
-      if (interactions) {
-        const uniqueCandidates = Array.from(
-          new Map(interactions.map((i: any) => [i.profiles.id, i.profiles])).values()
-        );
-        setCandidates(uniqueCandidates as any[]);
-      }
-    } catch (error) {
-      console.error("Error loading candidates:", error);
+  const handleSelectAll = () => {
+    if (selectedCandidates.size === candidates.length) {
+      setSelectedCandidates(new Set());
+    } else {
+      setSelectedCandidates(new Set(candidates.map(c => c.id)));
     }
   };
 
-  const loadScheduled = async () => {
-    try {
-      const { data } = await supabase
-        .from("follow_ups")
-        .select(`
-          id,
-          candidate_id,
-          followup_due,
-          followup_message,
-          followup_sent,
-          profiles!follow_ups_candidate_id_fkey(full_name)
-        `)
-        .eq("recruiter_id", recruiterId)
-        .eq("followup_sent", false)
-        .not("followup_due", "is", null)
-        .order("followup_due");
-
-      if (data) {
-        setScheduled(
-          data.map((f: any) => ({
-            id: f.id,
-            candidate_id: f.candidate_id,
-            candidate_name: f.profiles.full_name,
-            scheduled_date: f.followup_due,
-            template_name: "Programmato",
-            status: "pending",
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Error loading scheduled:", error);
+  const handleToggleCandidate = (candidateId: string) => {
+    const newSet = new Set(selectedCandidates);
+    if (newSet.has(candidateId)) {
+      newSet.delete(candidateId);
+    } else {
+      newSet.add(candidateId);
     }
+    setSelectedCandidates(newSet);
   };
 
-  const scheduleFollowUp = async () => {
-    if (selectedCandidates.length === 0 || !selectedTemplate) {
-      toast.error("Seleziona almeno un candidato e un template");
+  const handleGeneratePreview = async () => {
+    if (!selectedTemplate || selectedCandidates.size === 0) {
+      toast.error('Seleziona un template e almeno un candidato');
       return;
     }
 
-    setLoading(true);
-    try {
-      const template = TEMPLATES[selectedTemplate as keyof typeof TEMPLATES];
-      const scheduledDate = new Date();
-      scheduledDate.setDate(scheduledDate.getDate() + template.delay_days);
+    const candidatesWithoutEmail = candidates.filter(c => 
+      selectedCandidates.has(c.id) && !c.email
+    );
 
-      for (const candidateId of selectedCandidates) {
-        const candidate = candidates.find((c) => c.id === candidateId);
-        const message = template.message.replace("{name}", candidate?.full_name || "");
+    if (candidatesWithoutEmail.length > 0) {
+      toast.error(`${candidatesWithoutEmail.length} candidati senza email. Rimuovili dalla selezione.`);
+      return;
+    }
 
-        // Check if follow-up already exists
-        const { data: existing } = await supabase
-          .from("follow_ups")
-          .select("id")
-          .eq("candidate_id", candidateId)
-          .eq("recruiter_id", recruiterId)
-          .maybeSingle();
+    setIsGenerating(true);
+    
+    const firstCandidateId = Array.from(selectedCandidates)[0];
+    const candidate = candidates.find(c => c.id === firstCandidateId);
+    
+    if (!candidate) {
+      setIsGenerating(false);
+      return;
+    }
+    
+    setCurrentCandidate(candidate);
 
-        if (existing) {
-          await supabase
-            .from("follow_ups")
-            .update({
-              followup_due: scheduledDate.toISOString(),
-              followup_message: message,
-              followup_sent: false,
-            })
-            .eq("id", existing.id);
-        } else {
-          await supabase.from("follow_ups").insert({
-            candidate_id: candidateId,
-            recruiter_id: recruiterId,
-            followup_due: scheduledDate.toISOString(),
-            followup_message: message,
-            last_contact: new Date().toISOString(),
-          });
+    const result = await generateMessage(selectedTemplate, firstCandidateId);
+    
+    if (result) {
+      setGeneratedMessage(result.message);
+      setShowPreview(true);
+    }
+    
+    setIsGenerating(false);
+  };
+
+  const handleScheduleFollowUp = async () => {
+    if (!generatedMessage || selectedCandidates.size === 0) {
+      toast.error('Genera prima il messaggio');
+      return;
+    }
+
+    let scheduledDate: Date;
+
+    switch (scheduleType) {
+      case "immediate":
+        scheduledDate = new Date();
+        break;
+      case "hours":
+        scheduledDate = new Date();
+        scheduledDate.setHours(scheduledDate.getHours() + hoursDelay);
+        break;
+      case "datetime":
+        if (!scheduledDateTime) {
+          toast.error('Seleziona una data e ora');
+          return;
         }
-      }
+        scheduledDate = new Date(scheduledDateTime);
+        break;
+    }
 
-      toast.success(`Follow-up programmato per ${selectedCandidates.length} candidati`);
-      loadScheduled();
-      setSelectedCandidates([]);
+    let successCount = 0;
+    
+    for (const candidateId of selectedCandidates) {
+      const success = await scheduleMessage(
+        candidateId,
+        generatedMessage,
+        scheduledDate,
+        selectedTemplate
+      );
+      
+      if (success) successCount++;
+    }
+
+    if (successCount > 0) {
+      toast.success(`${successCount} follow-up programmati!`);
+      setShowPreview(false);
+      setSelectedCandidates(new Set());
+      setGeneratedMessage("");
       setSelectedTemplate("");
-    } catch (error) {
-      console.error("Error scheduling follow-up:", error);
-      toast.error("Errore nella programmazione");
-    } finally {
-      setLoading(false);
+      refresh();
     }
   };
 
-  const sendNow = async (followUpId: string, candidateId: string, candidateName: string) => {
-    try {
-      const { data: followUp } = await supabase
-        .from("follow_ups")
-        .select("followup_message")
-        .eq("id", followUpId)
-        .single();
-
-      if (!followUp) return;
-
-      // Send message
-      await supabase.from("messages").insert({
-        sender_id: recruiterId,
-        receiver_id: candidateId,
-        content: followUp.followup_message,
-      });
-
-      // Mark as sent
-      await supabase
-        .from("follow_ups")
-        .update({ followup_sent: true })
-        .eq("id", followUpId);
-
-      toast.success(`Messaggio inviato a ${candidateName}`);
-      loadScheduled();
-    } catch (error) {
-      console.error("Error sending follow-up:", error);
-      toast.error("Errore nell'invio");
-    }
-  };
-
-  const cancelFollowUp = async (followUpId: string) => {
-    try {
-      await supabase
-        .from("follow_ups")
-        .update({ followup_due: null, followup_message: null })
-        .eq("id", followUpId);
-
-      toast.success("Follow-up cancellato");
-      loadScheduled();
-    } catch (error) {
-      console.error("Error canceling follow-up:", error);
-      toast.error("Errore nella cancellazione");
-    }
-  };
+  if (loading) {
+    return (
+      <Card className="p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Quick Setup */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Follow-up Automatico ⚡
-          </CardTitle>
-          <CardDescription>
-            Imposta messaggi automatici con 1 click. Niente più dimenticanze!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Seleziona Candidati</p>
-              <Badge variant="secondary">
-                <Users className="h-3 w-3 mr-1" />
-                {selectedCandidates.length} selezionati
-              </Badge>
-            </div>
-            
-            <div className="max-h-[200px] overflow-y-auto space-y-2 border rounded-lg p-2">
-              {candidates.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">Nessun candidato trovato</p>
-              ) : (
-                candidates.map((candidate) => (
-                  <div
-                    key={candidate.id}
-                    className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 cursor-pointer"
-                    onClick={() => {
-                      setSelectedCandidates((prev) =>
-                        prev.includes(candidate.id)
-                          ? prev.filter((id) => id !== candidate.id)
-                          : [...prev, candidate.id]
-                      );
-                    }}
-                  >
-                    <Checkbox
-                      checked={selectedCandidates.includes(candidate.id)}
-                      onCheckedChange={() => {
-                        setSelectedCandidates((prev) =>
-                          prev.includes(candidate.id)
-                            ? prev.filter((id) => id !== candidate.id)
-                            : [...prev, candidate.id]
-                        );
-                      }}
-                    />
-                    <span className="text-sm flex-1">{candidate.full_name}</span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleziona template" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TEMPLATES).map(([key, template]) => (
-                  <SelectItem key={key} value={key}>
-                    {template.name} • {template.delay_days} giorni
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <>
+      <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="p-3 bg-primary/10 rounded-lg">
+            <Zap className="h-6 w-6 text-primary animate-pulse" />
           </div>
-
-          {selectedTemplate && selectedCandidates.length > 0 && (
-            <div className="p-3 rounded-lg bg-accent/50 text-sm">
-              <p className="font-medium mb-1">Anteprima messaggio:</p>
-              <p className="text-muted-foreground">
-                {TEMPLATES[selectedTemplate as keyof typeof TEMPLATES].message.replace(
-                  "{name}",
-                  selectedCandidates.length === 1
-                    ? candidates.find((c) => c.id === selectedCandidates[0])?.full_name || "Candidato"
-                    : `${selectedCandidates.length} candidati`
-                )}
-              </p>
-            </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold mb-1">Follow-up Automatico</h3>
+            <p className="text-sm text-muted-foreground">
+              Ricontatta i candidati con messaggi AI personalizzati
+            </p>
+          </div>
+          {scheduledCount > 0 && (
+            <Badge variant="secondary" className="gap-1">
+              <Clock className="h-3 w-3" />
+              {scheduledCount} programmati
+            </Badge>
           )}
+        </div>
 
-          <Button
-            className="w-full"
-            onClick={scheduleFollowUp}
-            disabled={selectedCandidates.length === 0 || !selectedTemplate || loading}
-          >
-            <Clock className="h-4 w-4 mr-2" />
-            Programma per {selectedCandidates.length} candidat{selectedCandidates.length === 1 ? 'o' : 'i'}
-          </Button>
-        </CardContent>
+        {candidates.length === 0 ? (
+          <div className="text-center py-12 px-6 bg-background/50 rounded-lg border-2 border-dashed">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h4 className="text-lg font-medium mb-2">Nessun candidato in pipeline</h4>
+            <p className="text-sm text-muted-foreground mb-4">
+              Sposta qualcuno nella pipeline per programmare follow-up automatici.
+            </p>
+            <Button variant="outline" onClick={refresh}>
+              Aggiorna
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-2">Seleziona Template AI</Label>
+              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Scegli un template..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        <div>
+                          <div className="font-medium">{template.name}</div>
+                          <div className="text-xs text-muted-foreground">{template.description}</div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label>Candidati ({selectedCandidates.size}/{candidates.length})</Label>
+                <Button variant="ghost" size="sm" onClick={handleSelectAll}>
+                  {selectedCandidates.size === candidates.length ? 'Deseleziona tutti' : 'Seleziona tutti'}
+                </Button>
+              </div>
+              
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {candidates.map((candidate) => (
+                  <Card
+                    key={candidate.id}
+                    className={`p-3 cursor-pointer transition-all hover:shadow-md ${
+                      selectedCandidates.has(candidate.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                    }`}
+                    onClick={() => handleToggleCandidate(candidate.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedCandidates.has(candidate.id)}
+                        onCheckedChange={() => handleToggleCandidate(candidate.id)}
+                      />
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={candidate.avatar_url} />
+                        <AvatarFallback>
+                          {candidate.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{candidate.full_name}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{candidate.email || 'No email'}</span>
+                          {!candidate.email && (
+                            <Badge variant="destructive" className="h-4 text-xs px-1">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              No email
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-1 text-xs">
+                          {candidate.pipelineStageName}
+                        </Badge>
+                        {candidate.jobOfferTitle && (
+                          <p className="text-xs text-muted-foreground truncate max-w-32">
+                            {candidate.jobOfferTitle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              onClick={handleGeneratePreview}
+              className="w-full"
+              size="lg"
+              disabled={!selectedTemplate || selectedCandidates.size === 0 || isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  Generazione in corso...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Genera e Programma Follow-up
+                </>
+              )}
+            </Button>
+          </div>
+        )}
       </Card>
 
-      {/* Scheduled List */}
-      {scheduled.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Follow-up Programmati</CardTitle>
-            <CardDescription>{scheduled.length} messaggi in coda</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {scheduled.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{item.candidate_name}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <Clock className="h-3 w-3" />
-                    {new Date(item.scheduled_date).toLocaleString("it-IT", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => sendNow(item.id, item.candidate_id, item.candidate_name)}
-                  >
-                    <Send className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => cancelFollowUp(item.id)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5 text-primary" />
+              Anteprima e Programmazione
+            </DialogTitle>
+            <DialogDescription>
+              Rivedi il messaggio generato dall'AI e scegli quando inviarlo
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {currentCandidate && (
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-sm font-medium mb-1">Destinatario:</p>
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentCandidate.avatar_url} />
+                    <AvatarFallback>
+                      {currentCandidate.full_name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium">{currentCandidate.full_name}</span>
+                  {selectedCandidates.size > 1 && (
+                    <Badge variant="outline" className="ml-auto">
+                      +{selectedCandidates.size - 1} altri
+                    </Badge>
+                  )}
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            )}
+
+            <div>
+              <Label className="mb-2">Messaggio Generato (modificabile)</Label>
+              <Textarea
+                value={generatedMessage}
+                onChange={(e) => setGeneratedMessage(e.target.value)}
+                rows={8}
+                className="resize-none"
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Quando inviare?</Label>
+              <Select value={scheduleType} onValueChange={(value: any) => setScheduleType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="immediate">
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      Immediatamente
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="hours">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Dopo X ore
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="datetime">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Data e ora specifica
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              {scheduleType === "hours" && (
+                <div className="mt-2">
+                  <Input
+                    type="number"
+                    min="1"
+                    value={hoursDelay}
+                    onChange={(e) => setHoursDelay(parseInt(e.target.value) || 1)}
+                    placeholder="Ore di ritardo"
+                  />
+                </div>
+              )}
+
+              {scheduleType === "datetime" && (
+                <div className="mt-2">
+                  <Input
+                    type="datetime-local"
+                    value={scheduledDateTime}
+                    onChange={(e) => setScheduledDateTime(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPreview(false)}>
+              Annulla
+            </Button>
+            <Button onClick={handleScheduleFollowUp}>
+              <Check className="h-4 w-4 mr-2" />
+              Programma Follow-up
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
