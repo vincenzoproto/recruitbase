@@ -1,34 +1,41 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Zap, Brain, ArrowRight, CheckCircle } from "lucide-react";
+import { Heart, Zap, Brain, ArrowRight, CheckCircle, Sparkles, Target, TrendingUp, Users, Award, Star } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
-      {/* Header - iOS Style */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/95 border-b border-border/40">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-semibold text-lg">RB</span>
+    <div className="min-h-screen bg-gradient-to-br from-background via-violet/5 to-fuchsia/10 overflow-hidden">
+      {/* Geometric Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 right-10 w-96 h-96 bg-violet/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 left-10 w-80 h-80 bg-fuchsia/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-neon-purple/10 rounded-full blur-3xl animate-pulse" />
+      </div>
+
+      {/* Header - Modern Sticky */}
+      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-background/80 border-b border-violet/20 shadow-lg">
+        <div className="container mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 group">
+            <div className="w-12 h-12 bg-gradient-to-br from-violet to-fuchsia rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300">
+              <span className="text-white font-bold text-xl">RB</span>
             </div>
-            <span className="font-semibold text-xl tracking-tight text-foreground">
+            <span className="font-bold text-2xl tracking-tight bg-gradient-to-r from-violet to-fuchsia bg-clip-text text-transparent">
               Recruit Base
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               onClick={() => navigate("/auth")} 
-              className="font-medium hidden sm:inline-flex rounded-xl hover:bg-accent/50 transition-all duration-200"
+              className="font-semibold hidden sm:inline-flex rounded-2xl hover:bg-violet/10 transition-all duration-300 hover:scale-105"
             >
               Accedi
             </Button>
             <Button 
               onClick={() => navigate("/auth")} 
-              className="font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 bg-primary hover:bg-primary/90"
+              className="font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-r from-violet to-fuchsia hover:scale-105 animate-glow-pulse"
             >
               Inizia Gratis
             </Button>
@@ -36,163 +43,194 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - iOS Minimal Style */}
-      <section className="container mx-auto px-4 sm:px-6 py-16 md:py-28">
-        <div className="max-w-4xl mx-auto text-center space-y-10 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/8 rounded-full border border-primary/15">
-            <span className="text-sm font-medium text-primary">🚀 Il TRM che semplifica la vita ai Recruiter</span>
+      {/* Hero Section - Ultra Impact */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 md:py-32 relative">
+        <div className="max-w-5xl mx-auto text-center space-y-12 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-6 py-3 glass-card animate-scale-in">
+            <Sparkles className="h-5 w-5 text-neon-purple animate-pulse" />
+            <span className="text-sm font-bold bg-gradient-to-r from-violet to-fuchsia bg-clip-text text-transparent">
+              🚀 Il TRM che semplifica la vita ai Recruiter
+            </span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
             Candidature, Match e Follow-up
             <br />
-            <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-violet via-fuchsia to-neon-pink bg-clip-text text-transparent animate-glow">
               Gestiti in modo intelligente
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
-            Velocità di selezione 10×, AI che scrive messaggi, match basati su valori
+          <p className="text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
+            Velocità di selezione <span className="font-bold text-violet">10×</span>, AI che scrive messaggi, match basati su valori
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <Button 
               size="lg" 
               onClick={() => navigate("/auth")}
-              className="text-base px-10 h-14 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 font-semibold group bg-primary hover:bg-primary/90"
+              className="text-lg px-12 h-16 rounded-3xl shadow-2xl transition-all duration-300 font-bold group bg-gradient-to-r from-violet via-fuchsia to-violet animate-glow-pulse"
             >
               Inizia ora (gratis 30 giorni)
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+              <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
             </Button>
             <Button 
               size="lg" 
               variant="outline"
               onClick={() => navigate("/demo")}
-              className="text-base px-10 h-14 rounded-2xl font-semibold border-border/60 hover:border-border hover:bg-accent/50 transition-all duration-200"
+              className="text-lg px-12 h-16 rounded-3xl font-bold border-2 border-violet/40 hover:border-violet hover:bg-violet/10 transition-all duration-300 hover:scale-105"
             >
               Prova la Demo Live
             </Button>
           </div>
           
-          {/* Trust Indicators - iOS Minimal */}
-          <div className="flex flex-wrap justify-center gap-8 pt-10 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2.5">
-              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
-                <CheckCircle className="h-3.5 w-3.5 text-success" />
+          <div className="flex flex-wrap justify-center gap-8 pt-12 text-sm">
+            {[
+              { icon: CheckCircle, text: "30 giorni gratis" },
+              { icon: CheckCircle, text: "Nessuna carta richiesta" },
+              { icon: CheckCircle, text: "Setup in 2 minuti" }
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet to-fuchsia/50 flex items-center justify-center">
+                  <item.icon className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-semibold text-foreground">{item.text}</span>
               </div>
-              <span className="font-medium">30 giorni gratis</span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
-                <CheckCircle className="h-3.5 w-3.5 text-success" />
-              </div>
-              <span className="font-medium">Nessuna carta richiesta</span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <div className="w-5 h-5 rounded-full bg-success/10 flex items-center justify-center">
-                <CheckCircle className="h-3.5 w-3.5 text-success" />
-              </div>
-              <span className="font-medium">Setup in 2 minuti</span>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section - Animated */}
-      <section className="container mx-auto px-4 sm:px-6 py-12 md:py-16 border-y border-border/40 bg-muted/30">
-        <div className="grid grid-cols-3 gap-8 md:gap-12">
-          <div className="text-center space-y-2 animate-fade-in">
-            <div className="text-4xl md:text-5xl font-bold text-primary">500+</div>
-            <div className="text-sm text-muted-foreground font-medium">Recruiter attivi</div>
-          </div>
-          <div className="text-center space-y-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
-            <div className="text-4xl md:text-5xl font-bold text-primary">10K+</div>
-            <div className="text-sm text-muted-foreground font-medium">Candidature gestite</div>
-          </div>
-          <div className="text-center space-y-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="text-4xl md:text-5xl font-bold text-primary">98%</div>
-            <div className="text-sm text-muted-foreground font-medium">Soddisfazione utenti</div>
-          </div>
+      {/* Stats Section */}
+      <section className="container mx-auto px-4 sm:px-6 py-16 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {[
+            { value: "500+", label: "Recruiter attivi" },
+            { value: "10K+", label: "Candidature gestite" },
+            { value: "98%", label: "Soddisfazione utenti" }
+          ].map((stat, idx) => (
+            <div key={idx} className="neon-card p-8 text-center space-y-3 hover:scale-105 transition-all duration-500 animate-fade-in group" style={{ animationDelay: `${idx * 100}ms` }}>
+              <div className="text-5xl md:text-6xl font-black bg-gradient-to-br from-violet via-fuchsia to-neon-pink bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
+                {stat.value}
+              </div>
+              <div className="text-base font-semibold text-muted-foreground">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Value Props - iOS Card Style */}
-      <section className="container mx-auto px-4 sm:px-6 py-20 md:py-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {/* Velocità */}
-          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
-            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
-              <Zap className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold tracking-tight">Velocità 10×</h3>
-            <p className="text-muted-foreground leading-relaxed text-[15px]">
-              Gestisci candidature con swipe, aggiorna stati in 1 tap, pianifica colloqui istantaneamente
-            </p>
-          </div>
+      {/* Value Props */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 md:py-32 relative">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-5xl md:text-6xl font-black tracking-tight">
+            <span className="bg-gradient-to-r from-violet to-fuchsia bg-clip-text text-transparent">Perché scegliere</span>
+            <br />Recruit Base
+          </h2>
+        </div>
 
-          {/* AI */}
-          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
-            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
-              <Brain className="h-7 w-7 text-primary" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {[
+            { icon: Zap, title: "Velocità 10×", description: "Gestisci candidature con swipe, aggiorna stati in 1 tap, pianifica colloqui istantaneamente", gradient: "from-violet to-fuchsia" },
+            { icon: Brain, title: "AI che scrive per te", description: "Follow-up automatici, messaggi ottimizzati, insight su chi contattare per primo", gradient: "from-fuchsia to-neon-pink" },
+            { icon: Heart, title: "Match su valori reali", description: "Algoritmo TRS™ che valuta relazioni autentiche, non solo competenze tecniche", gradient: "from-neon-pink to-violet" }
+          ].map((prop, idx) => (
+            <div key={idx} className="glass-card p-8 space-y-6 hover:scale-105 hover:shadow-2xl transition-all duration-500 group animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
+              <div className={`w-16 h-16 bg-gradient-to-br ${prop.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <prop.icon className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold tracking-tight">{prop.title}</h3>
+              <p className="text-muted-foreground leading-relaxed text-base">{prop.description}</p>
             </div>
-            <h3 className="text-xl font-semibold tracking-tight">AI che scrive per te</h3>
-            <p className="text-muted-foreground leading-relaxed text-[15px]">
-              Follow-up automatici, messaggi ottimizzati, insight su chi contattare per primo
-            </p>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          {/* Values */}
-          <div className="minimal-card text-center space-y-5 p-8 bg-card hover:shadow-md transition-all duration-300 group">
-            <div className="mx-auto w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200">
-              <Heart className="h-7 w-7 text-primary" />
+      {/* How It Works */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 md:py-32 bg-gradient-to-b from-violet/5 to-transparent">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-5xl md:text-6xl font-black tracking-tight">
+            Come <span className="bg-gradient-to-r from-violet to-fuchsia bg-clip-text text-transparent">funziona</span>
+          </h2>
+        </div>
+
+        <div className="max-w-4xl mx-auto space-y-8">
+          {[
+            { step: "01", title: "Crea il tuo account", desc: "Setup in 2 minuti, senza carta di credito", icon: Target },
+            { step: "02", title: "Carica le candidature", desc: "Import automatico o manuale, AI che analizza i CV", icon: TrendingUp },
+            { step: "03", title: "Match intelligenti", desc: "L'AI trova i candidati perfetti per le tue posizioni", icon: Award }
+          ].map((step, idx) => (
+            <div key={idx} className="neon-card p-8 flex items-center gap-8 hover:scale-[1.02] transition-all duration-500 animate-fade-in group" style={{ animationDelay: `${idx * 100}ms` }}>
+              <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-violet to-fuchsia rounded-2xl flex items-center justify-center font-black text-3xl text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                {step.step}
+              </div>
+              <div className="flex-1 space-y-2">
+                <h3 className="text-2xl font-bold">{step.title}</h3>
+                <p className="text-muted-foreground text-lg">{step.desc}</p>
+              </div>
+              <step.icon className="h-12 w-12 text-violet group-hover:scale-110 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold tracking-tight">Match su valori reali</h3>
-            <p className="text-muted-foreground leading-relaxed text-[15px]">
-              Algoritmo TRS™ che valuta relazioni autentiche, non solo competenze tecniche
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto text-center space-y-8 p-8 md:p-12 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/20 shadow-xl animate-fade-in">
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight">
-            Pronto a gestire candidature
-            <br />
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              in modo intelligente?
-            </span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            30 giorni gratis · Nessuna carta · Setup in 2 minuti
-          </p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/auth")}
-            className="text-base px-10 h-14 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold group"
-          >
-            Inizia ora gratis
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
+      <section className="container mx-auto px-4 py-20 md:py-32">
+        <div className="max-w-5xl mx-auto text-center space-y-10 p-12 md:p-16 rounded-[3rem] relative overflow-hidden animate-fade-in">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet via-fuchsia to-neon-purple opacity-90" />
+          <div className="relative z-10 space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black leading-tight text-white">
+              Pronto a gestire candidature<br />in modo intelligente?
+            </h2>
+            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-light">
+              30 giorni gratis · Nessuna carta · Setup in 2 minuti
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/auth")}
+              className="text-lg px-12 h-16 rounded-3xl shadow-2xl transition-all duration-300 font-bold group bg-white text-violet hover:scale-110"
+            >
+              Inizia ora gratis
+              <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">RB</span>
+      <footer className="border-t border-violet/20 bg-gradient-to-b from-background to-violet/5 backdrop-blur-xl">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-violet to-fuchsia rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold">RB</span>
+                </div>
+                <span className="font-bold text-xl bg-gradient-to-r from-violet to-fuchsia bg-clip-text text-transparent">Recruit Base</span>
               </div>
-              <span className="text-sm text-muted-foreground">© 2024 Recruit Base</span>
             </div>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <button className="hover:text-foreground transition-colors">Privacy</button>
-              <button className="hover:text-foreground transition-colors">Termini</button>
-              <button className="hover:text-foreground transition-colors">Contatti</button>
+            <div className="space-y-3">
+              <h4 className="font-bold text-foreground">Prodotto</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button className="block hover:text-violet transition-colors">Funzionalità</button>
+                <button className="block hover:text-violet transition-colors">Demo</button>
+              </div>
             </div>
+            <div className="space-y-3">
+              <h4 className="font-bold text-foreground">Azienda</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button className="block hover:text-violet transition-colors">Chi siamo</button>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h4 className="font-bold text-foreground">Legale</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button className="block hover:text-violet transition-colors">Privacy</button>
+                <button className="block hover:text-violet transition-colors">Termini</button>
+              </div>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-violet/20 text-center">
+            <p className="text-sm text-muted-foreground">© 2024 Recruit Base. Tutti i diritti riservati.</p>
           </div>
         </div>
       </footer>
