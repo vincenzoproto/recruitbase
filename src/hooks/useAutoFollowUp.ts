@@ -105,15 +105,16 @@ export const useAutoFollowUp = (recruiterId: string) => {
             .limit(1)
             .single();
 
-          // Get user email from auth
-          const { data: authUser } = await supabase.auth.admin.getUserById(candidate.id);
+          // Get candidate email from profiles or use a placeholder
+          // Note: In production, emails should be stored in profiles table
+          const email = candidate.phone_number || `candidate_${candidate.id.substring(0, 8)}@temp.com`;
 
           return {
             ...candidate,
             pipelineStageName: stage?.name || 'Non assegnato',
             lastMessageDate: lastMessage?.created_at,
             jobOfferTitle: application?.job_offers?.title,
-            email: authUser?.user?.email || candidate.phone_number || ''
+            email
           };
         })
       );
