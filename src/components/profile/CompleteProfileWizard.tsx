@@ -127,11 +127,29 @@ export const CompleteProfileWizard = ({ open, onClose, userId, onComplete }: Com
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Completa il tuo Profilo</DialogTitle>
-          <div className="space-y-2">
-            <Progress value={progress} />
-            <p className="text-sm text-muted-foreground">
-              Step {step + 1} di {steps.length}: {steps[step]}
+          <DialogTitle className="text-2xl font-bold">Completa il tuo Profilo</DialogTitle>
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              {steps.map((stepName, index) => (
+                <div key={index} className="flex flex-col items-center gap-1 flex-1">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    index < step ? "bg-success text-white scale-110" :
+                    index === step ? "bg-primary text-white scale-125 shadow-lg" :
+                    "bg-muted text-muted-foreground"
+                  }`}>
+                    {index + 1}
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`h-0.5 w-full transition-all duration-300 ${
+                      index < step ? "bg-success" : "bg-muted"
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+            <Progress value={progress} className="h-2" />
+            <p className="text-sm text-muted-foreground font-medium text-center">
+              {steps[step]}
             </p>
           </div>
         </DialogHeader>

@@ -100,7 +100,7 @@ const Index = () => {
 
       {/* Stats Section - Animated */}
       <section className="container mx-auto px-4 sm:px-6 py-12 md:py-16 border-y border-border/40 bg-muted/30">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-3 gap-8 md:gap-12">
           <div className="text-center space-y-2 animate-fade-in">
             <div className="text-4xl md:text-5xl font-bold text-primary">500+</div>
             <div className="text-sm text-muted-foreground font-medium">Recruiter attivi</div>
@@ -112,10 +112,6 @@ const Index = () => {
           <div className="text-center space-y-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div className="text-4xl md:text-5xl font-bold text-primary">98%</div>
             <div className="text-sm text-muted-foreground font-medium">Soddisfazione utenti</div>
-          </div>
-          <div className="text-center space-y-2 animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <div className="text-4xl md:text-5xl font-bold text-primary">72h</div>
-            <div className="text-sm text-muted-foreground font-medium">Tempo medio di hiring</div>
           </div>
         </div>
       </section>
