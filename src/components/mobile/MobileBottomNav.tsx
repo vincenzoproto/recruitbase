@@ -48,25 +48,25 @@ export const MobileBottomNav = ({
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full gap-1 smooth-transition ${
+              className={`relative flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-300 ease-out ${
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <div className={`relative smooth-transition ${isActive ? "scale-110 -translate-y-0.5" : ""}`}>
+              <div className={`relative transition-all duration-300 ease-out ${isActive ? "scale-125 -translate-y-1" : "hover:scale-110"}`}>
                 <Icon className="h-6 w-6" />
                 {showBadge && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg animate-scale-in">
                     {badgeCount > 9 ? "9+" : badgeCount}
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] font-medium smooth-transition ${isActive ? "font-bold" : ""}`}>
+              <span className={`text-[10px] font-medium transition-all duration-200 ${isActive ? "font-bold scale-105" : ""}`}>
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-t-full animate-scale-in" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-primary rounded-t-full animate-scale-in shadow-lg" />
               )}
             </button>
           );

@@ -115,34 +115,36 @@ const JobOfferCard = ({ job, onApply, hasApplied, isCandidate, isRecruiter, onUp
   return (
     <>
     <Card 
-      className="hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in border-border/50 cursor-pointer"
+      className="hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] animate-fade-in border-border/50 cursor-pointer group overflow-hidden relative"
       onClick={() => setDetailsOpen(true)}
     >
-      <CardHeader className="pb-3">
+      {/* Subtle gradient effect on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <CardHeader className="pb-3 relative z-10">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-xl">{job.title}</CardTitle>
+            <CardTitle className="text-xl transition-colors group-hover:text-primary">{job.title}</CardTitle>
             <CardDescription className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
+              <MapPin className="h-4 w-4 transition-transform group-hover:scale-110" />
               {job.city}
             </CardDescription>
           </div>
-          {job.is_active && <Badge variant="default">Attiva</Badge>}
+          {job.is_active && <Badge variant="default" className="shadow-md">Attiva</Badge>}
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 relative z-10">
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="flex items-center gap-1">
+          <Badge variant="secondary" className="flex items-center gap-1 transition-all hover:scale-105">
             <Briefcase className="h-3 w-3" />
             {job.sector}
           </Badge>
-          <Badge variant="outline" className="flex items-center gap-1">
+          <Badge variant="outline" className="flex items-center gap-1 transition-all hover:scale-105">
             <TrendingUp className="h-3 w-3" />
             {experienceLevelLabels[job.experience_level] || job.experience_level}
           </Badge>
         </div>
 
-        <p className="text-sm text-muted-foreground line-clamp-3">{job.description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{job.description}</p>
 
         <div className="space-y-2 pt-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">

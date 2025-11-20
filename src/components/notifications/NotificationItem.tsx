@@ -85,8 +85,8 @@ export const NotificationItem = memo(({
     <div
       onClick={handleClick}
       onTouchStart={handleSwipeLeft}
-      className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-        notification.read ? "bg-background" : "bg-muted/50"
+      className={`p-4 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5 animate-fade-in ${
+        notification.read ? "bg-background" : "bg-muted/50 border border-primary/10"
       }`}
     >
       <div className="flex items-start gap-3">
