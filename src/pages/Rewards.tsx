@@ -29,7 +29,7 @@ const Rewards = () => {
     loadUser();
   }, []);
 
-  const { stats } = useGamification(userId);
+  const { stats } = require("@/hooks/useUnifiedGamification").useUnifiedGamification(userId);
 
   const handleClaim = async (rewardId: string) => {
     setClaiming(true);
