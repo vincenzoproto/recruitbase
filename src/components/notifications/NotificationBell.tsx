@@ -111,27 +111,54 @@ export const NotificationBell = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="end">
-        <div className="border-b p-4 flex items-center justify-between">
-          <h3 className="font-semibold">Notifiche</h3>
+        <div className="border-b p-4 flex items-center justify-between bg-muted/30">
+          <div>
+            <h3 className="font-semibold">Notifiche</h3>
+            {unreadCount > 0 && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {unreadCount} {unreadCount === 1 ? 'non letta' : 'non lette'}
+              </p>
+            )}
+          </div>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={markAllAsRead}
-              className="text-xs"
+              className="text-xs h-8"
             >
-              Segna tutte come lette
+              Segna tutte
             </Button>
           )}
         </div>
         <ScrollArea className="h-96">
           {loading ? (
-            <div className="p-8 text-center text-muted-foreground">
-              Caricamento...
+            <div className="p-8 text-center space-y-3">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="text-sm text-muted-foreground">Caricamento notifiche...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              Nessuna notifica
+            <div className="p-8 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <Bell className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium">Nessuna notifica</p>
+                <p className="text-sm text-muted-foreground">
+                  Ti avviseremo quando ci saranno novità
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setOpen(false);
+                  navigate('/dashboard');
+                }}
+                className="mt-4"
+              >
+                Torna alla Dashboard
+              </Button>
             </div>
           ) : (
             <div className="divide-y">
