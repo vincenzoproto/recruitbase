@@ -173,9 +173,22 @@ const Dashboard = () => {
   if (isLoadingFromCache || (isLoadingProfile && !cachedProfile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Caricamento...</p>
+        <div className="text-center space-y-6 animate-fade-in max-w-md mx-auto px-4">
+          <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="space-y-2">
+            <p className="text-xl font-semibold text-foreground">Preparazione dashboard</p>
+            <p className="text-sm text-muted-foreground">
+              Stiamo caricando i tuoi dati e preparando l'esperienza personalizzata...
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+            <span>Verifica profilo</span>
+            <div className="w-2 h-2 rounded-full bg-primary/50 animate-pulse" style={{ animationDelay: '200ms' }}></div>
+            <span>Caricamento dati</span>
+            <div className="w-2 h-2 rounded-full bg-primary/30 animate-pulse" style={{ animationDelay: '400ms' }}></div>
+            <span>Pronto</span>
+          </div>
         </div>
       </div>
     );
@@ -190,9 +203,14 @@ const Dashboard = () => {
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg text-muted-foreground">Caricamento...</p>
+        <div className="text-center space-y-6 animate-fade-in max-w-md mx-auto px-4">
+          <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="space-y-2">
+            <p className="text-xl font-semibold text-foreground">Finalizzazione accesso</p>
+            <p className="text-sm text-muted-foreground">
+              Ultimo controllo prima di mostrarti la tua dashboard personalizzata...
+            </p>
+          </div>
         </div>
       </div>
     );
