@@ -210,7 +210,7 @@ const Auth = () => {
             <Briefcase className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Recruit Base
+            Pausilio
           </CardTitle>
           <CardDescription className="text-base">Connetti recruiter e candidati in modo semplice</CardDescription>
         </CardHeader>

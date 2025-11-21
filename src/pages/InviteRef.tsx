@@ -90,7 +90,7 @@ const InviteRef = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Sei stato invitato! 🎉</h1>
-                <p className="text-lg opacity-90">{ambassadorName} ti ha invitato su Recruit Base</p>
+                <p className="text-lg opacity-90">{ambassadorName} ti ha invitato su Pausilio</p>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@ const InviteRef = () => {
                 Offerta Speciale Premium
               </h2>
               <p className="text-lg text-muted-foreground">
-                Ottieni <strong className="text-foreground">30 giorni GRATIS</strong> di Recruit Base Premium!
+                Ottieni <strong className="text-foreground">30 giorni GRATIS</strong> di Pausilio Premium!
               </p>
             </div>
 
@@ -144,7 +144,7 @@ const InviteRef = () => {
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Briefcase className="h-4 w-4" />
-              <span>Unisciti a centinaia di recruiter e candidati su Recruit Base</span>
+              <span>Unisciti a centinaia di recruiter e candidati su Pausilio</span>
             </div>
           </CardContent>
         </Card>

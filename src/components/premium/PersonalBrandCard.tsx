@@ -39,8 +39,8 @@ export const PersonalBrandCard = ({ profile }: PersonalBrandCardProps) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${profile.full_name} - Recruit Base`,
-          text: `Scopri il mio profilo su Recruit Base TRM`,
+          title: `${profile.full_name} - Pausilio`,
+          text: `Scopri il mio profilo su Pausilio TRM`,
           url: profileUrl,
         });
       } catch (error) {

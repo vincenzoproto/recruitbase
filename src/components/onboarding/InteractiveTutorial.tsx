@@ -22,7 +22,7 @@ export const InteractiveTutorial = ({ open, onComplete, userRole }: InteractiveT
 
   const recruiterSteps: TutorialStep[] = [
     {
-      title: "Benvenuto in RecruitBase! 👋",
+      title: "Benvenuto in Pausilio! 👋",
       description: "Ti mostrerò le funzioni principali in 30 secondi. Pronto?",
       icon: "🚀",
     },
@@ -60,7 +60,7 @@ export const InteractiveTutorial = ({ open, onComplete, userRole }: InteractiveT
 
   const candidateSteps: TutorialStep[] = [
     {
-      title: "Benvenuto su RecruitBase! 👋",
+      title: "Benvenuto su Pausilio! 👋",
       description: "Ti guido attraverso le funzioni principali in 30 secondi.",
       icon: "🚀",
     },

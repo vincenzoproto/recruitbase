@@ -66,7 +66,7 @@ export const TRSInfoPopup = ({ open, onOpenChange }: TRSInfoPopupProps) => {
 
           <div className="pt-4 border-t">
             <Button onClick={handleGoToLogin} size="lg" className="w-full">
-              Accedi a Recruit Base TRM
+              Accedi a Pausilio TRM
             </Button>
           </div>
         </div>

@@ -11,7 +11,7 @@ interface CachedProfile {
   cached_at: number;
 }
 
-const CACHE_KEY = "recruit_base_profile";
+const CACHE_KEY = "pausilio_profile";
 const CACHE_DURATION = 1000 * 60 * 30; // 30 minuti
 
 export const useAuthCache = () => {

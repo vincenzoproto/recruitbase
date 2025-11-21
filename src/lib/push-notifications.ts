@@ -78,7 +78,7 @@ export const pushNotifications = {
       await registration.showNotification(title, {
         icon: '/logo.png',
         badge: '/logo.png',
-        tag: 'recruit-base-notification',
+        tag: 'pausilio-notification',
         requireInteraction: false,
         ...options
       });

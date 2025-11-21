@@ -28,7 +28,7 @@ export const biometricAuth = {
         publicKey: {
           challenge,
           rp: {
-            name: "Recruit Base TRM",
+            name: "Pausilio TRM",
             id: window.location.hostname,
           },
           user: {

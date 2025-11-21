@@ -121,7 +121,7 @@ const Admin = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Recruit Base Pro</p>
+              <p className="text-sm text-muted-foreground">Pausilio Pro</p>
             </div>
           </div>
           <div className="flex gap-2">

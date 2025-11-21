@@ -139,7 +139,7 @@ const Help = () => {
           <CardContent className="space-y-3">
             <Button variant="outline" className="w-full justify-start">
               <Mail className="w-4 h-4 mr-2" />
-              support@recruitbase.com
+              support@pausilio.com
             </Button>
             <Button variant="outline" className="w-full justify-start">
               <Phone className="w-4 h-4 mr-2" />

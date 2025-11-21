@@ -19,7 +19,7 @@ interface ShareMenuProps {
 export const ShareMenu = ({ postId, content, className, onShare }: ShareMenuProps) => {
   const [copied, setCopied] = useState(false);
   const shareUrl = `${window.location.origin}/post/${postId}`;
-  const shareText = content ? content.slice(0, 100) : "Guarda questo post su RecruitBase";
+  const shareText = content ? content.slice(0, 100) : "Guarda questo post su Pausilio";
 
   const handleCopyLink = async () => {
     try {
@@ -68,7 +68,7 @@ export const ShareMenu = ({ postId, content, className, onShare }: ShareMenuProp
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'RecruitBase',
+          title: 'Pausilio',
           text: shareText,
           url: shareUrl,
         });

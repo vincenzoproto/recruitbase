@@ -11,7 +11,7 @@ const UnifiedTopBar = () => {
     <header className="fixed top-0 left-0 right-0 h-14 px-4 bg-background border-b border-border flex items-center justify-between z-50">
       
       <h1 className="font-semibold text-lg">
-        {role === "candidate" ? "RecruitBase" : "RecruitBase HR"}
+        {role === "candidate" ? "Pausilio" : "Pausilio HR"}
       </h1>
 
       <div className="flex items-center gap-2">

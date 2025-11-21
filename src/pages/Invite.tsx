@@ -69,7 +69,7 @@ const Invite = () => {
             <CardDescription>Il link di invito non è valido o è scaduto</CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">Puoi comunque registrarti su Recruit Base!</p>
+            <p className="text-muted-foreground">Puoi comunque registrarti su Pausilio!</p>
             <Button onClick={() => navigate("/auth")} size="lg" className="w-full">
               Vai alla Registrazione
             </Button>
@@ -87,7 +87,7 @@ const Invite = () => {
             <Gift className="h-10 w-10 text-white" />
           </div>
           <div>
-            <CardTitle className="text-3xl mb-2">Sei stato invitato su Recruit Base! 🎉</CardTitle>
+            <CardTitle className="text-3xl mb-2">Sei stato invitato su Pausilio! 🎉</CardTitle>
             <CardDescription className="text-lg">
               <strong className="text-primary">{ambassadorName}</strong> ti invita a provare la migliore piattaforma per recruiter
             </CardDescription>

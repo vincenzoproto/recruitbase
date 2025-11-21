@@ -28,7 +28,7 @@ const Privacy = () => {
             
             <h2 className="text-xl font-semibold mt-6 mb-3">1. Raccolta dei Dati</h2>
             <p>
-              Recruit Base raccoglie i seguenti dati personali per fornire i servizi della piattaforma:
+              Pausilio raccoglie i seguenti dati personali per fornire i servizi della piattaforma:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Nome completo, email e informazioni di contatto</li>
@@ -82,8 +82,8 @@ const Privacy = () => {
             <h2 className="text-xl font-semibold mt-6 mb-3">7. Contatti</h2>
             <p>
               Per esercitare i tuoi diritti o per domande sulla privacy, contattaci a:{" "}
-              <a href="mailto:privacy@recruitbase.com" className="text-primary hover:underline">
-                privacy@recruitbase.com
+              <a href="mailto:privacy@pausilio.com" className="text-primary hover:underline">
+                privacy@pausilio.com
               </a>
             </p>
           </CardContent>

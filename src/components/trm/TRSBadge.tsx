@@ -9,7 +9,7 @@ interface TRSBadgeProps {
 }
 
 const TRSBadge = ({ score, showTrend = false, trend = 0, size = "md" }: TRSBadgeProps) => {
-  // Recruit Base TRS proprietary algorithm visualization
+  // Pausilio TRS proprietary algorithm visualization
   const getColor = (score: number) => {
     if (score >= 70) return { bg: "bg-green-500", text: "text-green-700", light: "bg-green-50" };
     if (score >= 40) return { bg: "bg-yellow-500", text: "text-yellow-700", light: "bg-yellow-50" };
@@ -57,7 +57,7 @@ const TRSBadge = ({ score, showTrend = false, trend = 0, size = "md" }: TRSBadge
               Misura proprietaria che valuta la qualità e la vitalità della relazione tra te e questo talento.
             </p>
             <p className="text-xs italic text-muted-foreground mt-2">
-              Proprietary Metric by Recruit Base
+              Proprietary Metric by Pausilio
             </p>
           </div>
         </TooltipContent>
