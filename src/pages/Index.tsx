@@ -14,30 +14,35 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
       </div>
 
-      {/* Header - Fast & Sleek */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/90 border-b border-primary/10 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigate("/")}>
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
-              <Zap className="w-5 h-5 text-white" strokeWidth={2.5} />
+      {/* Header - Premium & Fast */}
+      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-background/95 border-b border-primary/20 shadow-lg shadow-primary/5">
+        <div className="container mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate("/")}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/30 rounded-xl blur-md group-hover:blur-lg transition-all duration-300 group-hover:bg-primary/40" />
+              <div className="relative w-11 h-11 bg-gradient-to-br from-primary via-primary/90 to-primary/80 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <Zap className="w-6 h-6 text-white drop-shadow-lg" strokeWidth={2.5} />
+              </div>
             </div>
-            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
               Pausilio
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               onClick={() => navigate("/auth")} 
-              className="font-semibold hidden sm:inline-flex rounded-xl hover:bg-primary/10 transition-all duration-200"
+              className="font-semibold hidden sm:inline-flex rounded-xl hover:bg-primary/10 hover:scale-105 transition-all duration-300 relative overflow-hidden group"
             >
-              Accedi
+              <span className="relative z-10">Accedi</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Button>
             <Button 
               onClick={() => navigate("/auth")} 
-              className="font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-primary to-primary/90 hover:scale-105"
+              className="font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:scale-110 hover:from-primary/90 hover:via-primary hover:to-primary relative overflow-hidden group"
             >
-              Inizia Gratis
+              <span className="relative z-10">Inizia Gratis</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
             </Button>
           </div>
         </div>
@@ -65,22 +70,26 @@ const Index = () => {
             Velocità di selezione <span className="font-bold text-primary">10×</span>, AI che scrive messaggi, match basati su valori
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Button 
               size="lg" 
               onClick={() => navigate("/auth")}
-              className="text-base px-10 h-14 rounded-xl shadow-lg transition-all duration-200 font-bold group bg-gradient-to-r from-primary to-primary/90 hover:shadow-xl hover:scale-105"
+              className="text-base px-12 h-16 rounded-2xl shadow-2xl transition-all duration-300 font-black group bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)] hover:scale-110 relative overflow-hidden"
             >
-              Inizia ora (gratis 30 giorni)
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+              <span className="relative z-10 flex items-center gap-2">
+                Inizia ora (gratis 30 giorni)
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Button>
             <Button 
               size="lg" 
               variant="outline"
               onClick={() => navigate("/demo")}
-              className="text-base px-10 h-14 rounded-xl font-bold border-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-200"
+              className="text-base px-12 h-16 rounded-2xl font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 hover:scale-105 transition-all duration-300 backdrop-blur-sm relative overflow-hidden group"
             >
-              Prova la Demo Live
+              <span className="relative z-10">Prova la Demo Live</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Button>
           </div>
           
@@ -131,18 +140,24 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
             { icon: Zap, title: "Velocità 10×", description: "Gestisci candidature con swipe, aggiorna stati in 1 tap, pianifica colloqui istantaneamente", gradient: "from-primary to-primary/80" },
             { icon: Sparkles, title: "AI che scrive per te", description: "Follow-up automatici, messaggi ottimizzati, insight su chi contattare per primo", gradient: "from-primary/90 to-primary/70" },
             { icon: Shield, title: "Match su valori reali", description: "Algoritmo TRS™ che valuta relazioni autentiche, non solo competenze tecniche", gradient: "from-primary/80 to-primary" }
           ].map((prop, idx) => (
-            <div key={idx} className="glass-card p-6 space-y-4 hover:scale-105 hover:shadow-xl transition-all duration-300 group animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
-              <div className={`w-14 h-14 bg-gradient-to-br ${prop.gradient} rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-200`}>
-                <prop.icon className="h-7 w-7 text-white" />
+            <div key={idx} className="relative group animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
+              <div className="relative glass-card p-8 space-y-5 hover:scale-105 hover:shadow-2xl transition-all duration-500 border border-primary/10 group-hover:border-primary/30">
+                <div className="relative">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${prop.gradient} rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300`} />
+                  <div className={`relative w-16 h-16 bg-gradient-to-br ${prop.gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                    <prop.icon className="h-8 w-8 text-white drop-shadow-lg" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-black tracking-tight group-hover:text-primary transition-colors duration-300">{prop.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{prop.description}</p>
               </div>
-              <h3 className="text-xl font-bold tracking-tight">{prop.title}</h3>
-              <p className="text-muted-foreground leading-relaxed text-sm">{prop.description}</p>
             </div>
           ))}
         </div>
@@ -229,44 +244,66 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-primary/10 bg-gradient-to-b from-background to-primary/5 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
+      {/* Footer - Premium */}
+      <footer className="relative border-t border-primary/20 bg-gradient-to-b from-background via-primary/5 to-primary/10 backdrop-blur-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]" />
+        <div className="container mx-auto px-4 py-12 relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="space-y-4 md:col-span-1">
+              <div className="flex items-center gap-3 group cursor-pointer">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/30 rounded-xl blur-md group-hover:blur-lg transition-all duration-300" />
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                    <Zap className="w-5 h-5 text-white drop-shadow-lg" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <span className="font-bold text-lg bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Pausilio</span>
+                <span className="font-black text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Pausilio</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Il TRM che semplifica il recruiting
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Il TRM veloce e intelligente che semplifica il recruiting con attenzione ai dettagli
               </p>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-sm text-foreground">Prodotto</h4>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <button className="block hover:text-primary transition-colors">Funzionalità</button>
-                <button className="block hover:text-primary transition-colors">Demo</button>
+            <div className="space-y-3">
+              <h4 className="font-bold text-sm text-foreground mb-3 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Prodotto
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Funzionalità</button>
+                <button className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Demo</button>
+                <button className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Prezzi</button>
               </div>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-sm text-foreground">Azienda</h4>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <button className="block hover:text-primary transition-colors">Chi siamo</button>
+            <div className="space-y-3">
+              <h4 className="font-bold text-sm text-foreground mb-3 flex items-center gap-2">
+                <Target className="h-4 w-4 text-primary" />
+                Azienda
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Chi siamo</button>
+                <button className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Contatti</button>
               </div>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-sm text-foreground">Legale</h4>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <button className="block hover:text-primary transition-colors">Privacy</button>
-                <button className="block hover:text-primary transition-colors">Termini</button>
+            <div className="space-y-3">
+              <h4 className="font-bold text-sm text-foreground mb-3 flex items-center gap-2">
+                <Shield className="h-4 w-4 text-primary" />
+                Legale
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <button onClick={() => navigate("/privacy")} className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Privacy</button>
+                <button onClick={() => navigate("/terms")} className="block hover:text-primary hover:translate-x-1 transition-all duration-200">Termini</button>
               </div>
             </div>
           </div>
-          <div className="pt-6 border-t border-primary/10 text-center">
-            <p className="text-xs text-muted-foreground">© 2024 Pausilio. Tutti i diritti riservati.</p>
+          <div className="pt-8 border-t border-primary/20 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground">
+              © 2024 Pausilio. Tutti i diritti riservati.
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Made with</span>
+              <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+              <span className="text-xs text-muted-foreground">for Recruiters</span>
+            </div>
           </div>
         </div>
       </footer>

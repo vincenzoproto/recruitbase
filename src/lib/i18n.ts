@@ -21,7 +21,7 @@ export const translations = {
       forgotPassword: "Password dimenticata?",
     },
     onboarding: {
-      welcome: "Benvenuto in Recruit Base",
+      welcome: "Benvenuto in Pausilio",
       skip: "Salta onboarding",
       next: "Avanti",
       start: "Inizia",
@@ -61,7 +61,7 @@ export const translations = {
       savedOffers: "Offerte salvate",
       applications: "Candidature",
     },
-    footer: "RecruitBase™ — Built for Human Connections.",
+    footer: "Pausilio™ — Il TRM veloce e intelligente.",
   },
   en: {
     hero: {
@@ -83,7 +83,7 @@ export const translations = {
       forgotPassword: "Forgot password?",
     },
     onboarding: {
-      welcome: "Welcome to Recruit Base",
+      welcome: "Welcome to Pausilio",
       skip: "Skip onboarding",
       next: "Next",
       start: "Start",
@@ -123,7 +123,7 @@ export const translations = {
       savedOffers: "Saved Offers",
       applications: "Applications",
     },
-    footer: "RecruitBase™ — Built for Human Connections.",
+    footer: "Pausilio™ — Fast and smart TRM.",
   },
 };
 

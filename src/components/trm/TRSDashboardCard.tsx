@@ -122,7 +122,7 @@ const TRSDashboardCard = ({ recruiterId }: TRSDashboardCardProps) => {
           )}
 
           <p className="text-xs text-muted-foreground italic mt-4 border-t pt-3">
-            🔒 Talent Relationship Score™ – Proprietary Metric. Algoritmo esclusivo Recruit Base.
+            🔒 Talent Relationship Score™ – Proprietary Metric. Algoritmo esclusivo Pausilio.
           </p>
         </div>
       </CardContent>

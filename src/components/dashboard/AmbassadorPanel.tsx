@@ -11,7 +11,7 @@ export const AmbassadorPanel = ({ userId }: { userId: string }) => {
 
   const referralLink = useMemo(() => {
     if (!stats?.referralCode) return '';
-    const origin = window.location.origin || "https://recruitbase.lovable.app";
+    const origin = window.location.origin || "https://pausilio.lovable.app";
     return `${origin}/invite/${stats.referralCode}`;
   }, [stats?.referralCode]);
 

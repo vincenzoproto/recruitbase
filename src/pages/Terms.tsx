@@ -28,13 +28,13 @@ const Terms = () => {
             
             <h2 className="text-xl font-semibold mt-6 mb-3">1. Accettazione dei Termini</h2>
             <p>
-              Accedendo e utilizzando Recruit Base, accetti di essere vincolato dai presenti Termini e Condizioni. 
+              Accedendo e utilizzando Pausilio, accetti di essere vincolato dai presenti Termini e Condizioni. 
               Se non accetti questi termini, ti preghiamo di non utilizzare la piattaforma.
             </p>
 
             <h2 className="text-xl font-semibold mt-6 mb-3">2. Descrizione del Servizio</h2>
             <p>
-              Recruit Base è una piattaforma di recruiting che facilita l'incontro tra candidati e recruiter 
+              Pausilio è una piattaforma di recruiting che facilita l'incontro tra candidati e recruiter 
               attraverso tecnologie di matching basate su AI e gestione delle relazioni.
             </p>
 
@@ -58,7 +58,7 @@ const Terms = () => {
 
             <h2 className="text-xl font-semibold mt-6 mb-3">5. Piano di Abbonamento</h2>
             <p>
-              Recruit Base offre diversi piani di abbonamento (Free, Business, Enterprise). 
+              Pausilio offre diversi piani di abbonamento (Free, Business, Enterprise). 
               I dettagli sui prezzi e le funzionalità sono disponibili sulla pagina dei prezzi.
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -70,19 +70,19 @@ const Terms = () => {
             <h2 className="text-xl font-semibold mt-6 mb-3">6. Proprietà Intellettuale</h2>
             <p>
               Tutti i contenuti, il software e i materiali presenti sulla piattaforma sono di proprietà 
-              di Recruit Base o dei suoi licenziatari e sono protetti da copyright e altre leggi sulla 
+              di Pausilio o dei suoi licenziatari e sono protetti da copyright e altre leggi sulla 
               proprietà intellettuale.
             </p>
 
             <h2 className="text-xl font-semibold mt-6 mb-3">7. Contenuti Utente</h2>
             <p>
-              Mantenendo la proprietà dei tuoi contenuti (CV, portfolio, post), concedi a Recruit Base 
+              Mantenendo la proprietà dei tuoi contenuti (CV, portfolio, post), concedi a Pausilio 
               una licenza per utilizzarli al fine di fornire e migliorare i servizi.
             </p>
 
             <h2 className="text-xl font-semibold mt-6 mb-3">8. Limitazione di Responsabilità</h2>
             <p>
-              Recruit Base non è responsabile per:
+              Pausilio non è responsabile per:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>La qualità o l'idoneità dei candidati o delle offerte di lavoro</li>
@@ -105,8 +105,8 @@ const Terms = () => {
             <h2 className="text-xl font-semibold mt-6 mb-3">11. Contatti</h2>
             <p>
               Per domande sui termini di servizio, contattaci a:{" "}
-              <a href="mailto:support@recruitbase.com" className="text-primary hover:underline">
-                support@recruitbase.com
+              <a href="mailto:support@pausilio.com" className="text-primary hover:underline">
+                support@pausilio.com
               </a>
             </p>
           </CardContent>

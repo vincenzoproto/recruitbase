@@ -85,7 +85,7 @@ const GlobalTopBar = () => {
     if (path === "/copilot") return "Copilot";
     if (path === "/profile") return "Profilo";
     if (path === "/notifications") return "Notifiche";
-    return role === "candidate" ? "RecruitBase" : "RecruitBase HR";
+    return role === "candidate" ? "Pausilio" : "Pausilio HR";
   };
 
   const handleNavigate = (section: string) => {

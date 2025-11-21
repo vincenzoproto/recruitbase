@@ -46,7 +46,7 @@ export const PWAInstallPrompt = () => {
               <Download className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">Installa Recruit Base</h3>
+              <h3 className="font-semibold text-lg">Installa Pausilio</h3>
               <p className="text-sm text-muted-foreground">
                 Accesso rapido dalla schermata Home
               </p>

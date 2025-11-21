@@ -45,7 +45,7 @@ const RoleSetup = ({ userId, onComplete }: RoleSetupProps) => {
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             Configura il tuo account
           </CardTitle>
-          <CardDescription className="text-base">Scegli come vuoi utilizzare Recruit Base</CardDescription>
+          <CardDescription className="text-base">Scegli come vuoi utilizzare Pausilio</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <RadioGroup value={selectedRole} onValueChange={(value: any) => setSelectedRole(value)}>

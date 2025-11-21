@@ -25,7 +25,7 @@ export const EnhancedSplashScreen = () => {
         </div>
       </div>
       <h1 className="mt-6 text-3xl font-bold text-foreground animate-fade-in">
-        Recruit Base TRM
+        Pausilio
       </h1>
       <p className="mt-2 text-sm text-muted-foreground animate-fade-in">
         La tua piattaforma HR premium

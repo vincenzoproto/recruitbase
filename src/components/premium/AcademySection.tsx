@@ -71,7 +71,7 @@ export const AcademySection = () => {
             <GraduationCap className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">Recruit Base Academy</h3>
+            <h3 className="font-semibold text-lg">Pausilio Academy</h3>
             <p className="text-sm text-muted-foreground">Migliora le tue skill</p>
           </div>
         </div>
