@@ -121,8 +121,8 @@ export default {
           "50%": { transform: "translateY(-4px)" },
         },
         "glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)" },
-          "50%": { boxShadow: "0 0 40px rgba(217, 70, 239, 0.6)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(59, 130, 246, 0.3)" },
+          "50%": { boxShadow: "0 0 40px rgba(147, 51, 234, 0.4)" },
         },
         "shimmer": {
           "0%": { backgroundPosition: "-1000px 0" },
@@ -134,12 +134,12 @@ export default {
         },
         "glow-pulse": {
           "0%, 100%": { 
-            boxShadow: "0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(217, 70, 239, 0.3)",
+            boxShadow: "0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(147, 51, 234, 0.2)",
             filter: "brightness(1)"
           },
           "50%": { 
-            boxShadow: "0 0 40px rgba(168, 85, 247, 0.8), 0 0 80px rgba(217, 70, 239, 0.5)",
-            filter: "brightness(1.2)"
+            boxShadow: "0 0 40px rgba(59, 130, 246, 0.6), 0 0 80px rgba(147, 51, 234, 0.4)",
+            filter: "brightness(1.1)"
           },
         },
       },

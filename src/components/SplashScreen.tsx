@@ -45,7 +45,7 @@ const SplashScreen = ({ userName, onComplete }: SplashScreenProps) => {
         {/* Brand & Welcome Message */}
         <div className="space-y-3 animate-fade-in">
           <h1 className="text-4xl font-bold text-white tracking-tight">
-            Recruit Base
+            Pausilio
           </h1>
           {userName ? (
             <p className="text-white/90 text-xl font-medium animate-slide-up">
