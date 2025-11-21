@@ -1,7 +1,7 @@
 {
-  "name": "Recruit Base TRM",
-  "short_name": "Recruit Base",
-  "description": "Piattaforma di Talent Relationship Management con AI per recruiter moderni",
+  "name": "Pausilio - TRM Veloce",
+  "short_name": "Pausilio",
+  "description": "Il TRM veloce e intelligente che semplifica il recruiting",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",

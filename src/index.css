@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Recruit Base Design System - LinkedIn Talent / Notion / iOS Inspired */
+/* Pausilio Design System - Fast, Sleek, Detail-Oriented */
 
 /* Custom scrollbar hide for mobile tabs */
 .scrollbar-hide::-webkit-scrollbar {
@@ -16,59 +16,59 @@
 
 @layer base {
   :root {
-    /* Modern Violet/Purple Theme - Light Mode */
+    /* Pausilio Modern Theme - Light Mode */
     --background: 0 0% 100%;
-    --foreground: 270 15% 5%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 270 15% 5%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 270 15% 5%;
-    --primary: 270 91% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 280 60% 50%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 270 20% 96%;
-    --muted-foreground: 270 8% 45%;
-    --accent: 280 100% 70%;
-    --accent-foreground: 270 15% 5%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
     --success: 142 76% 36%;
     --warning: 38 92% 50%;
-    --border: 270 15% 88%;
-    --input: 270 15% 92%;
-    --ring: 270 91% 65%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
     
-    /* Violet Palette */
-    --violet: 270 91% 65%;
-    --violet-light: 270 100% 85%;
-    --violet-dark: 270 80% 45%;
+    /* Brand Colors - Fast & Modern */
+    --violet: 221.2 83.2% 53.3%;
+    --violet-light: 221.2 83.2% 70%;
+    --violet-dark: 221.2 83.2% 40%;
     
-    /* Fuchsia/Pink Accents */
-    --fuchsia: 320 100% 65%;
-    --fuchsia-light: 320 100% 85%;
+    /* Accent Colors */
+    --fuchsia: 280 100% 50%;
+    --fuchsia-light: 280 100% 70%;
     
-    /* Neon Accents */
-    --neon-purple: 270 100% 70%;
-    --neon-pink: 320 100% 70%;
-    --neon-blue: 230 100% 70%;
+    /* Speed & Energy Colors */
+    --neon-purple: 280 100% 60%;
+    --neon-pink: 320 100% 60%;
+    --neon-blue: 200 100% 50%;
     
     --progress-background: hsl(var(--primary));
     --radius: 0.75rem;
     
-    /* Violet Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(320 100% 65%) 100%);
+    /* Gradients - Dynamic & Fast */
+    --gradient-primary: linear-gradient(135deg, hsl(221.2 83.2% 53.3%) 0%, hsl(200 100% 50%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 46%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(270 20% 98%) 100%);
-    --gradient-glass: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%);
-    --gradient-card-overlay: linear-gradient(180deg, rgba(168, 85, 247, 0) 0%, rgba(168, 85, 247, 0.3) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.04) 100%);
+    --gradient-card-overlay: linear-gradient(180deg, rgba(59, 130, 246, 0) 0%, rgba(59, 130, 246, 0.1) 100%);
     
-    /* Neon/Glow Shadows */
-    --shadow-soft: 0 2px 8px rgba(168, 85, 247, 0.1);
-    --shadow-medium: 0 4px 16px rgba(168, 85, 247, 0.15);
-    --shadow-strong: 0 8px 32px rgba(168, 85, 247, 0.25);
-    --shadow-glow-violet: 0 0 30px rgba(168, 85, 247, 0.4);
-    --shadow-glow-fuchsia: 0 0 30px rgba(217, 70, 239, 0.4);
+    /* Modern Shadows */
+    --shadow-soft: 0 2px 8px rgba(59, 130, 246, 0.08);
+    --shadow-medium: 0 4px 16px rgba(59, 130, 246, 0.12);
+    --shadow-strong: 0 8px 32px rgba(59, 130, 246, 0.16);
+    --shadow-glow-violet: 0 0 20px rgba(59, 130, 246, 0.2);
+    --shadow-glow-fuchsia: 0 0 20px rgba(147, 51, 234, 0.2);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 270 15% 5%;
@@ -81,48 +81,48 @@
   }
 
   .dark {
-    --background: 270 30% 8%;
-    --foreground: 270 15% 98%;
-    --card: 270 25% 12%;
-    --card-foreground: 270 15% 98%;
-    --popover: 270 25% 12%;
-    --popover-foreground: 270 15% 98%;
-    --primary: 270 91% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 280 60% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 8% 65%;
-    --accent: 280 100% 70%;
-    --accent-foreground: 270 15% 5%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 270 15% 20%;
-    --input: 270 15% 18%;
-    --ring: 270 91% 65%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
     --success: 142 76% 36%;
     --warning: 38 92% 50%;
     
-    /* Dark mode violet variations */
-    --violet: 270 91% 65%;
-    --violet-light: 270 100% 75%;
-    --violet-dark: 270 80% 35%;
-    --fuchsia: 320 100% 65%;
-    --fuchsia-light: 320 100% 75%;
-    --neon-purple: 270 100% 75%;
-    --neon-pink: 320 100% 75%;
-    --neon-blue: 230 100% 75%;
+    /* Dark mode variations */
+    --violet: 217.2 91.2% 59.8%;
+    --violet-light: 217.2 91.2% 70%;
+    --violet-dark: 217.2 91.2% 40%;
+    --fuchsia: 280 100% 60%;
+    --fuchsia-light: 280 100% 70%;
+    --neon-purple: 280 100% 65%;
+    --neon-pink: 320 100% 65%;
+    --neon-blue: 200 100% 60%;
 
-    --sidebar-background: 270 30% 8%;
-    --sidebar-foreground: 270 15% 98%;
-    --sidebar-primary: 270 91% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 20% 18%;
-    --sidebar-accent-foreground: 270 15% 98%;
-    --sidebar-border: 270 15% 20%;
-    --sidebar-ring: 270 91% 65%;
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217.2 91.2% 59.8%;
+    --sidebar-primary-foreground: 222.2 47.4% 11.2%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 224.3 76.3% 48%;
     
-    --gradient-glass: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(217, 70, 239, 0.08) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
   }
 }
 
@@ -142,42 +142,42 @@
 }
 
 @layer components {
-  /* Premium Card - Violet Theme */
+  /* Premium Card - Pausilio Fast Theme */
   .minimal-card {
-    @apply rounded-3xl border border-violet/20 bg-card shadow-lg backdrop-blur-sm;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply rounded-2xl border border-primary/20 bg-card shadow-lg backdrop-blur-sm;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .minimal-card:hover {
-    @apply shadow-2xl border-violet/40;
-    transform: translateY(-3px);
+    @apply shadow-xl border-primary/40;
+    transform: translateY(-2px);
   }
   
-  /* Glass Card Effect - Enhanced */
+  /* Glass Card Effect - Sleek */
   .glass-card {
-    @apply rounded-3xl border border-violet/30 bg-background/20 shadow-2xl backdrop-blur-2xl;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply rounded-2xl border border-primary/20 bg-background/60 shadow-xl backdrop-blur-xl;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.03) 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Neon Card with Glow */
+  /* Neon Card with subtle Glow */
   .neon-card {
-    @apply rounded-3xl border-2 border-neon-purple/40 bg-card shadow-2xl backdrop-blur-xl;
-    box-shadow: 0 0 30px rgba(168, 85, 247, 0.3), 0 0 60px rgba(217, 70, 239, 0.2);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply rounded-2xl border border-primary/30 bg-card shadow-xl backdrop-blur-lg;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Professional Button with glow */
+  /* Professional Button - Fast & Sleek */
   .pro-button {
-    @apply rounded-2xl px-8 py-4 font-bold transition-all duration-300;
-    @apply shadow-lg hover:shadow-2xl active:scale-95;
-    background: linear-gradient(135deg, hsl(var(--violet)) 0%, hsl(var(--fuchsia)) 100%);
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+    @apply rounded-xl px-6 py-3 font-semibold transition-all duration-200;
+    @apply shadow-md hover:shadow-xl active:scale-95;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--neon-blue)) 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
   }
   
   .pro-button:hover {
-    box-shadow: 0 6px 30px rgba(168, 85, 247, 0.6), 0 0 40px rgba(217, 70, 239, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 0 30px rgba(147, 51, 234, 0.2);
+    transform: translateY(-1px);
   }
   
   .pro-button:active {

@@ -26,7 +26,7 @@ const LinkedInIntegration = () => {
         mode: "no-cors",
         body: JSON.stringify({
           timestamp: new Date().toISOString(),
-          source: "Recruit Base",
+          source: "Pausilio",
           action: "linkedin_search",
         }),
       });
